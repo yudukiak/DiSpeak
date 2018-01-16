@@ -31,13 +31,7 @@ Windows10 64bitで動作確認済み。
 ### その他
 * install
   ```
-  npm i electron
-  ```
-  ```
-  npm i electron-packager
-  ```
-  ```
-  npm i discord.js
+  npm i
   ```
 * run
   ```
