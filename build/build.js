@@ -11,7 +11,7 @@ packager({
   out:       "./dist",
   icon:      "./src/images/icon.ico",
   platform:  "win32",
-  arch:      "x64",
+  arch:      "ia32,x64",
   version:   "1.7.10", // Electronのバージョン
   overwrite: true, // 上書き
   asar:      true, // asarパッケージ化
@@ -29,17 +29,13 @@ packager({
 // 完了時のコールバック
 function (err, appPaths) {
   if (err) console.log(err);
-  console.log(`Create: ${appPaths}`);
   // ファイル削除
   for (var fileName of deletefile){
-    var fileDir = `./dist/DiSpeak-win32-x64/${fileName}`;
-    //fs.unlink(fileDir, function (fsErr) {
-    //  if (fsErr) console.error(fsErr);
-    //  console.log(`Delete: ${fileName}`);
-    //});
-    fs.unlinkSync(fileDir);
+    var fileDir32 = `./dist/DiSpeak-win32-ia32/${fileName}`;
+    var fileDir64 = `./dist/DiSpeak-win32-x64/${fileName}`;
+    fs.unlinkSync(fileDir32);
+    fs.unlinkSync(fileDir64);
     console.log(`Delete: ${fileName}`);
   }
-  fs.renameSync("./dist/DiSpeak-win32-x64", "./dist/DiSpeak");
-  console.log("ReName: ./dist/DiSpeak");
+  console.log(`Create: ${appPaths}`);
 });

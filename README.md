@@ -5,6 +5,8 @@ DiSpeak - でぃすぴーく
 
 ### ダウンロード、インストール
 1. ファイルのダウンロードは[ここから](https://github.com/micelle/dc_DiSpeak/releases)行えます。
+  * 32bit版 **DiSpeak-win32-ia32.zip**
+  * 64bit版 **DiSpeak-win32-x64.zip**
 1. ダウンロード後、適当なフォルダーへ解凍します。
 1. 解凍後**DiSpeak.exe**をクリックすることで、起動できます。
 
