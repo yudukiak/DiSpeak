@@ -1,0 +1,22 @@
+{
+  "name": "DiSpeak",
+  "version": "0.1.0",
+  "description": "Bouyomi speaks the notice of Discord.",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^11.2.1",
+    "electron": "^1.7.10"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micelle/dc_DiSpeak.git"
+  },
+  "author": "micelle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/micelle/dc_DiSpeak/issues"
+  },
+  "homepage": "https://github.com/micelle/dc_DiSpeak#readme"
+}
