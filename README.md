@@ -1,12 +1,16 @@
 DiSpeak - でぃすぴーく
 =====
+Discordのチャット内容を棒読みちゃんで読み上げてくれるツールです。
+Discordを起動していなくても読み上げてくれます。
+
+詳細については[Wiki](https://github.com/micelle/dc_DiSpeak/wiki)をご確認ください。
 
 ## 日本語
 
 ### ダウンロード、インストール
 1. ファイルのダウンロードは[ここから](https://github.com/micelle/dc_DiSpeak/releases)行えます。
-  * 32bit版 **DiSpeak-win32-ia32.zip**
-  * 64bit版 **DiSpeak-win32-x64.zip**
+    * 32bit版 **DiSpeak-win32-ia32.zip**
+    * 64bit版 **DiSpeak-win32-x64.zip**
 1. ダウンロード後、適当なフォルダーへ解凍します。
 1. 解凍後**DiSpeak.exe**をクリックすることで、起動できます。
 
