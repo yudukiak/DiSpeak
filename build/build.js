@@ -1,6 +1,7 @@
 // http://tj.hateblo.jp/entry/2016/05/12/164451
 const packager = require("electron-packager");
 const fs = require("fs");
+const archiver = require("archiver");
 
 const package = require("../src/package.json");
 const deletefile = require("./deletefile.json");
@@ -28,6 +29,7 @@ packager({
 },
 // 完了時のコールバック
 function (err, appPaths) {
+  console.log(`Create: ${appPaths}`);
   if (err) console.log(err);
   // ファイル削除
   for (var fileName of deletefile){
@@ -37,5 +39,16 @@ function (err, appPaths) {
     fs.unlinkSync(fileDir64);
     console.log(`Delete: ${fileName}`);
   }
-  console.log(`Create: ${appPaths}`);
+  var file32 = "DiSpeak-win32-ia32";
+  var file64 = "DiSpeak-win32-x64";
+  createZip(file32);
+  createZip(file64);
 });
+function createZip(filename){
+  var output = fs.createWriteStream(`./dist/${filename}.zip`);
+  var archive = archiver('zip', {zlib:{level:9}});
+  archive.pipe(output);
+  archive.directory(`./dist/${filename}/`, filename);
+  archive.finalize();
+  console.log(`Create: ${filename}.zip`);
+}
