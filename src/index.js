@@ -1,12 +1,17 @@
 "use strct";
 // Electron https://electronjs.org/docs
-const {app, Menu, shell, BrowserWindow, dialog} = require("electron");
+const {app, Menu, shell, BrowserWindow, dialog, ipcMain} = require("electron");
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let infoWindow = null;
 
 // 現在のバージョン
 const package = require("./package.json");
 const nowVersion = package["version"];
+
+// 現在のバージョンを返す
+ipcMain.on("now-version-check", (event) => {
+  event.returnValue = nowVersion;
+})
 
 // APIへアクセス https://maku77.github.io/nodejs/net/request-module.html
 const request = require("request");
@@ -94,7 +99,7 @@ app.on("ready", ()=> {
 function infoWindowOpen(){
   infoWindow = new BrowserWindow({
     width: 320,
-    height: 260,
+    height: 240,
     //useContentSize: true,
     parent: mainWindow,
     "icon": `${__dirname}/images/icon.png`,
