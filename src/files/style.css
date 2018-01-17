@@ -1,0 +1,181 @@
+/* ********************
+  分割
+******************** */
+/* 親 */
+.box-container {
+    display: flex;
+}
+/* 子 */
+.box-contents {
+    width: 50%;
+}
+.box-container .box-contents:last-child {
+    text-align: right;
+}
+
+/* ********************
+  枠組み
+******************** */
+.box-table {
+    border: solid 3px #95ccff;
+    border-radius: 8px;
+    margin: 32px 0;
+    padding: 8px 16px;
+    position: relative;
+}
+.box-title {
+    background: #FFF;
+    color: #95ccff;
+    display: inline-block;
+    font-size: 1.188em;
+    font-weight: bold;
+    left: 10px;
+    line-height: 1;
+    padding: 0 9px;
+    position: absolute;
+    top: -13px;
+}
+.box-table table {
+    width: 100%;
+}
+.box-table table td {
+    padding: 10px;
+    vertical-align: top;
+}
+.box-table table td:first-child {
+    width: 140px;
+}
+
+/* ********************
+  ボタン
+******************** */
+.button {
+    background-color: rgba(149,204,255,1);
+    border: 3px solid rgb(149,204,255);
+    border-radius: 4px;
+    box-sizing: border-box;
+    cursor: pointer;
+    color: #fff;
+    display: inline-block;
+    font-size: 0.75em;
+    padding: 16px 0;
+    position: relative;
+    text-align: center;
+    transition: .6s all;
+    width: 120px;
+}
+.button::before,
+.button::after {
+    box-sizing: border-box;
+}
+.button:hover {
+    background-color: rgba(149,204,255,.0);
+    border: 3px solid rgb(149,204,255);
+    color:  rgba(149,204,255,1);
+}
+.button-disabled {
+    background-color: rgba(146,158,145,1);
+    border: 3px solid rgb(146,158,145);
+}
+.button-disabled:hover {
+    background-color: rgba(146,158,145,.0);
+    border: 3px solid rgb(146,158,145);
+    color: rgba(146,158,145,1);
+}
+
+/* ********************
+  フォーカス
+******************** */
+input[type="text"],
+textarea {
+    border: 1px solid #aaa;
+    outline: none;
+    transition: all .3s;
+    -webkit-transition: all .3s;
+    width: 350px;
+}
+input[type="text"]:focus,
+textarea:focus {
+    border: 1px solid #95ccff;
+    box-shadow: 0 0 7px #95ccff;
+}
+input[type="button"]:focus,
+input[type="radio"]:focus{
+    box-shadow: 0 0 7px #95ccff;
+    outline: none;
+}
+
+/* ********************
+  設定の開閉
+******************** */
+/*チェック隠す*/
+.setting-check {
+    display: none;
+}
+/*中身非表示*/
+.setting-box {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0;
+    transition: 0.8s;
+}
+/*クリックで中身表示*/
+.setting-check:checked + .setting-box {
+    height: auto;
+    opacity: 1;
+}
+
+/* ********************
+  その他
+******************** */
+html {
+    overflow-y: scroll;
+}
+body {
+    color: #333;
+    margin: 32px auto;
+    letter-spacing: 1px;
+    line-height: 1.75;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Helvetica Neue",
+        "Noto Sans Japanese",
+        "ヒラギノ角ゴ ProN W3",
+        Hiragino Kaku Gothic ProN,
+        Arial,
+        Meiryo,
+        sans-serif;
+    font-size: 1em;
+    width: 600px;
+}
+a {
+    color: #C02942;
+    font-weight: bold;
+    text-decoration:none;
+}
+h2 {
+    margin: 0;
+    padding: 0;
+}
+h3 {
+    font-size: 1em;
+    margin: 0;
+}
+h3:first-letter {
+    font-size: 1.5em;
+}
+hr {
+    background-color: #95ccff;
+    border: none;
+    height: 3px;
+}
+p {
+    margin: 0;
+    padding: 0;
+}
+.bouyomi-log,
+.comment {
+    font-size: 0.625em;
+}

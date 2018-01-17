@@ -1,0 +1,23 @@
+{
+  "name": "DiSpeak_build",
+  "version": "1.0.0",
+  "description": "For DiSpeak build.",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^11.2.1",
+    "electron": "^1.7.10",
+    "electron-packager": "^10.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micelle/dc_DiSpeak.git"
+  },
+  "author": "micelle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/micelle/dc_DiSpeak/issues"
+  },
+  "homepage": "https://github.com/micelle/dc_DiSpeak#readme"
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>でぃすぴーく</title>
+  <link rel="stylesheet" type="text/css" href="files/style.css">
+  <link href="https://fonts.googleapis.com/earlyaccess/notosansjapanese.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="box-container">
+    <div class="box-contents">
+      <h2>でぃすぴーく</h2>
+    </div>
+    <div id="bouyomi_status" class="box-contents">
+      <input type="button" class="button" name="bouyomi_start" value="読み上げ開始" onclick="bouyomiStart();">
+      <p class="comment">読み上げは開始していません。</p>
+    </div>
+  </div>
+
+  <div class="box-table">
+    <span class="box-title">ログ</span>
+    <table>
+      <tr>
+        <td id="log" class="bouyomi-log" colspan="2">
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <label for="setting-label" class="button" onclick="bouyomiDisabled();">設定を編集</label>
+  <input type="checkbox" id="setting-label" class="setting-check">
+  <div class="setting-box">
+    <div class="box-table">
+      <span class="box-title">Discord</span>
+      <table>
+        <tr>
+          <td colspan="2"><h3>基本設定</h3></td></tr>
+        <tr>
+          <td>トークン</td>
+          <td>
+            <input type="text" name="d_token">
+            <p class="comment">トークンは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Token_Id" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
+          </td>
+        </tr>
+        <tr>
+          <td>自分のチャット</td>
+          <td>
+            <form id="d_user">
+              <input type="radio" name="d_user" value="0">読む
+              <input type="radio" name="d_user" value="1">読まない
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2"><hr><h3>DM設定</h3></td>
+        </tr>
+        <tr>
+          <td>読み上げ設定</td>
+          <td>
+            <form id="d_dm">
+              <input type="radio" name="d_dm" value="0">読む
+              <input type="radio" name="d_dm" value="1">読まない
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <td>リスト設定</td>
+          <td>
+            <form id="d_dm_list">
+              <input type="radio" name="d_dm_list" value="0">ブラックリストを使う
+              <textarea name="d_dm_list_b" rows="4" placeholder="読み上げないユーザーIDを記載"></textarea>
+              <input type="radio" name="d_dm_list" value="1">ホワイトリストを使う
+              <textarea name="d_dm_list_w" rows="4" placeholder="読み上げるユーザーIDを記載"></textarea>
+            </form>
+            <p class="comment">ユーザーIDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Token_Id" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2"><hr><h3>サーバ設定</h3></td>
+        </tr>
+        <tr>
+          <td>読み上げ設定</td>
+          <td>
+            <form id="d_sv">
+              <input type="radio" name="d_sv" value="0">読む
+              <input type="radio" name="d_sv" value="1">読まない
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <td>ニックネーム</td>
+          <td>
+            <form id="d_sv_nick">
+              <input type="radio" name="d_sv_nick" value="0">読む
+              <input type="radio" name="d_sv_nick" value="1">読まない
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <td>SERVER設定</td>
+          <td>
+            <form id="d_sv_sv_list">
+              <input type="radio" name="d_sv_sv_list" value="0">ブラックリストを使う
+              <textarea name="d_sv_sv_list_b" rows="4" placeholder="読み上げないSERVER IDを記載"></textarea>
+              <input type="radio" name="d_sv_sv_list" value="1">ホワイトリストを使う
+              <textarea name="d_sv_sv_list_w" rows="4" placeholder="読み上げるSERVER IDを記載"></textarea>
+            </form>
+            <p class="comment">SERVER IDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Token_Id" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
+          </td>
+        </tr>
+        <tr>
+          <td>CHANNEL設定</td>
+          <td>
+            <form id="d_sv_ch_list">
+              <input type="radio" name="d_sv_ch_list" value="0">ブラックリストを使う
+              <textarea name="d_sv_ch_list_b" rows="4" placeholder="読み上げないCHANNEL IDを記載"></textarea>
+              <input type="radio" name="d_sv_ch_list" value="1">ホワイトリストを使う
+              <textarea name="d_sv_ch_list_w" rows="4" placeholder="読み上げるCHANNEL IDを記載"></textarea>
+            </form>
+            <p class="comment">CHANNEL IDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Token_Id" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="box-table">
+      <span class="box-title">棒読みちゃん</span>
+      <table>
+        <tr>
+          <td colspan="2"><h3>基本設定</h3></td></tr>
+        <tr>
+          <td>IP</td>
+          <td><input type="text" name="b_ip"></td>
+        </tr>
+        <tr>
+          <td>ポート</td>
+          <td><input type="text" name="b_port"></td>
+        </tr>
+      </table>
+    </div>
+    <div class="box-container">
+      <div class="box-contents">
+        <input type="button" class="button" name="setting_save" value="設定を保存" onclick="writeFile();">
+        <input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">
+      </div>
+      <div class="box-contents"></div>
+    </div>
+    <p id="save_information" class="comment">「設定を保存」したら、必ず「画面を更新」してください。</p>
+  </div>
+
+  <script src="files/setting.js"></script>
+
+</body>
+
+</html>
