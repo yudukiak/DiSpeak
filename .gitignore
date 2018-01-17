@@ -1,5 +1,0 @@
-*.bat
-/dist/
-/node_modules/
-/setting.json
-/package-lock.json
