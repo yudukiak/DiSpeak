@@ -20,6 +20,7 @@ const apiOptions = {
   headers: {"User-Agent": "Awesome-Octocat-App"},
   json: true
 };
+request.get(apiOptions, apiCheck_s);
 function apiCheck_s(err, res, data){if(!err && res.statusCode==200){relCheck(data, "start");}}
 function apiCheck_c(err, res, data){if(!err && res.statusCode==200){relCheck(data, "check");}}
 function relCheck(data, status){
@@ -42,7 +43,11 @@ function relCheck(data, status){
   let relVer_v = relVer.replace(/v/g, "");
   let relName = data.name;
   let relUrl = data.html_url;
-  if(nowVersion != relVer_v){
+  // バージョンチェック
+  let nowVer = arraySplit(nowVersion);
+  let newVer = arraySplit(relVer_v);
+  let result = updateCheck(nowVer, newVer);
+  if(result){
     let mesOptions = {
       type: "warning",
       buttons: ["Yes", "No"],
@@ -64,7 +69,6 @@ function relCheck(data, status){
     dialog.showMessageBox(mesOptions);
   }
 }
-request.get(apiOptions, apiCheck_s);
 
 // 全てのウィンドウが閉じたら終了
 app.on("window-all-closed", () => {
@@ -171,6 +175,26 @@ function initWindowMenu(){
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 }
+
+// バージョンを配列化
+function arraySplit(ver){
+  let verAry = ver.split(".");
+  let verAry_n = [];
+  for(let v of verAry) {
+    let num = Number(v);
+    verAry_n.push(num);
+  }
+  return verAry_n;
+}
+// バージョンの確認
+function updateCheck(nowVer, newVer){
+  let nowMajor=nowVer[0], nowMinor=nowVer[1], nowBuild=nowVer[2],
+    newMajor=newVer[0], newMinor=newVer[1], newBuild=newVer[2];
+  if(newMajor>nowMajor){return true;}else if(newMajor<nowMajor){return false;}else
+  if(newMinor>nowMinor){return true;}else if(newMinor<nowMinor){return false;}else
+  if(newBuild>nowBuild){return true;}else if(newBuild<nowBuild){return false;}else{return false;}
+}
+
 // エラーの処理
 process.on("uncaughtException", (err) => {
   let errStr = String(err);
