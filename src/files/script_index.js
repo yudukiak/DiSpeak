@@ -268,6 +268,7 @@ client.on("message", message => {
   // チャットの内容
   var content = message.content;
   var text = `<${guildName}> ${username} ${content}`;
+  if(content==""){return;}
   // チャットの時間
   var utc  = message.createdTimestamp; // UTC
   var jst  = utc + (60 * 60 * 9); // +9hour
