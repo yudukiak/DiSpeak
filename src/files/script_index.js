@@ -62,8 +62,15 @@ function bouyomiStart(){
     `<p class="comment">${startMess}</p>`;
   logProcess(startTime, startText);
   //client.login(d_token);
+  if(d_token == ""){
+    var tokenText = "Error: The token is not filled in.";
+    console.log(`[token] ${tokenText}`);
+    errorLog(tokenText);
+    return;
+  }
   client.login(d_token).catch(function(error){
-    errorLog(error.message);
+    console.log(`[login] ${error}`);
+    errorLog(error);
   });
 }
 function bouyomiProcess(time, text){
@@ -183,6 +190,14 @@ client.on("ready", () => {
   logProcess(readyTime, readyText);
   bouyomiProcess(readyTime, readyText);
 });
+client.on("reconnecting", () => {
+  var reconnectTime    = new Date();
+  var reconnectMess = "再接続をします。";
+  var reconnectText = `<info> ${readyMess}`;
+  document.querySelector("#bouyomi_status p").textContent = reconnectMess;
+  logProcess(reconnectTime, reconnectText);
+  bouyomiProcess(reconnectTime, reconnectText);
+});
 client.on("message", message => {
   console.log(message);
   // Discord 基本設定
@@ -262,16 +277,36 @@ client.on("message", message => {
   bouyomiProcess(time, text);
 });
 // エラーが起きたときの処理
-process.on("uncaughtException", (error) => {
-  var error = String(error);
-  errorLog(error);
+client.on("debug", (message) => {
+  //console.log(`[debug] ${message}`);
+});
+client.on("error", (message) => {
+  console.log(`[error] ${message}`);
+  errorLog(message);
+});
+client.on("warn", (message) => {
+  console.log(`[warn] ${message}`);
+  errorLog(message);
+});
+process.on("uncaughtException", (message) => {
+  console.log(`[uncaughtException] ${message}`);
+  errorLog(message);
+});
+process.on("unhandledRejection", (message) => {
+  console.log(`[unhandledRejection] ${message}`);
+  errorLog(message);
 });
 // エラーをログへ書き出す
 function errorLog(error){
-  console.log(error);
+  var error = String(error);
   var errorMess = (function(){
-      if(error.match(/Error: connect ECONNREFUSED/)) return "棒読みちゃんが起動していません。";
-      if(error.match(/Incorrect login details were provided/)) return "トークンが間違えています。";
+      if(error.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
+      if(error.match(/Error: connect ECONNREFUSED/)) return "棒読みちゃんが起動していない、もしくは接続できません。";
+      if(error.match(/Error: getaddrinfo ENOTFOUND/)) return "IPが正しくありません。";
+      if(error.match(/RangeError: "port" option should be/)) return "ポートが正しくありません。";
+      if(error.match(/Error: Incorrect login details were provided/)) return "トークンが正しくありません。";
+      if(error.match(/Error: Uncaught, unspecified "error" event/)) return "エラーが発生しました。";
+      if(error.match(/Error: The token is not filled in/)) return "トークンが記入されていません。";
       return error;
     })();
   var errTime = new Date();
