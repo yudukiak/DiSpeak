@@ -193,7 +193,7 @@ client.on("ready", () => {
 client.on("reconnecting", () => {
   var reconnectTime    = new Date();
   var reconnectMess = "再接続をします。";
-  var reconnectText = `<info> ${readyMess}`;
+  var reconnectText = `<info> ${reconnectMess}`;
   document.querySelector("#bouyomi_status p").textContent = reconnectMess;
   logProcess(reconnectTime, reconnectText);
   bouyomiProcess(reconnectTime, reconnectText);
@@ -300,15 +300,16 @@ process.on("unhandledRejection", (message) => {
 function errorLog(error){
   var error = String(error);
   var errorMess = (function(){
-      if(error.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
-      if(error.match(/Error: connect ECONNREFUSED/)) return "棒読みちゃんが起動していない、もしくは接続できません。";
-      if(error.match(/Error: getaddrinfo ENOTFOUND/)) return "IPが正しくありません。";
-      if(error.match(/RangeError: "port" option should be/)) return "ポートが正しくありません。";
-      if(error.match(/Error: Incorrect login details were provided/)) return "トークンが正しくありません。";
-      if(error.match(/Error: Uncaught, unspecified "error" event/)) return "エラーが発生しました。";
-      if(error.match(/Error: The token is not filled in/)) return "トークンが記入されていません。";
-      return error;
-    })();
+    if(error.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
+    if(error.match(/Error: connect ECONNREFUSED/)) return "棒読みちゃんが起動していない、もしくは接続できません。";
+    if(error.match(/Error: getaddrinfo ENOTFOUND/)) return "IPが正しくありません。";
+    if(error.match(/RangeError: "port" option should be/)) return "ポートが正しくありません。";
+    if(error.match(/Error: Incorrect login details were provided/)) return "トークンが正しくありません。";
+    if(error.match(/Error: Uncaught, unspecified "error" event/)) return "エラーが発生しました。";
+    if(error.match(/Error: The token is not filled in/)) return "トークンが記入されていません。";
+    if(error.match(/ReferenceError: ([\s\S]*?) is not defined/)) return `変数 ${error.split(" ")[1]} が定義されていません。@micelle9までご連絡ください。`;
+    return `不明なエラーが発生しました。（${error}）`;
+  })();
   var errTime = new Date();
   var errText = `<error> ${errorMess}`;
   logProcess(errTime, errText);
