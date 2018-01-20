@@ -4,6 +4,10 @@ var client = new Discord.Client();
 var fs = require("fs");
 var fileName = "setting.json";
 var fileName_default = "setting_default.json";
+// 現在のバージョンを取得
+const {ipcRenderer} = require("electron");
+const nowVersion = ipcRenderer.sendSync("now-version-check");
+console.info(`Version ${nowVersion}`);
 // 設定ファイルの読み込み
 readFile();
 // 更新ボタン
