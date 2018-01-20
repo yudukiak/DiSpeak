@@ -268,7 +268,8 @@ client.on("message", message => {
   // チャットの内容
   var content = message.content;
   var text = `<${guildName}> ${username} ${content}`;
-  if(content==""){return;}
+  // 画像オンリー・もしくは追加スタンプ自体を読ませない
+  if(content=="" || content.match(/<:[0-9]*?:[0-9]*?>/)){return;}
   // チャットの時間
   var utc  = message.createdTimestamp; // UTC
   var jst  = utc + (60 * 60 * 9); // +9hour
