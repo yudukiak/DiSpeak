@@ -200,7 +200,7 @@ client.on("reconnecting", () => {
   var reconnectText = `<info> ${reconnectMess}`;
   document.querySelector("#bouyomi_status p").textContent = reconnectMess;
   logProcess(reconnectTime, reconnectText);
-  bouyomiProcess(reconnectTime, reconnectText);
+  //bouyomiProcess(reconnectTime, reconnectText);
 });
 client.on("message", message => {
   console.log(message);
@@ -271,9 +271,11 @@ client.on("message", message => {
   })();
   // チャットの内容
   var content = message.content;
+  // 追加スタンプを読ませない
+  var content = content.replace(/<:[0-9]*?:[0-9]*?>/g, "（スタンプ）");
+  // 画像オンリー、スペースのみを読ませない
+  if(content=="" || /^([\s]+)$/.test(content)){return;}
   var text = `<${guildName}> ${username} ${content}`;
-  // 画像オンリー・もしくは追加スタンプ自体を読ませない
-  if(content=="" || content.match(/<:[0-9]*?:[0-9]*?>/)){return;}
   // チャットの時間
   var utc  = message.createdTimestamp; // UTC
   var jst  = utc + (60 * 60 * 9); // +9hour
@@ -283,9 +285,9 @@ client.on("message", message => {
   bouyomiProcess(time, text);
 });
 // エラーが起きたときの処理
-client.on("debug", (message) => {
-  //console.log(`[debug] ${message}`);
-});
+//client.on("debug", (message) => {
+//  console.log(`[debug] ${message}`);
+//});
 client.on("error", (message) => {
   console.log(`[error] ${message}`);
   errorLog(message);
@@ -304,17 +306,18 @@ process.on("unhandledRejection", (message) => {
 });
 // エラーをログへ書き出す
 function errorLog(error){
-  var error = String(error);
+  var errorStr = String(error);
   var errorMess = (function(){
-    if(error.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
-    if(error.match(/Error: connect ECONNREFUSED/)) return "棒読みちゃんが起動していない、もしくは接続できません。";
-    if(error.match(/Error: getaddrinfo ENOTFOUND/)) return "IPが正しくありません。";
-    if(error.match(/RangeError: "port" option should be/)) return "ポートが正しくありません。";
-    if(error.match(/Error: Incorrect login details were provided/)) return "トークンが正しくありません。";
-    if(error.match(/Error: Uncaught, unspecified "error" event/)) return "エラーが発生しました。";
-    if(error.match(/Error: The token is not filled in/)) return "トークンが記入されていません。";
-    if(error.match(/ReferenceError: ([\s\S]*?) is not defined/)) return `変数 ${error.split(" ")[1]} が定義されていません。@micelle9までご連絡ください。`;
-    return `不明なエラーが発生しました。（${error}）`;
+    if(errorStr.match(/{"isTrusted":true}/)) return "インターネットに接続できません。再接続をします。";
+    if(errorStr.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
+    if(errorStr.match(/Error: connect ECONNREFUSED/)) return "棒読みちゃんが起動していない、もしくは接続できません。";
+    if(errorStr.match(/Error: getaddrinfo ENOTFOUND/)) return "IPが正しくありません。";
+    if(errorStr.match(/RangeError: "port" option should be/)) return "ポートが正しくありません。";
+    if(errorStr.match(/Error: Incorrect login details were provided/)) return "トークンが正しくありません。";
+    if(errorStr.match(/Error: Uncaught, unspecified "error" event/)) return "エラーが発生しました。";
+    if(errorStr.match(/Error: The token is not filled in/)) return "トークンが記入されていません。";
+    if(errorStr.match(/ReferenceError: ([\s\S]*?) is not defined/)) return `変数 ${errorStr.split(" ")[1]} が定義されていません。@micelle9までご連絡ください。`;
+    return `不明なエラーが発生しました。（${errorStr}）`;
   })();
   var errTime = new Date();
   var errText = `<error> ${errorMess}`;
