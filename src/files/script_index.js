@@ -65,16 +65,13 @@ function bouyomiStart(){
     `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
     `<p class="comment">${startMess}</p>`;
   logProcess(startTime, startText);
-  //client.login(d_token);
   if(d_token == ""){
     var tokenText = "Error: The token is not filled in.";
-    console.log(`[token] ${tokenText}`);
-    errorLog(tokenText);
+    errorLog("token", tokenText);
     return;
   }
   client.login(d_token).catch(function(error){
-    console.log(`[login] ${error}`);
-    errorLog(error);
+    errorLog("login", error);
   });
 }
 function bouyomiProcess(time, text){
@@ -203,7 +200,6 @@ client.on("reconnecting", () => {
   //bouyomiProcess(reconnectTime, reconnectText);
 });
 client.on("message", message => {
-  console.log(message);
   // Discord 基本設定
   var d_user         = document.getElementById("d_user").d_user.value;
   // Discord DM設定
@@ -287,29 +283,26 @@ client.on("message", message => {
   // 処理
   logProcess(time, text);
   bouyomiProcess(time, text);
+  debugLog("message", message);
 });
 // エラーが起きたときの処理
 //client.on("debug", (message) => {
-//  console.log(`[debug] ${message}`);
+//  errorLog("debug", message);
 //});
 client.on("error", (message) => {
-  console.log(`[error] ${message}`);
-  errorLog(message);
+  errorLog("error", message);
 });
 client.on("warn", (message) => {
-  console.log(`[warn] ${message}`);
-  errorLog(message);
+  errorLog("warn", message);
 });
 process.on("uncaughtException", (message) => {
-  console.log(`[uncaughtException] ${message}`);
-  errorLog(message);
+  errorLog("uncaughtException", message);
 });
 process.on("unhandledRejection", (message) => {
-  console.log(`[unhandledRejection] ${message}`);
-  errorLog(message);
+  errorLog("unhandledRejection", message);
 });
 // エラーをログへ書き出す
-function errorLog(error){
+function errorLog(fnc, error){
   var errorStr = String(error);
   var errorStr = (function(){
     if(errorStr.match(/object Event/)) return JSON.stringify(error);
@@ -330,7 +323,23 @@ function errorLog(error){
   var errTime = new Date();
   var errText = `<error> ${errorMess}`;
   logProcess(errTime, errText);
+  debugLog(fnc, error);
   document.getElementById("bouyomi_status").innerHTML =
     `<input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">`+
     `<p class="comment">エラーが発生しました。</p>`;
+}
+// デバッグ用
+var debugFnc = "Start";
+var debugTxt = "Start debug mode.";
+var redStyle = "color:red;";
+debugLog(debugFnc, debugTxt);
+function debugLog(fnc, txt){
+  var time = new Date();
+  var hour = toDoubleDigits(time.getHours());
+  var min  = toDoubleDigits(time.getMinutes());
+  var sec  = toDoubleDigits(time.getSeconds());
+  var jsn  = require("../setting.json");
+  if(jsn["debug"] != true){return;}
+  console.log(`%c[${hour}:${min}:${sec}] ${fnc}`, redStyle);
+  console.log(txt);
 }
