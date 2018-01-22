@@ -311,6 +311,10 @@ process.on("unhandledRejection", (message) => {
 // エラーをログへ書き出す
 function errorLog(error){
   var errorStr = String(error);
+  var errorStr = (function(){
+    if(errorStr.match(/object Event/)) return JSON.stringify(error);
+    return String(error);
+  })();
   var errorMess = (function(){
     if(errorStr.match(/{"isTrusted":true}/)) return "インターネットに接続できません。再接続をします。";
     if(errorStr.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
