@@ -311,6 +311,7 @@ function errorLog(fnc, error){
   var errorMess = (function(){
     if(errorStr.match(/{"isTrusted":true}/)) return "インターネットに接続できません。再接続をします。";
     if(errorStr.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
+    if(errorStr.match(/Error: Something took too long to do/)) return "Discordに接続できません。";
     if(errorStr.match(/Error: connect ECONNREFUSED/)) return "棒読みちゃんが起動していない、もしくは接続できません。";
     if(errorStr.match(/Error: getaddrinfo ENOTFOUND/)) return "IPが正しくありません。";
     if(errorStr.match(/RangeError: "port" option should be/)) return "ポートが正しくありません。";
