@@ -271,8 +271,12 @@ client.on("message", message => {
   })();
   // チャットの内容
   var content = message.content;
-  // 追加スタンプを読ませない
-  var content = content.replace(/<:[0-9]*?:[0-9]*?>/g, "（スタンプ）");
+  // 追加スタンプを読ませない "<:987654321:12345>, :foo12345:"
+  var content = content.replace(/<?:[A-Za-z0-9]+:([0-9]+)?>?/g, "（スタンプ）");
+  // リプライを読ませない
+  var content = content.replace(/<@!?[0-9]+>/g, "");
+  // チャンネルタグを読ませない
+  var content = content.replace(/<#[0-9]+>/g, "");
   // 画像オンリー、スペースのみを読ませない
   if(content=="" || /^([\s]+)$/.test(content)){return;}
   var text = `<${guildName}> ${username} ${content}`;
