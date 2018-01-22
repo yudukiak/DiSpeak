@@ -303,11 +303,11 @@ process.on("unhandledRejection", (message) => {
 });
 // エラーをログへ書き出す
 function errorLog(fnc, error){
-  var errorStr = String(error);
   var errorStr = (function(){
-    if(errorStr.match(/object Event/)) return JSON.stringify(error);
+    if(toString.call(error) == "[object Event]") return JSON.stringify(error);
     return String(error);
   })();
+  if(errorStr.match(/Error: Cannot find module '\.\.\/setting\.json'/)){return;}
   var errorMess = (function(){
     if(errorStr.match(/{"isTrusted":true}/)) return "インターネットに接続できません。再接続をします。";
     if(errorStr.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
@@ -335,12 +335,17 @@ var debugTxt = "Start debug mode.";
 var redStyle = "color:red;";
 debugLog(debugFnc, debugTxt);
 function debugLog(fnc, txt){
-  var time = new Date();
-  var hour = toDoubleDigits(time.getHours());
-  var min  = toDoubleDigits(time.getMinutes());
-  var sec  = toDoubleDigits(time.getSeconds());
   var jsn  = require("../setting.json");
   if(jsn["debug"] != true){return;}
-  console.log(`%c[${hour}:${min}:${sec}] ${fnc} (${String(txt)})`, redStyle);
+  var time = new Date();
+  var hour = toDoubleDigits(time.getHours());
+  var min = toDoubleDigits(time.getMinutes());
+  var sec = toDoubleDigits(time.getSeconds());
+  var txtCall = toString.call(txt);
+  var txtStr = (function(){
+    if(txtCall == "[object Event]") return JSON.stringify(txt);
+    return String(txt);
+  })();
+  console.log(`%c[${hour}:${min}:${sec}] "${fnc}" is "${txtCall}".`, redStyle);
   console.log(txt);
 }
