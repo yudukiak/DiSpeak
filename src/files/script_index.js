@@ -330,7 +330,7 @@ function errorLog(fnc, error){
     `<p class="comment">エラーが発生しました。</p>`;
 }
 // デバッグ用
-var debugFnc = "Start";
+var debugFnc = "start";
 var debugTxt = "Start debug mode.";
 var redStyle = "color:red;";
 debugLog(debugFnc, debugTxt);
@@ -341,6 +341,6 @@ function debugLog(fnc, txt){
   var sec  = toDoubleDigits(time.getSeconds());
   var jsn  = require("../setting.json");
   if(jsn["debug"] != true){return;}
-  console.log(`%c[${hour}:${min}:${sec}] ${fnc}`, redStyle);
+  console.log(`%c[${hour}:${min}:${sec}] ${fnc} (${String(txt)})`, redStyle);
   console.log(txt);
 }
