@@ -200,6 +200,7 @@ client.on("reconnecting", () => {
   //bouyomiProcess(reconnectTime, reconnectText);
 });
 client.on("message", message => {
+  debugLog("message", message);
   // Discord 基本設定
   var d_user         = document.getElementById("d_user").d_user.value;
   // Discord DM設定
@@ -283,7 +284,6 @@ client.on("message", message => {
   // 処理
   logProcess(time, text);
   bouyomiProcess(time, text);
-  debugLog("message", message);
 });
 // エラーが起きたときの処理
 //client.on("debug", (message) => {
