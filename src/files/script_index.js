@@ -334,20 +334,22 @@ var debugFnc = "start";
 var debugTxt = "Start debug mode.";
 debugLog(debugFnc, debugTxt);
 function debugLog(fnc, txt){
-  var jsn  = require("../setting.json");
-  if(jsn["debug"] != true){return;}
-  var time = new Date();
-  var hour = toDoubleDigits(time.getHours());
-  var min = toDoubleDigits(time.getMinutes());
-  var sec = toDoubleDigits(time.getSeconds());
-  var txtCall = toString.call(txt);
-  var txtStr = (function(){
-    if(txtCall == "[object Event]") return JSON.stringify(txt);
-    return String(txt);
-  })();
-  console.groupCollapsed(`${hour}:${min}:${sec} %s`, fnc);
-  console.log(txtCall);
-  console.log(txtStr);
-  console.log(txt);
-  console.groupEnd();
+  fs.readFile(`${fileName}`, "utf8", (error, file) => {
+    var file = JSON.parse(file);
+    if(error || file.debug!=true){return;}
+    var time = new Date();
+    var hour = toDoubleDigits(time.getHours());
+    var min = toDoubleDigits(time.getMinutes());
+    var sec = toDoubleDigits(time.getSeconds());
+    var txtCall = toString.call(txt);
+    var txtStr = (function(){
+      if(txtCall == "[object Event]") return JSON.stringify(txt);
+      return String(txt);
+    })();
+    console.groupCollapsed(`${hour}:${min}:${sec} %s`, fnc);
+    console.log(txtCall);
+    console.log(txtStr);
+    console.log(txt);
+    console.groupEnd();
+  });
 }
