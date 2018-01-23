@@ -130,7 +130,7 @@ input[type="radio"]:focus{
   その他
 ******************** */
 html {
-    overflow-y: scroll;
+    /*overflow-y: scroll;*/
 }
 body {
     color: #333;

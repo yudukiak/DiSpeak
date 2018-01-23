@@ -82,7 +82,7 @@ app.on("ready", ()=> {
   mainWindow = new BrowserWindow({
     width: 640,
     height: 480,
-    useContentSize: true,
+    //useContentSize: true,
     icon: `${__dirname}/images/icon.png`,
   });
   // ウィンドウメニューをカスタマイズ
@@ -105,6 +105,7 @@ function infoWindowOpen(){
     width: 320,
     height: 240,
     //useContentSize: true,
+    show: false,
     parent: mainWindow,
     icon: `${__dirname}/images/icon.png`,
   });
@@ -113,6 +114,9 @@ function infoWindowOpen(){
   infoWindow.webContents.on("new-window", (ev,url)=> {
     ev.preventDefault();
     shell.openExternal(url);
+  });
+  infoWindow.once("ready-to-show", ()=> {
+    infoWindow.show();
   });
   infoWindow.on("closed", ()=> {
     infoWindow = null;
