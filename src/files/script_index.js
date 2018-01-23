@@ -332,7 +332,6 @@ function errorLog(fnc, error){
 // デバッグ用
 var debugFnc = "start";
 var debugTxt = "Start debug mode.";
-var redStyle = "color:red;";
 debugLog(debugFnc, debugTxt);
 function debugLog(fnc, txt){
   var jsn  = require("../setting.json");
@@ -346,6 +345,9 @@ function debugLog(fnc, txt){
     if(txtCall == "[object Event]") return JSON.stringify(txt);
     return String(txt);
   })();
-  console.log(`%c[${hour}:${min}:${sec}] "${fnc}" is "${txtCall}".`, redStyle);
+  console.groupCollapsed(`${hour}:${min}:${sec} %s`, fnc);
+  console.log(txtCall);
+  console.log(txtStr);
   console.log(txt);
+  console.groupEnd();
 }
