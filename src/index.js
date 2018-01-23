@@ -83,12 +83,12 @@ app.on("ready", ()=> {
     width: 640,
     height: 480,
     useContentSize: true,
-    "icon": `${__dirname}/images/icon.png`,
+    icon: `${__dirname}/images/icon.png`,
   });
-  // 使用するhtmlファイルを指定する
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
   // ウィンドウメニューをカスタマイズ
   initWindowMenu();
+  // 使用するhtmlファイルを指定する
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
   // リンクをデフォルトブラウザで開く http://www.fujipro-inc.com/2017/04/29/4689.html
   mainWindow.webContents.on("new-window", (ev,url)=> {
     ev.preventDefault();
@@ -106,7 +106,7 @@ function infoWindowOpen(){
     height: 240,
     //useContentSize: true,
     parent: mainWindow,
-    "icon": `${__dirname}/images/icon.png`,
+    icon: `${__dirname}/images/icon.png`,
   });
   infoWindow.loadURL(`file://${__dirname}/info.html`);
   infoWindow.setMenu(null);
