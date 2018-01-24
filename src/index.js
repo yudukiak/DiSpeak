@@ -1,6 +1,7 @@
 "use strct";
 // Electron https://electronjs.org/docs
 const {app, Menu, shell, BrowserWindow, dialog, ipcMain} = require("electron");
+const exec = require("child_process").exec;
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let infoWindow = null;
 
@@ -198,6 +199,48 @@ function updateCheck(nowVer, newVer){
   if(newMinor>nowMinor){return true;}else if(newMinor<nowMinor){return false;}else
   if(newBuild>nowBuild){return true;}else if(newBuild<nowBuild){return false;}else{return false;}
 }
+
+// 棒読みちゃんのディレクトリ
+ipcMain.on("bouyomi-dir-dialog", (event) => {
+  let options = {
+    title: "選択",
+    filters: [{name: "EXE File", extensions: ["exe"]}],
+    defaultPath: ".",
+    properties: ["openFile"],
+  };
+  dialog.showOpenDialog(options, (filePaths) => {
+    let filePath = (function(){
+      if(filePaths == void 0) return "";
+      return filePaths[0];
+    })();
+    event.returnValue = filePath;
+  });
+});
+ipcMain.on("bouyomi-exe-start", (event, arg) => {
+  exec(arg, function(error, stdout, stderr) {
+    if (error != null) {
+      console.log(error);
+      let mesOptions = {
+        type: "error",
+        buttons: ["OK"],
+        title: "エラー",
+        message: "棒読みちゃんを起動できませんでした。",
+        detail: `ディレクトリを間違えていないか、ご確認ください。\n\n${error.cmd}`
+      };
+      dialog.showMessageBox(mesOptions);
+    }
+  });
+});
+ipcMain.on("bouyomi-exe-alert", (event) => {
+  let mesOptions = {
+    type: "error",
+    buttons: ["OK"],
+    title: "エラー",
+    message: "選択したファイルが異なります。",
+    detail: "「BouyomiChan.exe」を選択してください。"
+  };
+  dialog.showMessageBox(mesOptions);
+});
 
 // エラーの処理
 process.on("uncaughtException", (err) => {

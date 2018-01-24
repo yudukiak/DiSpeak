@@ -57,6 +57,7 @@ function bouyomiDisabled(){
     `<p class="comment">「画面を更新」してから「読み上げ開始」してください。</p>`;
 }
 function bouyomiStart(){
+  bouyomiExeStart();
   var d_token = document.querySelector('input[name="d_token"]').value;
   var startTime = new Date();
   var startMess = "読み上げを開始しています。";
@@ -82,6 +83,20 @@ function bouyomiProcess(time, text){
   bouyomiServer.host = ip;
   bouyomiServer.port = port;
   bouyomiConnect.sendBouyomi(bouyomiServer, textBym);
+}
+function bouyomiDialog(){
+  var bouyomiDir = ipcRenderer.sendSync("bouyomi-dir-dialog");
+  if(bouyomiDir == ""){return;}
+  if(!bouyomiDir.match(/BouyomiChan\.exe/)){
+    ipcRenderer.send("bouyomi-exe-alert");
+    return;
+  }
+  document.querySelector('input[name="b_dir"]').value = bouyomiDir;
+}
+function bouyomiExeStart(){
+  var bouyomiDir = document.querySelector('input[name="b_dir"]').value;
+  if(bouyomiDir == "" || !bouyomiDir.match(/BouyomiChan\.exe/)){return;}
+  ipcRenderer.send("bouyomi-exe-start", bouyomiDir);
 }
 // ファイルを表示
 function readFile(){
@@ -112,6 +127,7 @@ function readFile(){
         case "d_sv_ch_list_b": document.querySelector('textarea[name="d_sv_ch_list_b"]').value = settingAryKey.join("\n"); break;
         case "d_sv_ch_list_w": document.querySelector('textarea[name="d_sv_ch_list_w"]').value = settingAryKey.join("\n"); break;
         // 棒読みちゃん 基本設定
+        case "b_dir":           document.querySelector('input[name="b_dir"]').value = settingAryKey; break;
         case "b_ip":           document.querySelector('input[name="b_ip"]').value = settingAryKey; break;
         case "b_port":         document.querySelector('input[name="b_port"]').value = settingAryKey; break;
       }
@@ -142,6 +158,7 @@ function writeFile(){
   settingAry.d_sv_ch_list_b = filterArray(document.querySelector('textarea[name="d_sv_ch_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
   settingAry.d_sv_ch_list_w = filterArray(document.querySelector('textarea[name="d_sv_ch_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
   // 棒読みちゃん 基本設定
+  settingAry.b_dir          = document.querySelector('input[name="b_dir"]').value;
   settingAry.b_ip           = document.querySelector('input[name="b_ip"]').value;
   settingAry.b_port         = document.querySelector('input[name="b_port"]').value;
   var setting = JSON.stringify(settingAry, null, 4);
@@ -335,8 +352,9 @@ var debugTxt = "Start debug mode.";
 debugLog(debugFnc, debugTxt);
 function debugLog(fnc, txt){
   fs.readFile(`${fileName}`, "utf8", (error, file) => {
+    if(error || file == void 0){return;}
     var file = JSON.parse(file);
-    if(error || file.debug!=true){return;}
+    if(file.debug!=true){return;}
     var time = new Date();
     var hour = toDoubleDigits(time.getHours());
     var min = toDoubleDigits(time.getMinutes());
