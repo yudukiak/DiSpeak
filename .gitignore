@@ -1,4 +1,6 @@
 *.bat
+/build/
+/dest/
 /dist/
 /test/
 /node_modules/
