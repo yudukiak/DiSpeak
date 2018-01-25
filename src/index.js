@@ -242,6 +242,11 @@ ipcMain.on("bouyomi-exe-alert", (event) => {
   dialog.showMessageBox(mesOptions);
 });
 
+// DiSpeakのディレクトリを返す
+ipcMain.on("directory-check", (event) => {
+  event.returnValue = app.getAppPath();
+})
+
 // エラーの処理
 process.on("uncaughtException", (err) => {
   let errStr = String(err);

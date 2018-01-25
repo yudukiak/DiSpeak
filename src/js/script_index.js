@@ -1,12 +1,14 @@
-var bouyomiConnect = require("./files/bouyomiConnect.js");
+const {ipcRenderer} = require("electron");
+// DiSpeakのディレクトリを取得
+const directory = ipcRenderer.sendSync("directory-check").replace(/\\/g,"/");
+// 現在のバージョンを取得
+const nowVersion = ipcRenderer.sendSync("now-version-check");
+var bouyomiConnect = require(`${directory}/js/bouyomiConnect.js`);
 var Discord = require("discord.js");
 var client = new Discord.Client();
 var fs = require("fs");
 var fileName = "setting.json";
 var fileName_default = "setting_default.json";
-// 現在のバージョンを取得
-const {ipcRenderer} = require("electron");
-const nowVersion = ipcRenderer.sendSync("now-version-check");
 console.info(`Version ${nowVersion}`);
 // 設定ファイルの読み込み
 readFile();
@@ -175,7 +177,7 @@ function writeFile(){
   });
 }
 function createFile(){
-  fs.readFile(`${__dirname}/files/${fileName_default}`, "utf8", (error, setting) => {
+  fs.readFile(`${directory}/files/${fileName_default}`, "utf8", (error, setting) => {
     if(error){return;}
     fs.writeFile(`${fileName}`, setting, (error) => {
       if(error){return;}

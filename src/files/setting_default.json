@@ -13,6 +13,7 @@
     "d_sv_ch_list": 0,
     "d_sv_ch_list_b": [],
     "d_sv_ch_list_w": [],
+    "b_dir": "",
     "b_ip": "127.0.0.1",
     "b_port": "50001"
 }
