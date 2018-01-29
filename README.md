@@ -43,7 +43,7 @@ Windows10 64bitで動作確認済み。
   ```
 * build
   ```
-  node build/build.js
+  node lib/build.js
   ```
 
 ## English

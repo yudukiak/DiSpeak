@@ -1,7 +1,7 @@
 "use strct";
 // Electron https://electronjs.org/docs
 const {app, Menu, shell, BrowserWindow, dialog, ipcMain} = require("electron");
-const exec = require("child_process").exec;
+const {exec} = require("child_process");
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let infoWindow = null;
 
@@ -83,7 +83,6 @@ app.on("ready", ()=> {
   mainWindow = new BrowserWindow({
     width: 640,
     height: 480,
-    //useContentSize: true,
     icon: `${__dirname}/images/icon.png`,
   });
   // ウィンドウメニューをカスタマイズ
@@ -105,7 +104,6 @@ function infoWindowOpen(){
   infoWindow = new BrowserWindow({
     width: 320,
     height: 240,
-    //useContentSize: true,
     show: false,
     parent: mainWindow,
     icon: `${__dirname}/images/icon.png`,
