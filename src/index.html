@@ -42,15 +42,15 @@
           <td>トークン</td>
           <td>
             <input type="text" name="d_token">
-            <p class="comment">トークンは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Token_Id" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
+            <p class="comment">トークンは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
           </td>
         </tr>
         <tr>
           <td>自分のチャット</td>
           <td>
             <form id="d_user">
-              <input type="radio" name="d_user" value="0">読む
-              <input type="radio" name="d_user" value="1">読まない
+              <label><input type="radio" name="d_user" value="0">読む</label>
+              <label><input type="radio" name="d_user" value="1">読まない</label>
             </form>
           </td>
         </tr>
@@ -61,8 +61,8 @@
           <td>読み上げ設定</td>
           <td>
             <form id="d_dm">
-              <input type="radio" name="d_dm" value="0">読む
-              <input type="radio" name="d_dm" value="1">読まない
+              <label><input type="radio" name="d_dm" value="0">読む</label>
+              <label><input type="radio" name="d_dm" value="1">読まない</label>
             </form>
           </td>
         </tr>
@@ -70,12 +70,12 @@
           <td>リスト設定</td>
           <td>
             <form id="d_dm_list">
-              <input type="radio" name="d_dm_list" value="0">ブラックリストを使う
+              <label><input type="radio" name="d_dm_list" value="0">ブラックリストを使う</label>
               <textarea name="d_dm_list_b" rows="4" placeholder="読み上げないユーザーIDを記載"></textarea>
-              <input type="radio" name="d_dm_list" value="1">ホワイトリストを使う
+              <label><input type="radio" name="d_dm_list" value="1">ホワイトリストを使う</label>
               <textarea name="d_dm_list_w" rows="4" placeholder="読み上げるユーザーIDを記載"></textarea>
             </form>
-            <p class="comment">ユーザーIDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Token_Id" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
+            <p class="comment">ユーザーIDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
           </td>
         </tr>
         <tr>
@@ -85,8 +85,8 @@
           <td>読み上げ設定</td>
           <td>
             <form id="d_sv">
-              <input type="radio" name="d_sv" value="0">読む
-              <input type="radio" name="d_sv" value="1">読まない
+              <label><input type="radio" name="d_sv" value="0">読む</label>
+              <label><input type="radio" name="d_sv" value="1">読まない</label>
             </form>
           </td>
         </tr>
@@ -94,8 +94,8 @@
           <td>ニックネーム</td>
           <td>
             <form id="d_sv_nick">
-              <input type="radio" name="d_sv_nick" value="0">読む
-              <input type="radio" name="d_sv_nick" value="1">読まない
+              <label><input type="radio" name="d_sv_nick" value="0">読む</label>
+              <label><input type="radio" name="d_sv_nick" value="1">読まない</label>
             </form>
           </td>
         </tr>
@@ -103,24 +103,24 @@
           <td>SERVER設定</td>
           <td>
             <form id="d_sv_sv_list">
-              <input type="radio" name="d_sv_sv_list" value="0">ブラックリストを使う
+              <label><input type="radio" name="d_sv_sv_list" value="0">ブラックリストを使う</label>
               <textarea name="d_sv_sv_list_b" rows="4" placeholder="読み上げないSERVER IDを記載"></textarea>
-              <input type="radio" name="d_sv_sv_list" value="1">ホワイトリストを使う
+              <label><input type="radio" name="d_sv_sv_list" value="1">ホワイトリストを使う</label>
               <textarea name="d_sv_sv_list_w" rows="4" placeholder="読み上げるSERVER IDを記載"></textarea>
             </form>
-            <p class="comment">SERVER IDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Token_Id" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
+            <p class="comment">SERVER IDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
           </td>
         </tr>
         <tr>
           <td>CHANNEL設定</td>
           <td>
             <form id="d_sv_ch_list">
-              <input type="radio" name="d_sv_ch_list" value="0">ブラックリストを使う
+              <label><input type="radio" name="d_sv_ch_list" value="0">ブラックリストを使う</label>
               <textarea name="d_sv_ch_list_b" rows="4" placeholder="読み上げないCHANNEL IDを記載"></textarea>
-              <input type="radio" name="d_sv_ch_list" value="1">ホワイトリストを使う
+              <label><input type="radio" name="d_sv_ch_list" value="1">ホワイトリストを使う</label>
               <textarea name="d_sv_ch_list_w" rows="4" placeholder="読み上げるCHANNEL IDを記載"></textarea>
             </form>
-            <p class="comment">CHANNEL IDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Token_Id" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
+            <p class="comment">CHANNEL IDは【<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">dc_DiSpeak Wiki</a>】をご参考ください</p>
           </td>
         </tr>
       </table>
