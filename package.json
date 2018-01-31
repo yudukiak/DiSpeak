@@ -1,12 +1,12 @@
 {
   "name": "DiSpeak_build",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "For DiSpeak build.",
   "main": "index.js",
   "dependencies": {
     "archiver": "^2.1.1",
     "discord.js": "^11.3.0",
-    "electron": "^1.8.1",
+    "electron": "^1.8.2-beta.4",
     "electron-packager": "^10.1.1",
     "gulp": "^3.9.1",
     "gulp-clean-css": "^3.9.2",
