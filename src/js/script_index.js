@@ -119,6 +119,11 @@ function readFile(){
         case "d_dm_list":      document.getElementById("d_dm_list").d_dm_list[settingAryKey].checked = true; break;
         case "d_dm_list_b":    document.querySelector('textarea[name="d_dm_list_b"]').value = settingAryKey.join("\n"); break;
         case "d_dm_list_w":    document.querySelector('textarea[name="d_dm_list_w"]').value = settingAryKey.join("\n"); break;
+        // Discord グループ設定
+        case "d_gr":           document.getElementById("d_gr").d_gr[settingAryKey].checked = true; break;
+        case "d_gr_list":      document.getElementById("d_gr_list").d_gr_list[settingAryKey].checked = true; break;
+        case "d_gr_list_b":    document.querySelector('textarea[name="d_gr_list_b"]').value = settingAryKey.join("\n"); break;
+        case "d_gr_list_w":    document.querySelector('textarea[name="d_gr_list_w"]').value = settingAryKey.join("\n"); break;
         // Discord サーバ設定
         case "d_sv":           document.getElementById("d_sv").d_sv[settingAryKey].checked = true; break;
         case "d_sv_nick":      document.getElementById("d_sv_nick").d_sv_nick[settingAryKey].checked = true; break;
@@ -150,6 +155,11 @@ function writeFile(){
   settingAry.d_dm_list      = Number(document.getElementById("d_dm_list").d_dm_list.value);
   settingAry.d_dm_list_b    = filterArray(document.querySelector('textarea[name="d_dm_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
   settingAry.d_dm_list_w    = filterArray(document.querySelector('textarea[name="d_dm_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
+  // Discord グループ設定
+  settingAry.d_gr           = Number(document.getElementById("d_gr").d_gr.value);
+  settingAry.d_gr_list      = Number(document.getElementById("d_gr_list").d_gr_list.value);
+  settingAry.d_gr_list_b    = filterArray(document.querySelector('textarea[name="d_gr_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
+  settingAry.d_gr_list_w    = filterArray(document.querySelector('textarea[name="d_gr_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
   // Discord サーバ設定
   settingAry.d_sv           = Number(document.getElementById("d_sv").d_sv.value);
   settingAry.d_sv_nick      = Number(document.getElementById("d_sv_nick").d_sv_nick.value);
@@ -227,6 +237,11 @@ client.on("message", message => {
   var d_dm_list      = document.getElementById("d_dm_list").d_dm_list.value;
   var d_dm_list_b    = document.querySelector('textarea[name="d_dm_list_b"]').value;
   var d_dm_list_w    = document.querySelector('textarea[name="d_dm_list_w"]').value;
+  // Discord グループ設定
+  var d_gr           = document.getElementById("d_gr").d_gr.value;
+  var d_gr_list      = document.getElementById("d_gr_list").d_gr_list.value;
+  var d_gr_list_b    = document.querySelector('textarea[name="d_gr_list_b"]').value;
+  var d_gr_list_w    = document.querySelector('textarea[name="d_gr_list_w"]').value;
   // Discord サーバ設定
   var d_sv           = document.getElementById("d_sv").d_sv.value;
   var d_sv_nick      = document.getElementById("d_sv_nick").d_sv_nick.value;
@@ -249,12 +264,13 @@ client.on("message", message => {
   // DM UserId    message.author.id
   // SV ServerID  message.member.guild.id
   // SV ServerID  message.mentions._guild.id
-  // DM・サーバを読む・読まないの処理
+  // DM・グループ・サーバを読む・読まないの処理
   var channelType = message.channel.type;
   if(channelType=="dm"   && d_dm=="1"){return;}else
+  if(channelType=="group" && d_gr=="1"){return;}else
   if(channelType=="text" && d_sv=="1"){return;}
   // ホワイトリスト・ブラックリストの処理
-  // 1.  DMかサーバかを確認                channelType
+  // 1.  DMかグループかサーバを確認        channelType
   // 2.  リスト設定がどっちかを確認        d_dm_list,   d_sv_sv_list,   d_sv_ch_list   0ブラックリスト, 1ホワイトリスト
   // 3-1.ブラックリストのIDならreturn      d_dm_list_b, d_sv_sv_list_b, d_sv_ch_list_b
   // 3-2.ホワイトリスト以外のIDならreturn  d_dm_list_w, d_sv_sv_list_w, d_sv_ch_list_w
@@ -262,6 +278,10 @@ client.on("message", message => {
     var dmUserId = message.channel.recipient.id;
     if(d_dm_list=="0" &&  dmUserId.match(replaceNewline(d_dm_list_b))){return;}else
     if(d_dm_list=="1" && !dmUserId.match(replaceNewline(d_dm_list_w)) && d_dm_list_w.length>10){return;}
+  }else if(channelType == "group"){
+    var grUserId = message.channel.id;
+    if(d_gr_list=="0" &&  grUserId.match(replaceNewline(d_gr_list_b))){return;}else
+    if(d_gr_list=="1" && !grUserId.match(replaceNewline(d_gr_list_w)) && d_gr_list_w.length>10){return;}
   }else if(channelType == "text"){
     var svServerId  = message.channel.guild.id;
     var svChannelId = message.channel.id;
@@ -276,13 +296,14 @@ client.on("message", message => {
     return "";
   })();
   var username = (function() {
-    // d_sv_nickが無効の時、DMの時、nicknameが無いとき(DM)、サーバで未設定のとき
-    if(d_sv_nick=="1" || channelType=="dm" || nickname=="" || nickname===null) return message.author.username;
+    // d_sv_nickが無効の時、DMの時、グループの時、nicknameが無いとき(DM)、サーバで未設定のとき
+    if(d_sv_nick=="1" || channelType=="dm" || channelType=="group" || nickname=="" || nickname===null) return message.author.username;
     return nickname;
   })();
   // サーバー名
   var guildName = (function() {
     if(channelType == "dm") return "dm";
+    if(channelType == "group") return "group";
     return message.channel.guild.name;
   })();
   // チャットの内容
