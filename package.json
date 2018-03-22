@@ -5,14 +5,14 @@
   "main": "index.js",
   "dependencies": {
     "archiver": "^2.1.1",
-    "discord.js": "^11.3.0",
-    "electron": "^1.8.2-beta.4",
+    "discord.js": "^11.3.2",
+    "electron": "^1.8.4",
     "electron-packager": "^10.1.1",
     "gulp": "^3.9.1",
-    "gulp-clean-css": "^3.9.2",
+    "gulp-clean-css": "^3.9.3",
     "gulp-cli": "^2.0.1",
     "gulp-uglify": "^3.0.0",
-    "request": "^2.83.0"
+    "request": "^2.85.0"
   },
   "devDependencies": {},
   "scripts": {},
