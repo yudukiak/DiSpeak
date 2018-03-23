@@ -35,14 +35,25 @@ function filterArray(ary){
   var ary = ary.filter(Boolean);
   return ary;
 }
+// エスケープ
+function escapeHtml(str) {
+  var str = str.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+  return str;
+}
 function logProcess(time, text){
   var hour = toDoubleDigits(time.getHours());
   var min  = toDoubleDigits(time.getMinutes());
   var sec  = toDoubleDigits(time.getSeconds());
   var textLog = text.replace(/\r\n|\n|\r/,"");
-  var textLog = `[${hour}:${min}:${sec}] ${textLog}`;
+  var textLog = escapeHtml(`[${hour}:${min}:${sec}] ${textLog}`);
+  var textLog = textLog.replace(/&lt;(:[A-Za-z0-9]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">');
   var pLog = document.createElement("p"); // 要素作成
-  pLog.textContent = textLog; // 要素にテキストを設定
+  //pLog.textContent = textLog; // 要素にテキストを設定
+  pLog.innerHTML = textLog; // 要素にテキストを設定
   document.getElementById("log").prepend(pLog); // 要素を追加
   // ログの削除
   var logP = document.querySelectorAll("#log p");
@@ -79,7 +90,8 @@ function bouyomiStart(){
 }
 function bouyomiProcess(time, text){
   var bouyomiServer = {};
-  var textBym = text.replace(/<[\s\S]*?>\s/,"");
+  //var textBym = text.replace(/<[\s\S]*?>\s/,"");
+  var textBym = text.replace(/<?:[A-Za-z0-9]+:([0-9]+)?>?/g, "（スタンプ）"); // スタンプは読ませない
   var ip   = document.querySelector('input[name="b_ip"]').value;
   var port = document.querySelector('input[name="b_port"]').value;
   bouyomiServer.host = ip;
@@ -309,7 +321,7 @@ client.on("message", message => {
   // チャットの内容
   var content = message.content;
   // 追加スタンプを読ませない "<:987654321:12345>, :foo12345:"
-  var content = content.replace(/<?:[A-Za-z0-9]+:([0-9]+)?>?/g, "（スタンプ）");
+  //var content = content.replace(/<?:[A-Za-z0-9]+:([0-9]+)?>?/g, "（スタンプ）");
   // リプライを読ませない
   var content = content.replace(/<@!?[0-9]+>/g, "");
   // チャンネルタグを読ませない

@@ -178,3 +178,8 @@ p {
 .comment {
     font-size: 0.625em;
 }
+.emoji {
+    height: 20px;
+    width: 20px;
+    margin: 0 1px;
+}
