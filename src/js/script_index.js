@@ -91,7 +91,7 @@ function bouyomiStart(){
 function bouyomiProcess(time, text){
   var bouyomiServer = {};
   //var textBym = text.replace(/<[\s\S]*?>\s/,"");
-  var textBym = text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ $1）"); // スタンプの固有IDのみ読ませない
+  var textBym = text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）"); // スタンプを読ませない
   var ip   = document.querySelector('input[name="b_ip"]').value;
   var port = document.querySelector('input[name="b_port"]').value;
   bouyomiServer.host = ip;
