@@ -217,7 +217,6 @@ ipcMain.on("bouyomi-dir-dialog", (event) => {
 ipcMain.on("bouyomi-exe-start", (event, arg) => {
   execFile(arg, function(error, stdout, stderr) {
     if (error != null) {
-      console.log(error);
       let mesOptions = {
         type: "error",
         buttons: ["OK"],
