@@ -1,7 +1,7 @@
 "use strct";
 // Electron https://electronjs.org/docs
 const {app, Menu, shell, BrowserWindow, dialog, ipcMain} = require("electron");
-const {exec} = require("child_process");
+const {execFile} = require("child_process");
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let infoWindow = null;
 
@@ -215,7 +215,7 @@ ipcMain.on("bouyomi-dir-dialog", (event) => {
   });
 });
 ipcMain.on("bouyomi-exe-start", (event, arg) => {
-  exec(arg, function(error, stdout, stderr) {
+  execFile(arg, function(error, stdout, stderr) {
     if (error != null) {
       console.log(error);
       let mesOptions = {
