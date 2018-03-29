@@ -44,12 +44,18 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
   return str;
 }
-function logProcess(time, text){
-  var hour = toDoubleDigits(time.getHours());
-  var min  = toDoubleDigits(time.getMinutes());
-  var sec  = toDoubleDigits(time.getSeconds());
-  var textLog = text.replace(/\r\n|\n|\r/,"");
-  var textLog = escapeHtml(`[${hour}:${min}:${sec}] ${textLog}`);
+//function logProcess(time, text){
+function logProcess(ary){
+  //var hour = toDoubleDigits(time.getHours());
+  //var min  = toDoubleDigits(time.getMinutes());
+  //var sec  = toDoubleDigits(time.getSeconds());
+  var hour = toDoubleDigits(ary.time.getHours());
+  var min  = toDoubleDigits(ary.time.getMinutes());
+  var sec  = toDoubleDigits(ary.time.getSeconds());
+  //var textLog = text.replace(/\r\n|\n|\r/,"");
+  var textLog = ary.text.replace(/\r\n|\n|\r/,"");
+  //var textLog = escapeHtml(`[${hour}:${min}:${sec}] ${textLog}`);
+  var textLog = escapeHtml(`[${hour}:${min}:${sec}] <${ary.type}> ${ary.name} ${textLog}`); // [time] <type> name text
   var textLog = textLog.replace(/&lt;(:.+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">');
   var pLog = document.createElement("p"); // 要素作成
   //pLog.textContent = textLog; // 要素にテキストを設定
@@ -74,11 +80,19 @@ function bouyomiStart(){
   var d_token = document.querySelector('input[name="d_token"]').value;
   var startTime = new Date();
   var startMess = "読み上げを開始しています。";
-  var startText = `<info> ${startMess}`;
+  //var startText = `<info> ${startMess}`;
   document.getElementById("bouyomi_status").innerHTML =
     `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
     `<p class="comment">${startMess}</p>`;
-  logProcess(startTime, startText);
+  // 配列を生成
+  var ary = {
+    time: startTime,
+    type: "info",
+    name: "",
+    text: startMess
+  };
+  //logProcess(startTime, startText);
+  logProcess(ary);
   if(d_token == ""){
     var tokenText = "Error: The token is not filled in.";
     errorLog("token", tokenText);
@@ -88,10 +102,12 @@ function bouyomiStart(){
     errorLog("login", error);
   });
 }
-function bouyomiProcess(time, text){
+//function bouyomiProcess(time, text){
+function bouyomiProcess(ary){
   var bouyomiServer = {};
   //var textBym = text.replace(/<[\s\S]*?>\s/,"");
-  var textBym = text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）"); // スタンプを読ませない
+  var text = ary.text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）"); // スタンプを読ませない
+  var textBym = `${ary.name} ${text}`; // name text
   var ip   = document.querySelector('input[name="b_ip"]').value;
   var port = document.querySelector('input[name="b_port"]').value;
   bouyomiServer.host = ip;
@@ -152,8 +168,16 @@ function readFile(){
       }
     }
     var readTime = new Date();
-    var readText = "<info> 設定ファイルを読み込みました。";
-    logProcess(readTime, readText);
+    //var readText = "<info> 設定ファイルを読み込みました。";
+    // 配列を生成
+    var ary = {
+      time: readTime,
+      type: "info",
+      name: "",
+      text: "設定ファイルを読み込みました。"
+    };
+    //logProcess(readTime, readText);
+    logProcess(ary);
   });
 }
 // ファイルへ書き込み
@@ -193,9 +217,17 @@ function writeFile(){
     }
     var writTime = new Date();
     var writMess = "設定ファイルを保存しました。";
-    var writText = `<info> ${writMess}`;
+    //var writText = `<info> ${writMess}`;
     document.getElementById("save_information").textContent = writMess;
-    logProcess(writTime, writText);
+    // 配列を生成
+    var ary = {
+      time: writTime,
+      type: "info",
+      name: "",
+      text: writMess
+    };
+    //logProcess(writTime, writText);
+    logProcess(ary);
   });
 }
 function createFile(){
@@ -205,7 +237,15 @@ function createFile(){
       if(error){return;}
       var createTime = new Date();
       var createText = "<info> 設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
-      logProcess(createTime, createText);
+      // 配列を生成
+      var ary = {
+        time: createTime,
+        type: "info",
+        name: "",
+        text: "設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
+      };
+      //logProcess(createTime, createText);
+      logProcess(ary);
       readFile();
     });
   });
@@ -217,8 +257,15 @@ function errorHandling(error){
       if(errorCode.match(/ENOENT/)) return      "設定ファイルが存在しませんでした。";
       if(errorCode.match(/EPERM|EBUSY/)) return `設定ファイルを保存できませんでした。${fileName}を開いている場合は閉じてください。`;
     })(),
-    errorText = `<info> ${errorMess}`;
-  logProcess(errorTime, errorText);
+    //errorText = `<info> ${errorMess}`;
+    ary = {
+      time: errorTime,
+      type: "info",
+      name: "",
+      text: "errorMess"
+    };
+  //logProcess(errorTime, errorText);
+  logProcess(ary);
   if(errorCode.match(/ENOENT/)){
     createFile();
   }
@@ -227,17 +274,32 @@ function errorHandling(error){
 client.on("ready", () => {
   var readyTime    = new Date();
   var readyMess = "読み上げを開始しました。";
-  var readyText = `<info> ${readyMess}`;
+  //var readyText = `<info> ${readyMess}`;
   document.querySelector("#bouyomi_status p").textContent = readyMess;
-  logProcess(readyTime, readyText);
-  bouyomiProcess(readyTime, readyText);
+  var ary = {
+    time: readyTime,
+    type: "info",
+    name: "",
+    text: readyMess
+  };
+  //logProcess(readyTime, readyText);
+  logProcess(ary);
+  //bouyomiProcess(readyTime, readyText);
+  bouyomiProcess(ary);
 });
 client.on("reconnecting", () => {
   var reconnectTime    = new Date();
   var reconnectMess = "再接続をします。";
-  var reconnectText = `<info> ${reconnectMess}`;
+  //var reconnectText = `<info> ${reconnectMess}`;
   document.querySelector("#bouyomi_status p").textContent = reconnectMess;
-  logProcess(reconnectTime, reconnectText);
+  var ary = {
+    time: reconnectTime,
+    type: "info",
+    name: "",
+    text: reconnectMess
+  };
+  //logProcess(reconnectTime, reconnectText);
+  logProcess(ary);
   //bouyomiProcess(reconnectTime, reconnectText);
 });
 client.on("message", message => {
@@ -328,14 +390,23 @@ client.on("message", message => {
   var content = content.replace(/<#[0-9]+>/g, "");
   // 画像オンリー、スペースのみを読ませない
   if(content=="" || /^([\s]+)$/.test(content)){return;}
-  var text = `<${guildName}> ${username} ${content}`;
+  //var text = `<${guildName}> ${username} ${content}`;
   // チャットの時間
   var utc  = message.createdTimestamp; // UTC
   var jst  = utc + (60 * 60 * 9); // +9hour
   var time = new Date(jst);
+  // 配列を生成
+  var ary = {
+    time: time,
+    type: guildName,
+    name: username,
+    text: content
+  };
   // 処理
-  logProcess(time, text);
-  bouyomiProcess(time, text);
+  //logProcess(time, text);
+  logProcess(ary);
+  //bouyomiProcess(time, text);
+  bouyomiProcess(ary);
 });
 // エラーが起きたときの処理
 //client.on("debug", (message) => {
@@ -374,8 +445,16 @@ function errorLog(fnc, error){
     return `不明なエラーが発生しました。（${errorStr}）`;
   })();
   var errTime = new Date();
-  var errText = `<error> ${errorMess}`;
-  logProcess(errTime, errText);
+  //var errText = `<error> ${errorMess}`;
+  // 配列を生成
+  var ary = {
+    time: errTime,
+    type: "error",
+    name: "",
+    text: errorMess
+  };
+  //logProcess(errTime, errText);
+  logProcess(ary);
   debugLog(fnc, error);
   document.getElementById("bouyomi_status").innerHTML =
     `<input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">`+
