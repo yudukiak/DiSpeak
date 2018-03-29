@@ -44,21 +44,14 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
   return str;
 }
-//function logProcess(time, text){
 function logProcess(ary){
-  //var hour = toDoubleDigits(time.getHours());
-  //var min  = toDoubleDigits(time.getMinutes());
-  //var sec  = toDoubleDigits(time.getSeconds());
   var hour = toDoubleDigits(ary.time.getHours());
   var min  = toDoubleDigits(ary.time.getMinutes());
   var sec  = toDoubleDigits(ary.time.getSeconds());
-  //var textLog = text.replace(/\r\n|\n|\r/,"");
   var textLog = ary.text.replace(/\r\n|\n|\r/,"");
-  //var textLog = escapeHtml(`[${hour}:${min}:${sec}] ${textLog}`);
   var textLog = escapeHtml(`[${hour}:${min}:${sec}] <${ary.type}> ${ary.name} ${textLog}`); // [time] <type> name text
   var textLog = textLog.replace(/&lt;(:.+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">');
   var pLog = document.createElement("p"); // 要素作成
-  //pLog.textContent = textLog; // 要素にテキストを設定
   pLog.innerHTML = textLog; // 要素にテキストを設定
   document.getElementById("log").prepend(pLog); // 要素を追加
   // ログの削除
@@ -80,18 +73,15 @@ function bouyomiStart(){
   var d_token = document.querySelector('input[name="d_token"]').value;
   var startTime = new Date();
   var startMess = "読み上げを開始しています。";
-  //var startText = `<info> ${startMess}`;
   document.getElementById("bouyomi_status").innerHTML =
     `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
     `<p class="comment">${startMess}</p>`;
-  // 配列を生成
   var ary = {
     time: startTime,
     type: "info",
     name: "",
     text: startMess
   };
-  //logProcess(startTime, startText);
   logProcess(ary);
   if(d_token == ""){
     var tokenText = "Error: The token is not filled in.";
@@ -102,12 +92,9 @@ function bouyomiStart(){
     errorLog("login", error);
   });
 }
-//function bouyomiProcess(time, text){
 function bouyomiProcess(ary){
   var bouyomiServer = {};
-  //var textBym = text.replace(/<[\s\S]*?>\s/,"");
   var text = ary.text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）"); // スタンプを読ませない
-  //var textBym = `${ary.name} ${text}`; // name text
   var d_sv_nameRead = document.getElementById("d_sv_nameRead").d_sv_nameRead.value;
   var textBym = (function() {
     if(d_sv_nameRead=="1") return `${text}`;
@@ -174,15 +161,12 @@ function readFile(){
       }
     }
     var readTime = new Date();
-    //var readText = "<info> 設定ファイルを読み込みました。";
-    // 配列を生成
     var ary = {
       time: readTime,
       type: "info",
       name: "",
       text: "設定ファイルを読み込みました。"
     };
-    //logProcess(readTime, readText);
     logProcess(ary);
   });
 }
@@ -224,16 +208,13 @@ function writeFile(){
     }
     var writTime = new Date();
     var writMess = "設定ファイルを保存しました。";
-    //var writText = `<info> ${writMess}`;
     document.getElementById("save_information").textContent = writMess;
-    // 配列を生成
     var ary = {
       time: writTime,
       type: "info",
       name: "",
       text: writMess
     };
-    //logProcess(writTime, writText);
     logProcess(ary);
   });
 }
@@ -244,14 +225,12 @@ function createFile(){
       if(error){return;}
       var createTime = new Date();
       var createText = "<info> 設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
-      // 配列を生成
       var ary = {
         time: createTime,
         type: "info",
         name: "",
         text: "設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
       };
-      //logProcess(createTime, createText);
       logProcess(ary);
       readFile();
     });
@@ -264,14 +243,12 @@ function errorHandling(error){
       if(errorCode.match(/ENOENT/)) return      "設定ファイルが存在しませんでした。";
       if(errorCode.match(/EPERM|EBUSY/)) return `設定ファイルを保存できませんでした。${fileName}を開いている場合は閉じてください。`;
     })(),
-    //errorText = `<info> ${errorMess}`;
     ary = {
       time: errorTime,
       type: "info",
       name: "",
       text: "errorMess"
     };
-  //logProcess(errorTime, errorText);
   logProcess(ary);
   if(errorCode.match(/ENOENT/)){
     createFile();
@@ -281,7 +258,6 @@ function errorHandling(error){
 client.on("ready", () => {
   var readyTime    = new Date();
   var readyMess = "読み上げを開始しました。";
-  //var readyText = `<info> ${readyMess}`;
   document.querySelector("#bouyomi_status p").textContent = readyMess;
   var ary = {
     time: readyTime,
@@ -289,15 +265,12 @@ client.on("ready", () => {
     name: "",
     text: readyMess
   };
-  //logProcess(readyTime, readyText);
   logProcess(ary);
-  //bouyomiProcess(readyTime, readyText);
   bouyomiProcess(ary);
 });
 client.on("reconnecting", () => {
   var reconnectTime    = new Date();
   var reconnectMess = "再接続をします。";
-  //var reconnectText = `<info> ${reconnectMess}`;
   document.querySelector("#bouyomi_status p").textContent = reconnectMess;
   var ary = {
     time: reconnectTime,
@@ -305,9 +278,7 @@ client.on("reconnecting", () => {
     name: "",
     text: reconnectMess
   };
-  //logProcess(reconnectTime, reconnectText);
   logProcess(ary);
-  //bouyomiProcess(reconnectTime, reconnectText);
 });
 client.on("message", message => {
   debugLog("message", message);
@@ -390,20 +361,16 @@ client.on("message", message => {
   })();
   // チャットの内容
   var content = message.content;
-  // 追加スタンプを読ませない "<:987654321:12345>, :foo12345:"
-  //var content = content.replace(/<?:[A-Za-z0-9]+:([0-9]+)?>?/g, "（スタンプ）");
   // リプライを読ませない
   var content = content.replace(/<@!?[0-9]+>/g, "");
   // チャンネルタグを読ませない
   var content = content.replace(/<#[0-9]+>/g, "");
   // 画像オンリー、スペースのみを読ませない
   if(content=="" || /^([\s]+)$/.test(content)){return;}
-  //var text = `<${guildName}> ${username} ${content}`;
   // チャットの時間
   var utc  = message.createdTimestamp; // UTC
   var jst  = utc + (60 * 60 * 9); // +9hour
   var time = new Date(jst);
-  // 配列を生成
   var ary = {
     time: time,
     type: guildName,
@@ -411,9 +378,7 @@ client.on("message", message => {
     text: content
   };
   // 処理
-  //logProcess(time, text);
   logProcess(ary);
-  //bouyomiProcess(time, text);
   bouyomiProcess(ary);
 });
 // エラーが起きたときの処理
@@ -453,15 +418,12 @@ function errorLog(fnc, error){
     return `不明なエラーが発生しました。（${errorStr}）`;
   })();
   var errTime = new Date();
-  //var errText = `<error> ${errorMess}`;
-  // 配列を生成
   var ary = {
     time: errTime,
     type: "error",
     name: "",
     text: errorMess
   };
-  //logProcess(errTime, errText);
   logProcess(ary);
   debugLog(fnc, error);
   document.getElementById("bouyomi_status").innerHTML =
