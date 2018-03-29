@@ -1,14 +1,12 @@
 const {ipcRenderer} = require("electron");
-// DiSpeakのディレクトリを取得
-const directory = ipcRenderer.sendSync("directory-check").replace(/\\/g,"/");
-// 現在のバージョンを取得
-const nowVersion = ipcRenderer.sendSync("now-version-check");
-var bouyomiConnect = require(`${directory}/js/bouyomiConnect.js`);
-var Discord = require("discord.js");
-var client = new Discord.Client();
-var fs = require("fs");
-var fileName = "setting.json";
-var fileName_default = "setting_default.json";
+const directory = ipcRenderer.sendSync("directory-check").replace(/\\/g,"/"); // DiSpeakのディレクトリを取得
+const nowVersion = ipcRenderer.sendSync("now-version-check"); // 現在のバージョンを取得
+const bouyomiConnect = require(`${directory}/js/bouyomiConnect.js`);
+const Discord = require("discord.js");
+const client = new Discord.Client();
+const fs = require("fs");
+const fileName = "setting.json";
+const fileName_default = "setting_default.json";
 console.info(`Version ${nowVersion}`);
 // 設定ファイルの読み込み
 readFile();
@@ -37,23 +35,19 @@ function filterArray(ary){
 }
 // エスケープ
 function escapeHtml(str) {
-  var str = str.replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+  var str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   return str;
 }
 function logProcess(ary){
   var hour = toDoubleDigits(ary.time.getHours());
   var min  = toDoubleDigits(ary.time.getMinutes());
   var sec  = toDoubleDigits(ary.time.getSeconds());
-  var textLog = ary.text.replace(/\r\n|\n|\r/,"");
-  var textLog = escapeHtml(`[${hour}:${min}:${sec}] <${ary.type}> ${ary.name} ${textLog}`); // [time] <type> name text
-  var textLog = textLog.replace(/&lt;(:.+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">');
-  var pLog = document.createElement("p"); // 要素作成
-  pLog.innerHTML = textLog; // 要素にテキストを設定
-  document.getElementById("log").prepend(pLog); // 要素を追加
+  var text = ary.text.replace(/\r\n|\n|\r/,"");
+  var textEsc = escapeHtml(`[${hour}:${min}:${sec}] <${ary.type}> ${ary.name} ${text}`); // [time] <type> name text
+  var textRep = textEsc.replace(/&lt;(:.+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">');
+  var pElement = document.createElement("p"); // 要素作成
+  pElement.innerHTML = textRep; // 要素にテキストを設定
+  document.getElementById("log").prepend(pElement); // 要素を追加
   // ログの削除
   var logP = document.querySelectorAll("#log p");
   var maxLine = 50; // 表示される最大行数
