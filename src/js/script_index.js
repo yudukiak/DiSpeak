@@ -107,7 +107,12 @@ function bouyomiProcess(ary){
   var bouyomiServer = {};
   //var textBym = text.replace(/<[\s\S]*?>\s/,"");
   var text = ary.text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）"); // スタンプを読ませない
-  var textBym = `${ary.name} ${text}`; // name text
+  //var textBym = `${ary.name} ${text}`; // name text
+  var d_sv_nameRead = document.getElementById("d_sv_nameRead").d_sv_nameRead.value;
+  var textBym = (function() {
+    if(d_sv_nameRead=="1") return `${text}`;
+    return `${ary.name} ${text}`;
+  })();
   var ip   = document.querySelector('input[name="b_ip"]').value;
   var port = document.querySelector('input[name="b_port"]').value;
   bouyomiServer.host = ip;
@@ -155,6 +160,7 @@ function readFile(){
         // Discord サーバ設定
         case "d_sv":           document.getElementById("d_sv").d_sv[settingAryKey].checked = true; break;
         case "d_sv_nick":      document.getElementById("d_sv_nick").d_sv_nick[settingAryKey].checked = true; break;
+        case "d_sv_nameRead":  document.getElementById("d_sv_nameRead").d_sv_nameRead[settingAryKey].checked = true; break;
         case "d_sv_sv_list":   document.getElementById("d_sv_sv_list").d_sv_sv_list[settingAryKey].checked = true; break;
         case "d_sv_sv_list_b": document.querySelector('textarea[name="d_sv_sv_list_b"]').value = settingAryKey.join("\n"); break;
         case "d_sv_sv_list_w": document.querySelector('textarea[name="d_sv_sv_list_w"]').value = settingAryKey.join("\n"); break;
@@ -199,6 +205,7 @@ function writeFile(){
   // Discord サーバ設定
   settingAry.d_sv           = Number(document.getElementById("d_sv").d_sv.value);
   settingAry.d_sv_nick      = Number(document.getElementById("d_sv_nick").d_sv_nick.value);
+  settingAry.d_sv_nameRead  = Number(document.getElementById("d_sv_nameRead").d_sv_nameRead.value);
   settingAry.d_sv_sv_list   = Number(document.getElementById("d_sv_sv_list").d_sv_sv_list.value);
   settingAry.d_sv_sv_list_b = filterArray(document.querySelector('textarea[name="d_sv_sv_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
   settingAry.d_sv_sv_list_w = filterArray(document.querySelector('textarea[name="d_sv_sv_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
@@ -319,6 +326,7 @@ client.on("message", message => {
   // Discord サーバ設定
   var d_sv           = document.getElementById("d_sv").d_sv.value;
   var d_sv_nick      = document.getElementById("d_sv_nick").d_sv_nick.value;
+  var d_sv_nameRead  = document.getElementById("d_sv_nameRead").d_sv_nameRead.value;
   var d_sv_sv_list   = document.getElementById("d_sv_sv_list").d_sv_sv_list.value;
   var d_sv_sv_list_b = document.querySelector('textarea[name="d_sv_sv_list_b"]').value;
   var d_sv_sv_list_w = document.querySelector('textarea[name="d_sv_sv_list_w"]').value;
