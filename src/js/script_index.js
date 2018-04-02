@@ -87,19 +87,30 @@ function bouyomiStart(){
   });
 }
 function bouyomiProcess(ary){
-  var bouyomiServer = {};
-  var text = ary.text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）"); // スタンプを読ませない
+  // チャンネル（DM, Group, Server）を読ませるか
+  var d_channel = document.getElementById("d_channel").d_channel.value;
+  var type = (function() {
+    if(d_channel=="1") return "";
+    return ary.type;
+  })();
+  // 名前を読ませるか
   var d_dm_nameRead = document.getElementById("d_dm_nameRead").d_dm_nameRead.value;
   var d_gr_nameRead = document.getElementById("d_gr_nameRead").d_gr_nameRead.value;
   var d_sv_nameRead = document.getElementById("d_sv_nameRead").d_sv_nameRead.value;
-  var textBym = (function() {
-    if(d_dm_nameRead=="1" && ary.type=="dm") return `${text}`;
-    if(d_gr_nameRead=="1" && ary.type=="group") return `${text}`;
-    if(d_sv_nameRead=="1" && ary.type!="dm" && ary.type!="group") return `${text}`;
-    return `${ary.name} ${text}`;
+  var name = (function() {
+    if(d_dm_nameRead=="1" && ary.type=="dm") return "";
+    if(d_gr_nameRead=="1" && ary.type=="group") return "";
+    if(d_sv_nameRead=="1" && ary.type!="dm" && ary.type!="group") return "";
+    return ary.name;
   })();
+  // 読ませる文章を生成
+  var text = `${type} ${name} ${ary.text}`;
+  // 読ませる文章の調整
+  var textBym = text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）").replace(/\s+/g, "").trim();
+  // 棒読みちゃんの処理
   var ip   = document.querySelector('input[name="b_ip"]').value;
   var port = document.querySelector('input[name="b_port"]').value;
+  var bouyomiServer = {};
   bouyomiServer.host = ip;
   bouyomiServer.port = port;
   bouyomiConnect.sendBouyomi(bouyomiServer, textBym);
@@ -132,6 +143,7 @@ function readFile(){
         // Discord 基本設定
         case "d_token":        document.querySelector('input[name="d_token"]').value = settingAryKey; break;
         case "d_user":         document.getElementById("d_user").d_user[settingAryKey].checked = true; break;
+        case "d_channel":      document.getElementById("d_channel").d_channel[settingAryKey].checked = true; break;
         // Discord DM設定
         case "d_dm":           document.getElementById("d_dm").d_dm[settingAryKey].checked = true; break;
         case "d_dm_nameRead":  document.getElementById("d_dm_nameRead").d_dm_nameRead[settingAryKey].checked = true; break;
@@ -176,6 +188,7 @@ function writeFile(){
   // Discord 基本設定
   settingAry.d_token        = document.querySelector('input[name="d_token"]').value;
   settingAry.d_user         = Number(document.getElementById("d_user").d_user.value);
+  settingAry.d_channel      = Number(document.getElementById("d_channel").d_channel.value);
   // Discord DM設定
   settingAry.d_dm           = Number(document.getElementById("d_dm").d_dm.value);
   settingAry.d_dm_nameRead  = Number(document.getElementById("d_dm_nameRead").d_dm_nameRead.value);
