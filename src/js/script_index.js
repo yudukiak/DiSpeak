@@ -94,13 +94,13 @@ function bouyomiProcess(ary){
     return ary.type;
   })();
   // 名前を読ませるか
-  var d_dm_nameRead = document.getElementById("d_dm_nameRead").d_dm_nameRead.value;
-  var d_gr_nameRead = document.getElementById("d_gr_nameRead").d_gr_nameRead.value;
-  var d_sv_nameRead = document.getElementById("d_sv_nameRead").d_sv_nameRead.value;
+  var d_dm_name = document.getElementById("d_dm_name").d_dm_name.value;
+  var d_gr_name = document.getElementById("d_gr_name").d_gr_name.value;
+  var d_sv_name = document.getElementById("d_sv_name").d_sv_name.value;
   var name = (function() {
-    if(d_dm_nameRead=="1" && ary.type=="dm") return "";
-    if(d_gr_nameRead=="1" && ary.type=="group") return "";
-    if(d_sv_nameRead=="1" && ary.type!="dm" && ary.type!="group") return "";
+    if(d_dm_name=="1" && ary.type=="dm") return "";
+    if(d_gr_name=="1" && ary.type=="group") return "";
+    if(d_sv_name=="1" && ary.type!="dm" && ary.type!="group") return "";
     return ary.name;
   })();
   // 読ませる文章を生成
@@ -146,20 +146,20 @@ function readFile(){
         case "d_channel":      document.getElementById("d_channel").d_channel[settingAryKey].checked = true; break;
         // Discord DM設定
         case "d_dm":           document.getElementById("d_dm").d_dm[settingAryKey].checked = true; break;
-        case "d_dm_nameRead":  document.getElementById("d_dm_nameRead").d_dm_nameRead[settingAryKey].checked = true; break;
+        case "d_dm_name":      document.getElementById("d_dm_name").d_dm_name[settingAryKey].checked = true; break;
         case "d_dm_list":      document.getElementById("d_dm_list").d_dm_list[settingAryKey].checked = true; break;
         case "d_dm_list_b":    document.querySelector('textarea[name="d_dm_list_b"]').value = settingAryKey.join("\n"); break;
         case "d_dm_list_w":    document.querySelector('textarea[name="d_dm_list_w"]').value = settingAryKey.join("\n"); break;
         // Discord グループ設定
         case "d_gr":           document.getElementById("d_gr").d_gr[settingAryKey].checked = true; break;
-        case "d_gr_nameRead":  document.getElementById("d_gr_nameRead").d_gr_nameRead[settingAryKey].checked = true; break;
+        case "d_gr_name":      document.getElementById("d_gr_name").d_gr_name[settingAryKey].checked = true; break;
         case "d_gr_list":      document.getElementById("d_gr_list").d_gr_list[settingAryKey].checked = true; break;
         case "d_gr_list_b":    document.querySelector('textarea[name="d_gr_list_b"]').value = settingAryKey.join("\n"); break;
         case "d_gr_list_w":    document.querySelector('textarea[name="d_gr_list_w"]').value = settingAryKey.join("\n"); break;
         // Discord サーバ設定
         case "d_sv":           document.getElementById("d_sv").d_sv[settingAryKey].checked = true; break;
         case "d_sv_nick":      document.getElementById("d_sv_nick").d_sv_nick[settingAryKey].checked = true; break;
-        case "d_sv_nameRead":  document.getElementById("d_sv_nameRead").d_sv_nameRead[settingAryKey].checked = true; break;
+        case "d_sv_name":      document.getElementById("d_sv_name").d_sv_name[settingAryKey].checked = true; break;
         case "d_sv_sv_list":   document.getElementById("d_sv_sv_list").d_sv_sv_list[settingAryKey].checked = true; break;
         case "d_sv_sv_list_b": document.querySelector('textarea[name="d_sv_sv_list_b"]').value = settingAryKey.join("\n"); break;
         case "d_sv_sv_list_w": document.querySelector('textarea[name="d_sv_sv_list_w"]').value = settingAryKey.join("\n"); break;
@@ -191,20 +191,20 @@ function writeFile(){
   settingAry.d_channel      = Number(document.getElementById("d_channel").d_channel.value);
   // Discord DM設定
   settingAry.d_dm           = Number(document.getElementById("d_dm").d_dm.value);
-  settingAry.d_dm_nameRead  = Number(document.getElementById("d_dm_nameRead").d_dm_nameRead.value);
+  settingAry.d_dm_name  = Number(document.getElementById("d_dm_name").d_dm_name.value);
   settingAry.d_dm_list      = Number(document.getElementById("d_dm_list").d_dm_list.value);
   settingAry.d_dm_list_b    = filterArray(document.querySelector('textarea[name="d_dm_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
   settingAry.d_dm_list_w    = filterArray(document.querySelector('textarea[name="d_dm_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
   // Discord グループ設定
   settingAry.d_gr           = Number(document.getElementById("d_gr").d_gr.value);
-  settingAry.d_gr_nameRead  = Number(document.getElementById("d_gr_nameRead").d_gr_nameRead.value);
+  settingAry.d_gr_name  = Number(document.getElementById("d_gr_name").d_gr_name.value);
   settingAry.d_gr_list      = Number(document.getElementById("d_gr_list").d_gr_list.value);
   settingAry.d_gr_list_b    = filterArray(document.querySelector('textarea[name="d_gr_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
   settingAry.d_gr_list_w    = filterArray(document.querySelector('textarea[name="d_gr_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
   // Discord サーバ設定
   settingAry.d_sv           = Number(document.getElementById("d_sv").d_sv.value);
   settingAry.d_sv_nick      = Number(document.getElementById("d_sv_nick").d_sv_nick.value);
-  settingAry.d_sv_nameRead  = Number(document.getElementById("d_sv_nameRead").d_sv_nameRead.value);
+  settingAry.d_sv_name  = Number(document.getElementById("d_sv_name").d_sv_name.value);
   settingAry.d_sv_sv_list   = Number(document.getElementById("d_sv_sv_list").d_sv_sv_list.value);
   settingAry.d_sv_sv_list_b = filterArray(document.querySelector('textarea[name="d_sv_sv_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
   settingAry.d_sv_sv_list_w = filterArray(document.querySelector('textarea[name="d_sv_sv_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
