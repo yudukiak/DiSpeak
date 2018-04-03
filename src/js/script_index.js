@@ -106,7 +106,7 @@ function bouyomiProcess(ary){
   // 読ませる文章を生成
   var text = `${type} ${name} ${ary.text}`;
   // 読ませる文章の調整
-  var textBym = text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）").replace(/\s+/g, "").trim();
+  var textBym = text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）").replace(/\s+/g, " ").trim();
   // 棒読みちゃんの処理
   var ip   = document.querySelector('input[name="b_ip"]').value;
   var port = document.querySelector('input[name="b_port"]').value;
@@ -394,18 +394,18 @@ client.on("message", message => {
   if(channelType == "dm"){
     var dmUserId = message.channel.recipient.id;
     if(d_dm_list=="0" &&  dmUserId.match(replaceNewline(d_dm_list_b))){return;}else
-    if(d_dm_list=="1" && !dmUserId.match(replaceNewline(d_dm_list_w)) && d_dm_list_w.length>10){return;}
+    if(d_dm_list=="1" && !dmUserId.match(replaceNewline(d_dm_list_w))){return;}
   }else if(channelType == "group"){
     var grUserId = message.channel.id;
     if(d_gr_list=="0" &&  grUserId.match(replaceNewline(d_gr_list_b))){return;}else
-    if(d_gr_list=="1" && !grUserId.match(replaceNewline(d_gr_list_w)) && d_gr_list_w.length>10){return;}
+    if(d_gr_list=="1" && !grUserId.match(replaceNewline(d_gr_list_w))){return;}
   }else if(channelType == "text"){
     var svServerId  = message.channel.guild.id;
     var svChannelId = message.channel.id;
     if(d_sv_sv_list=="0" &&  svServerId.match(replaceNewline(d_sv_sv_list_b))){return;}else
-    if(d_sv_sv_list=="1" && !svServerId.match(replaceNewline(d_sv_sv_list_w)) && d_sv_sv_list_w.length>10){return;}else
+    if(d_sv_sv_list=="1" && !svServerId.match(replaceNewline(d_sv_sv_list_w))){return;}else
     if(d_sv_ch_list=="0" &&  svChannelId.match(replaceNewline(d_sv_ch_list_b))){return;}else
-    if(d_sv_ch_list=="1" && !svChannelId.match(replaceNewline(d_sv_ch_list_w)) && d_sv_ch_list_w.length>10){return;}
+    if(d_sv_ch_list=="1" && !svChannelId.match(replaceNewline(d_sv_ch_list_w))){return;}
   }
   // 名前の処理
   var nickname = (function() {
