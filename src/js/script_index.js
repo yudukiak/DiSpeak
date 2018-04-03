@@ -160,6 +160,7 @@ function readFile(){
         case "d_sv":           document.getElementById("d_sv").d_sv[settingAryKey].checked = true; break;
         case "d_sv_nick":      document.getElementById("d_sv_nick").d_sv_nick[settingAryKey].checked = true; break;
         case "d_sv_name":      document.getElementById("d_sv_name").d_sv_name[settingAryKey].checked = true; break;
+        case "d_sv_voice":     document.getElementById("d_sv_voice").d_sv_voice[settingAryKey].checked = true; break;
         case "d_sv_sv_list":   document.getElementById("d_sv_sv_list").d_sv_sv_list[settingAryKey].checked = true; break;
         case "d_sv_sv_list_b": document.querySelector('textarea[name="d_sv_sv_list_b"]').value = settingAryKey.join("\n"); break;
         case "d_sv_sv_list_w": document.querySelector('textarea[name="d_sv_sv_list_w"]').value = settingAryKey.join("\n"); break;
@@ -205,6 +206,7 @@ function writeFile(){
   settingAry.d_sv           = Number(document.getElementById("d_sv").d_sv.value);
   settingAry.d_sv_nick      = Number(document.getElementById("d_sv_nick").d_sv_nick.value);
   settingAry.d_sv_name  = Number(document.getElementById("d_sv_name").d_sv_name.value);
+  settingAry.d_sv_voice     = Number(document.getElementById("d_sv_voice").d_sv_voice.value);
   settingAry.d_sv_sv_list   = Number(document.getElementById("d_sv_sv_list").d_sv_sv_list.value);
   settingAry.d_sv_sv_list_b = filterArray(document.querySelector('textarea[name="d_sv_sv_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
   settingAry.d_sv_sv_list_w = filterArray(document.querySelector('textarea[name="d_sv_sv_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
@@ -294,6 +296,54 @@ client.on("reconnecting", () => {
     text: reconnectMess
   };
   logProcess(ary);
+});
+// ボイスチャンネルに参加（マイク、スピーカーのON/OFFも）
+client.on("voiceStateUpdate", message => {
+  debugLog("voiceStateUpdate", message);
+  var d_sv_voice = document.getElementById("d_sv_voice").d_sv_voice.value;
+  if(d_sv_voice == "1"){return;}
+  var clientUserId = client.user.id; // 自分のID
+  var messageUserId = message.id; // 参加者のID
+  if(clientUserId == messageUserId){return;} // 自分自身のイベント
+  var messageGuildId = message.guild.id; // サーバのID
+  var d_sv_sv_list   = document.getElementById("d_sv_sv_list").d_sv_sv_list.value;
+  var d_sv_sv_list_b = document.querySelector('textarea[name="d_sv_sv_list_b"]').value;
+  var d_sv_sv_list_w = document.querySelector('textarea[name="d_sv_sv_list_w"]').value;
+  if(d_sv_sv_list=="0" &&  messageGuildId.match(replaceNewline(d_sv_sv_list_b))){return;} // ブラックリストにある時
+  if(d_sv_sv_list=="1" && !messageGuildId.match(replaceNewline(d_sv_sv_list_w))){return;} // ホワイトリストにない時
+  var d_sv_nick = document.getElementById("d_sv_nick").d_sv_nick.value;
+  var nickname = message.nickname;
+  var username = (function() {
+    if(d_sv_nick=="1" || nickname==null) return message.user.username; // d_sv_nickが無効の時、サーバで未設定のとき
+    return nickname;
+  })();
+  var guildChannel = message.guild.channels; // サーバのチャンネル一覧
+  // 切断チャンネル（参加時:undefined, 切断時:123456789012345678）
+  var channelID = message.voiceChannelID;
+  var channelName = guildChannel.map(function(value, index){
+    if(channelID == index){return value.name;}
+  }).filter(Boolean);
+  // 参加チャンネル（参加時:123456789012345678, 切断時:null）
+  var protoChannelID = message.__proto__.voiceChannelID;
+  var protoChannelName = guildChannel.map(function(value, index){
+    if(protoChannelID == index){return value.name;}
+  }).filter(Boolean);
+  // テキストの生成
+  var text = (function() {
+    if(channelID == null) return `${username}が「${protoChannelName}」に参加しました。`; // チャンネルへ参加
+    if(protoChannelID==null) return `${username}が「${channelName}」から切断しました。`; // チャンネルから切断
+    if(channelID != protoChannelID) return `${username}が「${channelName}」から「${protoChannelName}」へ移動しました。`; // チャンネルの移動
+  })();
+  var ary = {
+    time: new Date(),
+    type: "info",
+    name: "",
+    text: text
+  };
+  // 処理
+  if(channelID == protoChannelID){return;}
+  logProcess(ary);
+  if(d_sv_voice == "0"){bouyomiProcess(ary);}
 });
 client.on("message", message => {
   debugLog("message", message);
