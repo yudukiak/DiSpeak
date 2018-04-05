@@ -1,9 +1,11 @@
 "use strct";
 // Electron https://electronjs.org/docs
-const {app, Menu, shell, BrowserWindow, dialog, ipcMain} = require("electron");
+const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain} = require("electron");
 const {execFile} = require("child_process");
+const appName = app.getName();
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let infoWindow = null;
+let tray = null;
 
 // 現在のバージョン
 const package = require("./package.json");
@@ -79,6 +81,8 @@ app.on("window-all-closed", () => {
 });
 // Electronの初期化完了後に実行
 app.on("ready", ()=> {
+  // タスクトレイを表示
+  createTray();
   //ウィンドウサイズを設定する
   mainWindow = new BrowserWindow({
     width: 640,
@@ -94,11 +98,46 @@ app.on("ready", ()=> {
     ev.preventDefault();
     shell.openExternal(url);
   });
+  // ウィンドウが最小化されたら
+  mainWindow.on("minimize", ()=> {
+    mainWindow.setSkipTaskbar(true); // タスクバーから削除
+  });
+  // ウィンドウが表示されたら
+  mainWindow.on("restore", ()=> {
+    mainWindow.setSkipTaskbar(false); // タスクバーに表示
+  });
   // ウィンドウが閉じられたらアプリも終了
   mainWindow.on("closed", ()=> {
     mainWindow = null;
   });
 });
+// タスクトレイ
+function createTray(){
+  tray = new Tray(`${__dirname}/images/icon.png`);
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Wikiを開く",
+      click: function() { shell.openExternal("https://github.com/micelle/dc_DiSpeak/wiki"); }
+    },
+    {
+      label: "表示する",
+      position: 'endof=cmd',
+      click: function(){mainWindow.focus();}
+    },
+    {
+      label: "終了する",
+      position: 'endof=cmd',
+      click: function(){mainWindow.close();}
+    }
+  ]);
+  tray.setContextMenu(contextMenu);
+  tray.setToolTip(`${appName} v${nowVersion}`);
+  tray.on('click', function(){
+    mainWindow.focus();
+    //tray.popUpContextMenu(contextMenu); // メニューを表示
+  });
+}
+
 // でぃすぴーくについて、のウィンドウ
 function infoWindowOpen(){
   infoWindow = new BrowserWindow({
