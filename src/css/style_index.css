@@ -6,10 +6,6 @@ html {
 body {
   margin: 0!important;
 }
-.body {
-    width: 580px;
-    margin: 10px auto 0 auto;
-}
 .header {
   -webkit-app-region: drag;
   -webkit-user-select: none;
@@ -22,6 +18,14 @@ body {
   padding-top: 4px;
   */
 }
+.body {
+  overflow-y: scroll;
+  height: calc(100vh - 25px);
+}
+.box {
+  width: 580px;
+  margin: 10px auto;
+}
 .minimize, .maximize, .close {
   -webkit-app-region: no-drag;
   text-align: center;
@@ -31,9 +35,24 @@ body {
   margin-right: auto;
   padding-left: 5px;
 }
+.logo img {
+  height: calc(100% - 10px);
+  padding: 5px;
+  width: auto;
+}
 .minimize:hover, .maximize:hover {
   background-color: #5C656A;
 }
 .close:hover {
   background-color: #E81123;
 }
+/*
+.box-logo {
+  display: flex;
+  align-items: center;
+}
+.box-logo img {
+  width: 100%;
+  height: auto;
+}
+*/
