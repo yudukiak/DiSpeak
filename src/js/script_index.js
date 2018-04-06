@@ -14,6 +14,10 @@ readFile();
 function reload(){
   location.reload();
 }
+// UIの挙動
+function windowMin(){ipcRenderer.send("window-minimize");}
+function windowMax(){ipcRenderer.send("window-maximize");}
+function windowCls(){ipcRenderer.send("window-close");}
 // 日時の0詰め https://tagamidaiki.com/javascript-0-chink/
 function toDoubleDigits(num){
   num += "";

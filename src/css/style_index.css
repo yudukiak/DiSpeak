@@ -1,6 +1,39 @@
 html {
+  /*
     overflow-y: scroll;
+  */
 }
 body {
+  margin: 0!important;
+}
+.body {
     width: 580px;
+    margin: 10px auto 0 auto;
+}
+.header {
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  background: #4A5459;
+  color: #fff;
+  display: flex;
+  font-size: 15px;
+  height: 25px;
+  /*
+  padding-top: 4px;
+  */
+}
+.minimize, .maximize, .close {
+  -webkit-app-region: no-drag;
+  text-align: center;
+  width: 35px;
+}
+.logo {
+  margin-right: auto;
+  padding-left: 5px;
+}
+.minimize:hover, .maximize:hover {
+  background-color: #5C656A;
+}
+.close:hover {
+  background-color: #E81123;
 }

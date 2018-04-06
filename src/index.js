@@ -85,6 +85,8 @@ app.on("ready", ()=> {
   createTray();
   //ウィンドウサイズを設定する
   mainWindow = new BrowserWindow({
+    frame: false,
+    show: false,
     width: 640,
     height: 480,
     icon: `${__dirname}/images/icon.png`,
@@ -98,14 +100,18 @@ app.on("ready", ()=> {
     ev.preventDefault();
     shell.openExternal(url);
   });
+  // ウィンドウの準備ができたら表示
+  mainWindow.on("ready-to-show", ()=> {
+    mainWindow.show();
+  });
   // ウィンドウが最小化されたら
-  mainWindow.on("minimize", ()=> {
-    mainWindow.setSkipTaskbar(true); // タスクバーから削除
-  });
+  //mainWindow.on("minimize", ()=> {
+  //  mainWindow.setSkipTaskbar(true); // タスクバーから削除
+  //});
   // ウィンドウが表示されたら
-  mainWindow.on("restore", ()=> {
-    mainWindow.setSkipTaskbar(false); // タスクバーに表示
-  });
+  //mainWindow.on("restore", ()=> {
+  //  mainWindow.setSkipTaskbar(false); // タスクバーに表示
+  //});
   // ウィンドウが閉じられたらアプリも終了
   mainWindow.on("closed", ()=> {
     mainWindow = null;
@@ -122,7 +128,7 @@ function createTray(){
     {
       label: "表示する",
       position: 'endof=cmd',
-      click: function(){mainWindow.focus();}
+      click: function(){mainWindow.show();}
     },
     {
       label: "終了する",
@@ -133,7 +139,7 @@ function createTray(){
   tray.setContextMenu(contextMenu);
   tray.setToolTip(`${appName} v${nowVersion}`);
   tray.on('click', function(){
-    mainWindow.focus();
+    mainWindow.show();
     //tray.popUpContextMenu(contextMenu); // メニューを表示
   });
 }
@@ -282,6 +288,21 @@ ipcMain.on("bouyomi-exe-alert", (event) => {
 ipcMain.on("directory-check", (event) => {
   event.returnValue = app.getAppPath();
 })
+
+// UIの挙動
+ipcMain.on("window-minimize", ()=>{
+  mainWindow.minimize();
+});
+ipcMain.on("window-maximize", ()=>{
+  if(mainWindow.isMaximized()){
+    mainWindow.unmaximize();
+  } else {
+    mainWindow.maximize();
+  }
+});
+ipcMain.on("window-close", ()=>{
+  mainWindow.hide();
+});
 
 // エラーの処理
 process.on("uncaughtException", (err) => {
