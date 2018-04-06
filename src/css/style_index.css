@@ -28,6 +28,7 @@ body {
 }
 .minimize, .maximize, .close {
   -webkit-app-region: no-drag;
+  cursor: pointer;
   text-align: center;
   width: 35px;
 }
