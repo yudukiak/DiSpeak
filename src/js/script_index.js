@@ -70,19 +70,21 @@ function logProcess(ary){
     }
   }
 }
-function bouyomiDisabled(){
-  document.getElementById("bouyomi_status").innerHTML =
-    `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
-    `<p class="comment">「画面を更新」してから「読み上げ開始」してください。</p>`;
-}
+//function bouyomiDisabled(){
+//  document.getElementById("bouyomi_status").innerHTML =
+//    `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
+//    `<p class="comment">「画面を更新」してから「読み上げ開始」してください。</p>`;
+//}
 function bouyomiStart(){
   bouyomiExeStart();
+  document.getElementsByClassName("footer-start")[0].className = "button footer-start footer-hidden";
+  document.getElementsByClassName("footer-stop")[0].className = "button footer-stop";
   var d_token = document.querySelector('input[name="d_token"]').value;
   var startTime = new Date();
   var startMess = "読み上げを開始しています。";
-  document.getElementById("bouyomi_status").innerHTML =
-    `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
-    `<p class="comment">${startMess}</p>`;
+//  document.getElementById("bouyomi_status").innerHTML =
+//    `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
+//    `<p class="comment">${startMess}</p>`;
   var ary = {
     time: startTime,
     type: "info",
@@ -238,8 +240,8 @@ function writeFile(){
     }
     var writTime = new Date();
     var writMess = "設定ファイルを保存しました。";
-    document.getElementsByClassName("save_information")[0].textContent = writMess;
-    document.getElementsByClassName("save_information")[1].textContent = writMess;
+//    document.getElementsByClassName("save_information")[0].textContent = writMess;
+//    document.getElementsByClassName("save_information")[1].textContent = writMess;
     var ary = {
       time: writTime,
       type: "info",
@@ -289,7 +291,7 @@ function errorHandling(error){
 client.on("ready", () => {
   var readyTime    = new Date();
   var readyMess = "読み上げを開始しました。";
-  document.querySelector("#bouyomi_status p").textContent = readyMess;
+//  document.querySelector("#bouyomi_status p").textContent = readyMess;
   var ary = {
     time: readyTime,
     type: "info",
@@ -302,7 +304,7 @@ client.on("ready", () => {
 client.on("reconnecting", () => {
   var reconnectTime    = new Date();
   var reconnectMess = "再接続をします。";
-  document.querySelector("#bouyomi_status p").textContent = reconnectMess;
+//  document.querySelector("#bouyomi_status p").textContent = reconnectMess;
   var ary = {
     time: reconnectTime,
     type: "info",
