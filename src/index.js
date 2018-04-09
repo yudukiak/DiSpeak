@@ -1,29 +1,35 @@
 "use strct";
-// Electron https://electronjs.org/docs
+// モジュールの読み込み
 const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain} = require("electron");
-const {execFile} = require("child_process");
+const execFile = require("child_process");
+const request = require("request");
+const package = require("./package.json");
+// 変数の指定
+const nowVersion = package["version"];
 const appName = app.getName();
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let infoWindow = null;
 let tray = null;
-
-// 現在のバージョン
-const package = require("./package.json");
-const nowVersion = package["version"];
-
-// 現在のバージョンを返す
-ipcMain.on("now-version-check", (event) => {
-  event.returnValue = nowVersion;
-})
-
-// APIへアクセス https://maku77.github.io/nodejs/net/request-module.html
-const request = require("request");
+// 起動時にバージョンのチェックを行う
 const apiOptions = {
   url: "https://api.github.com/repos/micelle/dc_DiSpeak/releases/latest",
   headers: {"User-Agent": "Awesome-Octocat-App"},
   json: true
 };
 request.get(apiOptions, apiCheck_s);
+// Electronの初期化完了後に実行
+app.on("ready", () => {
+  createMainwindow(); // mainWindowの生成
+});
+// 全てのウィンドウが閉じたら終了
+app.on("window-all-closed", () => {
+  if(process.platform != "darwin"){
+    app.quit();
+  }
+});
+// ------------------------------
+// 処理用の関数
+// ------------------------------
 function apiCheck_s(err, res, data){if(!err && res.statusCode==200){relCheck(data, "start");}}
 function apiCheck_c(err, res, data){if(!err && res.statusCode==200){relCheck(data, "check");}}
 function relCheck(data, status){
@@ -72,158 +78,6 @@ function relCheck(data, status){
     dialog.showMessageBox(mesOptions);
   }
 }
-
-// 全てのウィンドウが閉じたら終了
-app.on("window-all-closed", () => {
-  if(process.platform != "darwin"){
-    app.quit();
-  }
-});
-// Electronの初期化完了後に実行
-app.on("ready", ()=> {
-  // タスクトレイを表示
-  createTray();
-  //ウィンドウサイズを設定する
-  mainWindow = new BrowserWindow({
-    frame: false,
-    show: false,
-    width: 640,
-    height: 480,
-    icon: `${__dirname}/images/icon.png`,
-  });
-  // ウィンドウメニューをカスタマイズ
-  initWindowMenu();
-  // 使用するhtmlファイルを指定する
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
-  // リンクをデフォルトブラウザで開く http://www.fujipro-inc.com/2017/04/29/4689.html
-  mainWindow.webContents.on("new-window", (ev,url)=> {
-    ev.preventDefault();
-    shell.openExternal(url);
-  });
-  // ウィンドウの準備ができたら表示
-  mainWindow.on("ready-to-show", ()=> {
-    mainWindow.show();
-  });
-  // ウィンドウが最小化されたら
-  //mainWindow.on("minimize", ()=> {
-  //  mainWindow.setSkipTaskbar(true); // タスクバーから削除
-  //});
-  // ウィンドウが表示されたら
-  //mainWindow.on("restore", ()=> {
-  //  mainWindow.setSkipTaskbar(false); // タスクバーに表示
-  //});
-  // ウィンドウが閉じられたらアプリも終了
-  mainWindow.on("closed", ()=> {
-    mainWindow = null;
-  });
-});
-// タスクトレイ
-function createTray(){
-  tray = new Tray(`${__dirname}/images/icon.png`);
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Wikiを開く",
-      click: function() { shell.openExternal("https://github.com/micelle/dc_DiSpeak/wiki"); }
-    },
-    {
-      label: "表示する",
-      position: 'endof=cmd',
-      click: function(){mainWindow.show();}
-    },
-    {
-      label: "終了する",
-      position: 'endof=cmd',
-      click: function(){mainWindow.close();}
-    }
-  ]);
-  tray.setContextMenu(contextMenu);
-  tray.setToolTip(`${appName} v${nowVersion}`);
-  tray.on('click', function(){
-    mainWindow.show();
-    //tray.popUpContextMenu(contextMenu); // メニューを表示
-  });
-}
-
-// でぃすぴーくについて、のウィンドウ
-function infoWindowOpen(){
-  infoWindow = new BrowserWindow({
-    width: 320,
-    height: 240,
-    show: false,
-    parent: mainWindow,
-    icon: `${__dirname}/images/icon.png`,
-  });
-  infoWindow.loadURL(`file://${__dirname}/info.html`);
-  infoWindow.setMenu(null);
-  infoWindow.webContents.on("new-window", (ev,url)=> {
-    ev.preventDefault();
-    shell.openExternal(url);
-  });
-  infoWindow.once("ready-to-show", ()=> {
-    infoWindow.show();
-  });
-  infoWindow.on("closed", ()=> {
-    infoWindow = null;
-  });
-}
-// ウィンドウメニューをカスタマイズ https://github.com/electron/electron/blob/master/docs/api/browser-window.md
-function initWindowMenu(){
-  const template = [
-    {
-      label: "メニュー",
-      submenu: [
-        {
-          label: "リロード",
-          accelerator: "CmdOrCtrl+R",
-          click: function() { mainWindow.reload(); }
-        },
-        {
-          label: "終了する",
-          accelerator: "CmdOrCtrl+W",
-          position: 'endof=cmd',
-          click: function() { app.quit(); }
-        }
-      ]
-    },
-    {
-      label: "ヘルプ",
-      submenu: [
-        {
-          label: "Wikiを開く",
-          accelerator: "F1",
-          click: function() { shell.openExternal("https://github.com/micelle/dc_DiSpeak/wiki"); }
-        },
-        {
-          label: "デバッグ - main",
-          accelerator: "CmdOrCtrl+Shift+I",
-          position: 'endof=debug',
-          click: function() { mainWindow.toggleDevTools(); }
-        },
-        {
-          label: "デバッグ - info",
-          accelerator: "CmdOrCtrl+Shift+O",
-          position: 'endof=debug',
-          click: function() { infoWindow.toggleDevTools(); }
-        },
-        {
-          label: "最新のバージョンを確認",
-          accelerator: "CmdOrCtrl+H",
-          position: 'endof=info',
-          click: function() { request.get(apiOptions, apiCheck_c); }
-        },
-        {
-          label: "でぃすぴーくについて",
-          accelerator: "CmdOrCtrl+N",
-          position: 'endof=info',
-          click: function() { infoWindowOpen(); }
-        }
-      ]
-    }
-  ]
-  const menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
-}
-
 // バージョンを配列化
 function arraySplit(ver){
   let verAry = ver.split(".");
@@ -242,7 +96,78 @@ function updateCheck(nowVer, newVer){
   if(newMinor>nowMinor){return true;}else if(newMinor<nowMinor){return false;}else
   if(newBuild>nowBuild){return true;}else if(newBuild<nowBuild){return false;}else{return false;}
 }
-
+// メインウィンドウの処理
+function createMainwindow(){
+  // タスクトレイを表示
+  createTray();
+  //ウィンドウサイズを設定する
+  mainWindow = new BrowserWindow({
+    frame: false,
+    show: false,
+    width: 640,
+    height: 480,
+    icon: `${__dirname}/images/icon.png`,
+  });
+  // ウィンドウメニューをカスタマイズ
+  let template = mainWindowMenu();
+  let menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+  // 使用するhtmlファイルを指定する
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  // リンクをデフォルトブラウザで開く
+  mainWindow.webContents.on("new-window", (ev,url) => {
+    ev.preventDefault();
+    shell.openExternal(url);
+  });
+  // ウィンドウの準備ができたら表示
+  mainWindow.on("ready-to-show", () => {
+    mainWindow.show();
+  });
+  // ウィンドウが閉じられたらアプリも終了
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
+}
+// タスクトレイ
+function createTray(){
+  tray = new Tray(`${__dirname}/images/icon.png`);
+  let template = taskTrayMenu();
+  let menu = Menu.buildFromTemplate(template)
+  tray.setContextMenu(menu);
+  tray.setToolTip(`${appName} v${nowVersion}`);
+  tray.on('click', function(){
+    mainWindow.show();
+  });
+}
+// でぃすぴーくについて、のウィンドウ
+function infoWindowOpen(){
+  infoWindow = new BrowserWindow({
+    show: false,
+    width: 320,
+    height: 240,
+    parent: mainWindow,
+    icon: `${__dirname}/images/icon.png`,
+  });
+  infoWindow.loadURL(`file://${__dirname}/info.html`);
+  infoWindow.setMenu(null);
+  infoWindow.webContents.on("new-window", (ev,url) => {
+    ev.preventDefault();
+    shell.openExternal(url);
+  });
+  infoWindow.once("ready-to-show", () => {
+    infoWindow.show();
+  });
+  infoWindow.on("closed", () => {
+    infoWindow = null;
+  });
+}
+// ------------------------------
+// レンダラープロセスとのやりとり
+// ------------------------------
+// 現在のバージョンを返す
+ipcMain.on("now-version-check", (event) => {
+  event.returnValue = nowVersion;
+})
 // 棒読みちゃんのディレクトリ
 ipcMain.on("bouyomi-dir-dialog", (event) => {
   let options = {
@@ -283,27 +208,27 @@ ipcMain.on("bouyomi-exe-alert", (event) => {
   };
   dialog.showMessageBox(mesOptions);
 });
-
 // DiSpeakのディレクトリを返す
 ipcMain.on("directory-check", (event) => {
   event.returnValue = app.getAppPath();
 })
-
 // UIの挙動
-ipcMain.on("window-minimize", ()=>{
+ipcMain.on("window-minimize", () => {
   mainWindow.minimize();
 });
-ipcMain.on("window-maximize", ()=>{
+ipcMain.on("window-maximize", () => {
   if(mainWindow.isMaximized()){
     mainWindow.unmaximize();
   } else {
     mainWindow.maximize();
   }
 });
-ipcMain.on("window-close", ()=>{
+ipcMain.on("window-close", () => {
   mainWindow.hide();
 });
-
+// ------------------------------
+// その他
+// ------------------------------
 // エラーの処理
 process.on("uncaughtException", (err) => {
   let errStr = String(err);
@@ -320,3 +245,78 @@ process.on("uncaughtException", (err) => {
   };
   dialog.showMessageBox(mesOptions);
 });
+// ウィンドウメニューをカスタマイズ
+function mainWindowMenu(){
+  let template = [
+    {
+      label: "メニュー",
+      submenu: [
+        {
+          label: "リロード",
+          accelerator: "CmdOrCtrl+R",
+          click: function(){mainWindow.reload();}
+        },
+        {
+          label: "終了する",
+          accelerator: "CmdOrCtrl+W",
+          position: "endof=cmd",
+          click: function(){app.quit();}
+        }
+      ]
+    },
+    {
+      label: "ヘルプ",
+      submenu: [
+        {
+          label: "Wikiを開く",
+          accelerator: "F1",
+          click: function(){shell.openExternal("https://github.com/micelle/dc_DiSpeak/wiki");}
+        },
+        {
+          label: "デバッグ - main",
+          accelerator: "CmdOrCtrl+Shift+I",
+          position: "endof=debug",
+          click: function(){mainWindow.toggleDevTools();}
+        },
+        {
+          label: "デバッグ - info",
+          accelerator: "CmdOrCtrl+Shift+O",
+          position: "endof=debug",
+          click: function(){infoWindow.toggleDevTools();}
+        },
+        {
+          label: "最新のバージョンを確認",
+          accelerator: "CmdOrCtrl+H",
+          position: "endof=info",
+          click: function(){request.get(apiOptions, apiCheck_c);}
+        },
+        {
+          label: "でぃすぴーくについて",
+          accelerator: "CmdOrCtrl+N",
+          position: "endof=info",
+          click: function(){infoWindowOpen();}
+        }
+      ]
+    }
+  ];
+  return template;
+}
+function taskTrayMenu(){
+  let template = [
+    {
+      label: "Wikiを開く",
+      click: function(){shell.openExternal("https://github.com/micelle/dc_DiSpeak/wiki");}
+    },
+    {
+      label: "表示する",
+      position: "endof=cmd",
+      click: function(){mainWindow.show();}
+    },
+    {
+      label: "終了する",
+      position: "endof=cmd",
+      click: function(){mainWindow.close();}
+    }
+  ];
+  return template;
+}
