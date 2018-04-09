@@ -11,231 +11,240 @@
 
 <body>
   <div class="header">
-    <div class="logo"><img src="images/logo_w.png" alt="でぃすぴーく"></div>
-    <div class="minimize" onclick="windowMin();">―</div>
-    <div class="maximize" onclick="windowMax();">□</div>
-    <div class="close" onclick="windowCls();">×</div>
+    <div class="header-logo">
+      <img src="images/logo_w.png" alt="でぃすぴーく">
+    </div>
+    <div class="header-help">
+      <a href="https://github.com/micelle/dc_DiSpeak/wiki" target="_blank"><img src="images/help.svg"></a>
+    </div>
+    <div class="header-setting" onclick="settingOpn();">
+      <img src="images/setting.svg">
+    </div>
+    <div class="header-minimize" onclick="windowMin();">
+      <svg width="12" height="12"><path stroke="#fff" stroke-width="2" d="M0 6h12"/></svg>
+    </div>
+    <div class="header-maximize" onclick="windowMax();">
+      <svg width="12" height="12"><path stroke="#fff" stroke-width="2" d="M0 0v12M0 0h12M12 12H0M12 12V0"/></svg>
+    </div>
+    <div class="header-close" onclick="windowCls();">
+      <svg width="12" height="12"><path stroke="#fff" stroke-width="1.3" d="M0 0l12 12M12 0L0 12"/></svg>
+    </div>
   </div>
   <div class="body">
-  <div class="box">
-    <div class="box-container">
-      <!--
-      <div class="box-contents box-logo">
-        <h2><img src="images/logo_b.png" alt="でぃすぴーく"></h2>
-      </div>
-      -->
-      <div class="box-contents">
-        <h2>でぃすぴーく</h2>
-      </div>
-      <div id="bouyomi_status" class="box-contents">
-        <input type="button" class="button" name="bouyomi_start" value="読み上げ開始" onclick="bouyomiStart();">
-        <p class="comment">読み上げは開始していません。</p>
-      </div>
-    </div>
-    <div class="box-table">
-      <span class="box-title">ログ</span>
-      <table>
-        <tr>
-          <td id="log" class="bouyomi-log" colspan="2">
-          </td>
-        </tr>
-      </table>
-    </div>
-    <label for="setting-label" class="button" onclick="bouyomiDisabled();">設定を編集</label>
-    <p class="comment">各種設定の詳細は【<a href="https://github.com/micelle/dc_DiSpeak/wiki/Setting" target="_blank">dc_DiSpeak Wiki (Setting)</a>】をご参考ください</p>
-    <input type="checkbox" id="setting-label" class="setting-check">
-    <div class="setting-box">
-      <div class="box-table">
-        <span class="box-title">Discord</span>
-        <table>
-          <tr>
-            <td colspan="2"><h3>基本設定</h3></td></tr>
-          <tr>
-            <td>トークン</td>
-            <td>
-              <input type="text" name="d_token">
-            </td>
-          </tr>
-          <tr>
-            <td>自分のチャット</td>
-            <td>
-              <form id="d_user">
-                <label><input type="radio" name="d_user" value="0" checked>読む</label>
-                <label><input type="radio" name="d_user" value="1">読まない</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>チャンネル</td>
-            <td>
-              <form id="d_channel">
-                <label><input type="radio" name="d_channel" value="0" checked>読む</label>
-                <label><input type="radio" name="d_channel" value="1">読まない</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2"><hr><h3>DM設定</h3></td>
-          </tr>
-          <tr>
-            <td>読み上げ設定</td>
-            <td>
-              <form id="d_dm">
-                <label><input type="radio" name="d_dm" value="0" checked>読む</label>
-                <label><input type="radio" name="d_dm" value="1">読まない</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>名前の読み上げ</td>
-            <td>
-              <form id="d_dm_name">
-                <label><input type="radio" name="d_dm_name" value="0" checked>読む</label>
-                <label><input type="radio" name="d_dm_name" value="1">読まない</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>リスト設定</td>
-            <td>
-              <form id="d_dm_list">
-                <label><input type="radio" name="d_dm_list" value="0" checked>ブラックリストを使う</label>
-                <textarea name="d_dm_list_b" rows="4" placeholder="読み上げないユーザーIDを記載"></textarea>
-                <label><input type="radio" name="d_dm_list" value="1">ホワイトリストを使う</label>
-                <textarea name="d_dm_list_w" rows="4" placeholder="読み上げるユーザーIDを記載"></textarea>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2"><hr><h3>グループ設定</h3></td>
-          </tr>
-          <tr>
-            <td>読み上げ設定</td>
-            <td>
-              <form id="d_gr">
-                <label><input type="radio" name="d_gr" value="0" checked>読む</label>
-                <label><input type="radio" name="d_gr" value="1">読まない</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>名前の読み上げ</td>
-            <td>
-              <form id="d_gr_name">
-                <label><input type="radio" name="d_gr_name" value="0" checked>読む</label>
-                <label><input type="radio" name="d_gr_name" value="1">読まない</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>リスト設定</td>
-            <td>
-              <form id="d_gr_list">
-                <label><input type="radio" name="d_gr_list" value="0" checked>ブラックリストを使う</label>
-                <textarea name="d_gr_list_b" rows="4" placeholder="読み上げないグループIDを記載"></textarea>
-                <label><input type="radio" name="d_gr_list" value="1">ホワイトリストを使う</label>
-                <textarea name="d_gr_list_w" rows="4" placeholder="読み上げるグループIDを記載"></textarea>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2"><hr><h3>サーバ設定</h3></td>
-          </tr>
-          <tr>
-            <td>読み上げ設定</td>
-            <td>
-              <form id="d_sv">
-                <label><input type="radio" name="d_sv" value="0" checked>読む</label>
-                <label><input type="radio" name="d_sv" value="1">読まない</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>名前の設定</td>
-            <td>
-              <form id="d_sv_nick">
-                <label><input type="radio" name="d_sv_nick" value="0" checked>ニックネーム</label>
-                <label><input type="radio" name="d_sv_nick" value="1">ユーザー名</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>名前の読み上げ</td>
-            <td>
-              <form id="d_sv_name">
-                <label><input type="radio" name="d_sv_name" value="0" checked>読む</label>
-                <label><input type="radio" name="d_sv_name" value="1">読まない</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>VCの参加通知</td>
-            <td>
-              <form id="d_sv_voice">
-                <label><input type="radio" name="d_sv_voice" value="0" checked>読む</label>
-                <label><input type="radio" name="d_sv_voice" value="1">読まない</label>
-                <label><input type="radio" name="d_sv_voice" value="2">ログだけ表示</label>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>SERVER設定</td>
-            <td>
-              <form id="d_sv_sv_list">
-                <label><input type="radio" name="d_sv_sv_list" value="0" checked>ブラックリストを使う</label>
-                <textarea name="d_sv_sv_list_b" rows="4" placeholder="読み上げないSERVER IDを記載"></textarea>
-                <label><input type="radio" name="d_sv_sv_list" value="1">ホワイトリストを使う</label>
-                <textarea name="d_sv_sv_list_w" rows="4" placeholder="読み上げるSERVER IDを記載"></textarea>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>CHANNEL設定</td>
-            <td>
-              <form id="d_sv_ch_list">
-                <label><input type="radio" name="d_sv_ch_list" value="0" checked>ブラックリストを使う</label>
-                <textarea name="d_sv_ch_list_b" rows="4" placeholder="読み上げないCHANNEL IDを記載"></textarea>
-                <label><input type="radio" name="d_sv_ch_list" value="1">ホワイトリストを使う</label>
-                <textarea name="d_sv_ch_list_w" rows="4" placeholder="読み上げるCHANNEL IDを記載"></textarea>
-              </form>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="box-table">
-        <span class="box-title">棒読みちゃん</span>
-        <table>
-          <tr>
-            <td colspan="2"><h3>基本設定</h3></td>
-          </tr>
-          <tr>
-            <td>ディレクトリ</td>
-            <td>
-              <button  onclick="bouyomiDialog()">選択</button>
-              <span class="comment">棒読みちゃんの実行ファイルを選択してください。</span>
-              <input type="text" name="b_dir">
-            </td>
-          </tr>
-          <tr>
-            <td>IP</td>
-            <td><input type="text" name="b_ip"></td>
-          </tr>
-          <tr>
-            <td>ポート</td>
-            <td><input type="text" name="b_port"></td>
-          </tr>
-        </table>
-      </div>
-      <div class="box-container">
-        <div class="box-contents">
-          <input type="button" class="button" name="setting_save" value="設定を保存" onclick="writeFile();">
-          <input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">
+    <div class="box">
+      <div id="process">
+        <div class="box-container">
+          <div><h2>でぃすぴーく</h2></div>
+          <div id="bouyomi_status">
+            <input type="button" class="button" name="bouyomi_start" value="読み上げ開始" onclick="bouyomiStart();">
+            <p class="comment">読み上げは開始していません。</p>
+          </div>
         </div>
-        <div class="box-contents"></div>
+        <div class="box-table">
+          <span class="box-title">ログ</span>
+          <table><tr><td id="log" class="bouyomi-log" colspan="2"></td></tr></table>
+        </div>
       </div>
-      <p id="save_information" class="comment">「設定を保存」したら、必ず「画面を更新」してください。</p>
-    </div>
-  </div>
+      <div id="setting" class="box-hidden">
+        <div class="box-container">
+          <div><h2>Setting</h2></div>
+          <div>
+            <input type="button" class="button" name="setting_save" value="設定を保存" onclick="writeFile();">
+            <input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">
+            <p class="comment save_information">「設定を保存」したら「画面を更新」してください。</p>
+          </div>
+        </div>
+        <div class="box-table">
+          <span class="box-title">Discord</span>
+          <table>
+            <tr>
+              <td colspan="2"><h3>基本設定</h3></td></tr>
+            <tr>
+              <td>トークン</td>
+              <td>
+                <input type="text" name="d_token">
+              </td>
+            </tr>
+            <tr>
+              <td>自分のチャット</td>
+              <td>
+                <form id="d_user">
+                  <label><input type="radio" name="d_user" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_user" value="1">読まない</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>チャンネル</td>
+              <td>
+                <form id="d_channel">
+                  <label><input type="radio" name="d_channel" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_channel" value="1">読まない</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2"><hr><h3>DM設定</h3></td>
+            </tr>
+            <tr>
+              <td>読み上げ設定</td>
+              <td>
+                <form id="d_dm">
+                  <label><input type="radio" name="d_dm" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_dm" value="1">読まない</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>名前の読み上げ</td>
+              <td>
+                <form id="d_dm_name">
+                  <label><input type="radio" name="d_dm_name" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_dm_name" value="1">読まない</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>リスト設定</td>
+              <td>
+                <form id="d_dm_list">
+                  <label><input type="radio" name="d_dm_list" value="0" checked>ブラックリストを使う</label>
+                  <textarea name="d_dm_list_b" rows="4" placeholder="読み上げないユーザーIDを記載"></textarea>
+                  <label><input type="radio" name="d_dm_list" value="1">ホワイトリストを使う</label>
+                  <textarea name="d_dm_list_w" rows="4" placeholder="読み上げるユーザーIDを記載"></textarea>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2"><hr><h3>グループ設定</h3></td>
+            </tr>
+            <tr>
+              <td>読み上げ設定</td>
+              <td>
+                <form id="d_gr">
+                  <label><input type="radio" name="d_gr" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_gr" value="1">読まない</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>名前の読み上げ</td>
+              <td>
+                <form id="d_gr_name">
+                  <label><input type="radio" name="d_gr_name" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_gr_name" value="1">読まない</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>リスト設定</td>
+              <td>
+                <form id="d_gr_list">
+                  <label><input type="radio" name="d_gr_list" value="0" checked>ブラックリストを使う</label>
+                  <textarea name="d_gr_list_b" rows="4" placeholder="読み上げないグループIDを記載"></textarea>
+                  <label><input type="radio" name="d_gr_list" value="1">ホワイトリストを使う</label>
+                  <textarea name="d_gr_list_w" rows="4" placeholder="読み上げるグループIDを記載"></textarea>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2"><hr><h3>サーバ設定</h3></td>
+            </tr>
+            <tr>
+              <td>読み上げ設定</td>
+              <td>
+                <form id="d_sv">
+                  <label><input type="radio" name="d_sv" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_sv" value="1">読まない</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>名前の設定</td>
+              <td>
+                <form id="d_sv_nick">
+                  <label><input type="radio" name="d_sv_nick" value="0" checked>ニックネーム</label>
+                  <label><input type="radio" name="d_sv_nick" value="1">ユーザー名</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>名前の読み上げ</td>
+              <td>
+                <form id="d_sv_name">
+                  <label><input type="radio" name="d_sv_name" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_sv_name" value="1">読まない</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>VCの参加通知</td>
+              <td>
+                <form id="d_sv_voice">
+                  <label><input type="radio" name="d_sv_voice" value="0" checked>読む</label>
+                  <label><input type="radio" name="d_sv_voice" value="1">読まない</label>
+                  <label><input type="radio" name="d_sv_voice" value="2">ログだけ表示</label>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>SERVER設定</td>
+              <td>
+                <form id="d_sv_sv_list">
+                  <label><input type="radio" name="d_sv_sv_list" value="0" checked>ブラックリストを使う</label>
+                  <textarea name="d_sv_sv_list_b" rows="4" placeholder="読み上げないSERVER IDを記載"></textarea>
+                  <label><input type="radio" name="d_sv_sv_list" value="1">ホワイトリストを使う</label>
+                  <textarea name="d_sv_sv_list_w" rows="4" placeholder="読み上げるSERVER IDを記載"></textarea>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>CHANNEL設定</td>
+              <td>
+                <form id="d_sv_ch_list">
+                  <label><input type="radio" name="d_sv_ch_list" value="0" checked>ブラックリストを使う</label>
+                  <textarea name="d_sv_ch_list_b" rows="4" placeholder="読み上げないCHANNEL IDを記載"></textarea>
+                  <label><input type="radio" name="d_sv_ch_list" value="1">ホワイトリストを使う</label>
+                  <textarea name="d_sv_ch_list_w" rows="4" placeholder="読み上げるCHANNEL IDを記載"></textarea>
+                </form>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="box-table">
+          <span class="box-title">棒読みちゃん</span>
+          <table>
+            <tr>
+              <td colspan="2"><h3>基本設定</h3></td>
+            </tr>
+            <tr>
+              <td>ディレクトリ</td>
+              <td>
+                <button  onclick="bouyomiDialog()">選択</button>
+                <span class="comment">棒読みちゃんの実行ファイルを選択してください。</span>
+                <input type="text" name="b_dir">
+              </td>
+            </tr>
+            <tr>
+              <td>IP</td>
+              <td><input type="text" name="b_ip"></td>
+            </tr>
+            <tr>
+              <td>ポート</td>
+              <td><input type="text" name="b_port"></td>
+            </tr>
+          </table>
+        </div>
+        <div class="box-container">
+          <div>
+            <input type="button" class="button" name="setting_save" value="設定を保存" onclick="writeFile();">
+            <input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">
+            <p class="comment save_information">「設定を保存」したら「画面を更新」してください。</p>
+          </div>
+          <div></div>
+        </div>
+      </div>
+    </div> <!-- .box -->
   </div>
   <script src="js/script_index.js"></script>
 </body>

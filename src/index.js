@@ -1,7 +1,7 @@
 "use strct";
 // モジュールの読み込み
 const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain} = require("electron");
-const execFile = require("child_process");
+const {execFile} = require("child_process");
 const request = require("request");
 const package = require("./package.json");
 // 変数の指定

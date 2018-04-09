@@ -15,6 +15,15 @@ function reload(){
   location.reload();
 }
 // UIの挙動
+function settingOpn(){
+  if(document.getElementById("setting").classList.contains("box-hidden")){
+    document.getElementById("process").className = "box-hidden";
+    document.getElementById("setting").className = "box-open";
+  }else{
+    document.getElementById("process").className = "box-open";
+    document.getElementById("setting").className = "box-hidden";
+  }
+}
 function windowMin(){ipcRenderer.send("window-minimize");}
 function windowMax(){ipcRenderer.send("window-maximize");}
 function windowCls(){ipcRenderer.send("window-close");}
@@ -229,7 +238,8 @@ function writeFile(){
     }
     var writTime = new Date();
     var writMess = "設定ファイルを保存しました。";
-    document.getElementById("save_information").textContent = writMess;
+    document.getElementsByClassName("save_information")[0].textContent = writMess;
+    document.getElementsByClassName("save_information")[1].textContent = writMess;
     var ary = {
       time: writTime,
       type: "info",

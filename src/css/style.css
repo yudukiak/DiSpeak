@@ -1,185 +1,234 @@
 /* ********************
   分割
 ******************** */
-/* 親 */
 .box-container {
-    display: flex;
+  display: flex;
 }
-/* 子 */
-.box-contents {
-    width: 50%;
+.box-container > div {
+  width: 50%;
 }
-.box-container .box-contents:last-child {
-    text-align: right;
+.box-container > div:last-child {
+  text-align: right;
 }
-
 /* ********************
   枠組み
 ******************** */
 .box-table {
-    border: solid 3px #95ccff;
-    border-radius: 8px;
-    margin: 32px 0;
-    padding: 8px 16px;
-    position: relative;
+  border: solid 3px #95ccff;
+  border-radius: 8px;
+  margin: 32px 0;
+  padding: 8px 16px;
+  position: relative;
 }
 .box-title {
-    background: #FFF;
-    color: #95ccff;
-    display: inline-block;
-    font-size: 1.188em;
-    font-weight: bold;
-    left: 10px;
-    line-height: 1;
-    padding: 0 9px;
-    position: absolute;
-    top: -13px;
+  background: #FFF;
+  color: #95ccff;
+  display: inline-block;
+  font-size: 1.188em;
+  font-weight: bold;
+  left: 10px;
+  line-height: 1;
+  padding: 0 9px;
+  position: absolute;
+  top: -13px;
 }
 .box-table table {
-    width: 100%;
+  width: 100%;
 }
 .box-table table td {
-    padding: 10px;
-    vertical-align: top;
+  padding: 10px;
+  vertical-align: top;
 }
 .box-table table td:first-child {
-    width: 140px;
+  width: 140px;
 }
-
 /* ********************
-  ボタン
+ボタン
 ******************** */
 .button {
-    background-color: rgba(149,204,255,1);
-    border: 3px solid rgb(149,204,255);
-    border-radius: 4px;
-    box-sizing: border-box;
-    cursor: pointer;
-    color: #fff;
-    display: inline-block;
-    font-size: 0.75em;
-    padding: 16px 0;
-    position: relative;
-    text-align: center;
-    transition: .6s all;
-    width: 120px;
+  background-color: rgba(149,204,255,1);
+  border: 3px solid rgb(149,204,255);
+  border-radius: 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  color: #fff;
+  display: inline-block;
+  font-size: 0.75em;
+  padding: 16px 0;
+  position: relative;
+  text-align: center;
+  transition: .6s all;
+  width: 120px;
 }
 .button::before,
 .button::after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 .button:hover {
-    background-color: rgba(149,204,255,.0);
-    border: 3px solid rgb(149,204,255);
-    color:  rgba(149,204,255,1);
+  background-color: rgba(149,204,255,.0);
+  border: 3px solid rgb(149,204,255);
+  color:  rgba(149,204,255,1);
 }
 .button-disabled {
-    background-color: rgba(146,158,145,1);
-    border: 3px solid rgb(146,158,145);
+  background-color: rgba(146,158,145,1);
+  border: 3px solid rgb(146,158,145);
 }
 .button-disabled:hover {
-    background-color: rgba(146,158,145,.0);
-    border: 3px solid rgb(146,158,145);
-    color: rgba(146,158,145,1);
+  background-color: rgba(146,158,145,.0);
+  border: 3px solid rgb(146,158,145);
+  color: rgba(146,158,145,1);
 }
-
 /* ********************
   フォーカス
 ******************** */
 input[type="text"],
 textarea {
-    border: 1px solid #aaa;
-    outline: none;
-    transition: all .3s;
-    -webkit-transition: all .3s;
-    width: 350px;
+  border: 1px solid #aaa;
+  outline: none;
+  transition: all .3s;
+  -webkit-transition: all .3s;
+  width: 350px;
 }
 input[type="text"]:focus,
 textarea:focus {
-    border: 1px solid #95ccff;
-    box-shadow: 0 0 7px #95ccff;
+  border: 1px solid #95ccff;
+  box-shadow: 0 0 7px #95ccff;
 }
 input[type="button"]:focus,
-input[type="radio"]:focus{
-    box-shadow: 0 0 7px #95ccff;
-    outline: none;
+input[type="radio"]:focus {
+  box-shadow: 0 0 7px #95ccff;
+  outline: none;
 }
-
 /* ********************
   設定の開閉
 ******************** */
-/*チェック隠す*/
-.setting-check {
-    display: none;
+.box > div {
+  transition: 1.0s;
 }
-/*中身非表示*/
-.setting-box {
-    height: 0;
-    overflow: hidden;
-    opacity: 0;
-    padding: 0;
-    transition: 0.8s;
+.box-hidden {
+  -webkit-filter: blur(2px);
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
 }
-/*クリックで中身表示*/
-.setting-check:checked + .setting-box {
-    height: auto;
-    opacity: 1;
+.box-open {
+  height: auto;
+  opacity: 1;
 }
-
+/* ********************
+  ヘッダー
+******************** */
+.header {
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  background: #4A5459;
+  color: #fff;
+  display: flex;
+  font-size: 15px;
+  height: 25px;
+}
+.header-help, .header-help a,
+.header-setting,
+.header-minimize,
+.header-maximize,
+.header-close {
+  -webkit-app-region: no-drag;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 35px;
+}
+.header-help img,
+.header-setting img {
+  width: 16px;
+  height: 16px;
+}
+.header-logo {
+  margin-right: auto;
+  padding-left: 5px;
+}
+.header-logo img {
+  height: calc(100% - 10px);
+  padding: 5px;
+  width: auto;
+}
+.header-help:hover,
+.header-setting:hover,
+.header-minimize:hover,
+.header-maximize:hover {
+  background-color: #5C656A;
+}
+.header-close:hover {
+  background-color: #E81123;
+}
+.header-help:hover img,
+.header-setting:hover img {
+  animation: spin 3.5s linear infinite;
+}
+@keyframes spin {
+  0% {transform: rotate(0deg);}
+  100% {transform: rotate(360deg);}
+}
 /* ********************
   その他
 ******************** */
-html {
-    /*overflow-y: scroll;*/
-}
 body {
-    color: #333;
-    margin: 32px auto;
-    letter-spacing: 1px;
-    line-height: 1.75;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Helvetica Neue",
-        "Noto Sans Japanese",
-        "ヒラギノ角ゴ ProN W3",
-        Hiragino Kaku Gothic ProN,
-        Arial,
-        Meiryo,
-        sans-serif;
-    font-size: 1em;
+  color: #333;
+  margin: 32px auto;
+  letter-spacing: 1px;
+  line-height: 1.75;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    "Noto Sans Japanese",
+    "ヒラギノ角ゴ ProN W3",
+    Hiragino Kaku Gothic ProN,
+    Arial,
+    Meiryo,
+    sans-serif;
+  font-size: 1em;
 }
 a {
-    color: #C02942;
-    font-weight: bold;
-    text-decoration:none;
+  color: #C02942;
+  font-weight: bold;
+  text-decoration:none;
 }
 h2 {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 h3 {
-    font-size: 1em;
-    margin: 0;
+  font-size: 1em;
+  margin: 0;
 }
 h3:first-letter {
-    font-size: 1.5em;
+  font-size: 1.5em;
 }
 hr {
-    background-color: #95ccff;
-    border: none;
-    height: 3px;
+  background-color: #95ccff;
+  border: none;
+  height: 3px;
 }
 p {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+}
+.body {
+  overflow-y: scroll;
+  height: calc(100vh - 25px);
+}
+.box {
+  width: 580px;
+  margin: 10px auto;
 }
 .bouyomi-log,
 .comment {
-    font-size: 0.625em;
+  font-size: 0.625em;
 }
 .emoji {
-    height: 20px;
-    width: 20px;
-    margin: 0 1px;
+  height: 20px;
+  width: 20px;
+  margin: 0 1px;
 }
