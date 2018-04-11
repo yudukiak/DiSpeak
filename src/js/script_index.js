@@ -524,31 +524,29 @@ function debugLog(fnc, txt){
     console.groupEnd();
   });
 }
-// モーダルウィンドウを表示
-$("#footer_setting").click(function(){
-  $(this).blur(); // ボタンからフォーカスを外す
-  $("#modal_overlay").stop(true, false).fadeIn("slow");
-  centeringModalSyncer();
-  $("#main_setting").stop(true, false).fadeIn("slow");
+// モーダルウィンドウ
+$("#footer_setting").on("click", function() {
+  $(this).blur();
+  $("#main_overlay").addClass("show").removeClass("hide");
 });
-// モーダルウィンドウのボタン
-$("#modal_overlay").on("click", function(event) {
-  var targetData = $(event.target).data("modal");
-  if(targetData==null || targetData=="close"){
-    $("#main_setting, #modal_overlay").stop(true, false).fadeOut("slow");
-  } else if(targetData == "save"){
-    writeFile();
-  }
+$("#modal_close").on("click", function() {
+  $(this).blur();
+  $("#main_overlay").addClass("hide").removeClass("show");
 });
-$(window).resize(centeringModalSyncer); //リサイズされたらセンタリング
-//センタリングを実行する関数
-function centeringModalSyncer(){
-  var w = $(window).width(); //ウィンドウの幅を取得
-  var cw = $("#main_setting").outerWidth(); // コンテンツの幅を取得
-  $("#main_setting").css({"left":((w - cw)/2) + "px"});//センタリングを実行する
-}
+$("#modal_save").on("click", function() {
+  $(this).blur();
+  var writMess = "saveクリックしました";
+  modalAlert(writMess);
+});
 function modalAlert(text){
-  $("#modal_alert").stop(true, false).fadeIn("slow",function(){
-    $(this).delay(5000).stop(true, false).fadeOut("slow");
-  });
+  if($("#main_alert").hasClass("show")){return;}
+  $("#main_alert p").text(text);
+  $("#main_alert").addClass("show").removeClass("hide");
+  setTimeout(function(){
+      $("#main_alert").addClass("hide").removeClass("show");
+  },2000);
 }
+$(document).on("click", function(event) {
+  var target = $(event.target);
+  console.log(target);
+});

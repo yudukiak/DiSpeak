@@ -6,15 +6,6 @@
   margin: 10px auto;
 }
 /* ********************
-  分割
-******************** */
-.box-container {
-  display: flex;
-}
-.box-half {
-  width: 50%;
-}
-/* ********************
   枠組み
 ******************** */
 .box-table {
@@ -47,86 +38,88 @@
   width: 140px;
 }
 /* ********************
-  設定の開閉
+  オーバーレイ
 ******************** */
-#main_setting {
-  z-index: 2;
-  overflow-y: scroll;
-  top: 30px;
-  height: calc(100vh - 130px);
-  width: 580px;
-  margin: 0;
-  padding: 10px 20px;
-  border: 2px solid #aaa;
-  background: #fff;
-  position: fixed;
-  display: none;
-}
-#modal_overlay {
-  z-index: 1;
-  display: none;
+.overlay {
+  background: rgba(255,255,255,1);
   position: fixed;
   top: 25px;
-  left: 0;
   width: 100%;
   height: calc(100vh - 25px);
-  background-color: rgba( 0,0,0, 0.75 );
-}
-#modal_overlay .box {
-  height: calc(100vh - 35px);
-  position: relative;
-}
-#modal_overlay .button:hover {
-  background-color: rgba(255,255,255,1);
-}
-#modal_overlay .hidden {
   display: none;
+  opacity: 0;
 }
-#modal_save {
-  z-index: 2;
-  position: absolute;
-  bottom: 0;
-  left: 0;
+.overlay.show {
+  display: block;
+  z-index: 1;
+  opacity: 1;
+  animation-duration: 0.5s;
+  animation-name: fade-in;
 }
-#modal_close {
-  z-index: 2;
-  position: absolute;
-  bottom: 0;
-  right: 0;
+.overlay.hide {
+  display: block;
+  z-index: -1;
+  opacity: 0;
+  animation-duration: 0.5s;
+  animation-name: fade-out;
 }
-#modal_alert {
-  z-index: 2;
-  color: #fff;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
+.overlay > div:first-child {
+  height: calc(100vh - 96px);
+  overflow-y: scroll;
+}
+.overlay > div:last-child {
+  box-shadow: -4px 0 6px #4A5459;
+  -webkit-user-select: none;
+  border-top: 1px solid #4A5459;
+  color: rgba(255,255,255,1);
+}
+.overlay > div:last-child > div {
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+.overlay .button:hover {
+  background: rgba(255,255,255,1);
+}
+/* ********************
+  アラート
+******************** */
+.alert {
+opacity: 0;
+  bottom: 10px;
+  position: fixed;
+  height: 50px;
+  width: 300px;
+  left: calc(50% - 300px/2);
+}
+.alert p {
   text-align: center;
-}
-#modal_alert div {
-  position: relative;
-  display: inline-block;
-  margin: 10px;
-  padding: 5px 10px;
-  min-width: 120px;
-  max-width: 60%;
-  height: 25px;
-  color: #555;
-  font-size: 16px;
   background: #e0edff;
-  border-radius: 15px;
+  margin: 5px;
+  padding: 5px 10px;
+  height: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 0px 6px #4A5459;
 }
-#modal_alert p {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateY(-50%) translateX(-50%);
-  -webkit- transform: translateY(-50%) translateX(-50%);
+.alert.show {
+  display: block;
+  z-index: 1;
+  opacity: 1;
+  animation-duration: 0.5s;
+  animation-name: fade-in;
+}
+.alert.hide {
+  display: block;
+  z-index: -1;
+  opacity: 0;
+  animation-duration: 0.5s;
+  animation-name: fade-out;
 }
 /* ********************
 ボタン
 ******************** */
 .button {
-  background-color: rgba(149,204,255,1);
+  background: rgba(149,204,255,1);
   border: 3px solid rgba(149,204,255,1);
   color: rgba(255,255,255,1);
   fill: rgba(255,255,255,1);
@@ -144,17 +137,17 @@
   box-sizing: border-box;
 }
 .button:hover {
-  background-color: rgba(149,204,255,.0);
+  background: rgba(149,204,255,.0);
   border: 3px solid rgba(149,204,255,1);
   color:  rgba(149,204,255,1);
   fill: rgba(149,204,255,1);
 }
 .button-disabled {
-  background-color: rgba(146,158,145,1);
+  background: rgba(146,158,145,1);
   border: 3px solid rgba(146,158,145,1);
 }
 .button-disabled:hover {
-  background-color: rgba(146,158,145,.0);
+  background: rgba(146,158,145,.0);
   border: 3px solid rgba(146,158,145,1);
   color: rgba(146,158,145,1);
   fill: rgba(146,158,145,1);
@@ -189,10 +182,10 @@ header > div:not(:first-child) {
   width: 35px;
 }
 header > div:not(:first-child):not(:last-child):hover {
-  background-color: #5C656A;
+  background: #5C656A;
 }
 header > div:last-child:hover {
-  background-color: #E81123;
+  background: #E81123;
 }
 /* ********************
   メイン
@@ -229,6 +222,9 @@ footer .box {
   display: flex;
   margin: 0px auto;
 }
+footer .spin:hover svg {
+  animation: spin 3.5s linear infinite;
+}
 footer .button {
   width: 50px;
   height: 50px;
@@ -249,13 +245,26 @@ footer svg {
   width: 32px;
   height: 32px;
 }
-footer .button:nth-child(3):hover svg,
-footer .button:nth-child(4):hover svg {
-  animation: spin 3.5s linear infinite;
-}
+/* ********************
+  アニメーション
+******************** */
 @keyframes spin {
   0% {transform: rotate(0deg);}
   100% {transform: rotate(360deg);}
+}
+@keyframes fade-in {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+    z-index: 1;
+  }
+  100% {
+    opacity: 0;
+    z-index: 1;
+  }
 }
 /* ********************
   フォーカス
@@ -316,7 +325,7 @@ h3:first-letter {
   font-size: 1.5em;
 }
 hr {
-  background-color: rgba(149,204,255,1);
+  background: rgba(149,204,255,1);
   border: none;
   height: 3px;
 }
