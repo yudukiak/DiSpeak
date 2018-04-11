@@ -18,15 +18,15 @@
   枠組み
 ******************** */
 .box-table {
-  border: solid 3px #95ccff;
+  border: solid 3px rgba(149,204,255,1);
   border-radius: 8px;
   margin: 32px 0;
   padding: 8px 16px;
   position: relative;
 }
 .box-title {
-  background: #FFF;
-  color: #95ccff;
+  background: rgba(255,255,255,1);
+  color: rgba(149,204,255,1);
   display: inline-block;
   font-size: 1.188em;
   font-weight: bold;
@@ -49,36 +49,95 @@
 /* ********************
   設定の開閉
 ******************** */
-.box > div {
-  transition: 1.0s;
+#main_setting {
+  z-index: 2;
+  overflow-y: scroll;
+  top: 30px;
+  height: calc(100vh - 130px);
+  width: 580px;
+  margin: 0;
+  padding: 10px 20px;
+  border: 2px solid #aaa;
+  background: #fff;
+  position: fixed;
+  display: none;
 }
-.box-hidden {
-  -webkit-filter: blur(2px);
-  height: 0;
-  opacity: 0;
-  overflow: hidden;
+#modal_overlay {
+  z-index: 1;
+  display: none;
+  position: fixed;
+  top: 25px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 25px);
+  background-color: rgba( 0,0,0, 0.75 );
 }
-.box-open {
-  height: auto;
-  opacity: 1;
+#modal_overlay .box {
+  height: calc(100vh - 35px);
+  position: relative;
+}
+#modal_overlay .button:hover {
+  background-color: rgba(255,255,255,1);
+}
+#modal_overlay .hidden {
+  display: none;
+}
+#modal_save {
+  z-index: 2;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+#modal_close {
+  z-index: 2;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+#modal_alert {
+  z-index: 2;
+  color: #fff;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+#modal_alert div {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+  padding: 5px 10px;
+  min-width: 120px;
+  max-width: 60%;
+  height: 25px;
+  color: #555;
+  font-size: 16px;
+  background: #e0edff;
+  border-radius: 15px;
+}
+#modal_alert p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+  -webkit- transform: translateY(-50%) translateX(-50%);
 }
 /* ********************
 ボタン
 ******************** */
 .button {
   background-color: rgba(149,204,255,1);
-  border: 3px solid rgb(149,204,255);
+  border: 3px solid rgba(149,204,255,1);
+  color: rgba(255,255,255,1);
+  fill: rgba(255,255,255,1);
   border-radius: 4px;
   box-sizing: border-box;
   cursor: pointer;
-  color: #fff;
   display: inline-block;
   font-size: 0.75em;
-  /*padding: 16px 0;*/
   position: relative;
   text-align: center;
   transition: 0.1s all;
-  /*width: 120px;*/
 }
 .button::before,
 .button::after {
@@ -86,35 +145,42 @@
 }
 .button:hover {
   background-color: rgba(149,204,255,.0);
-  border: 3px solid rgb(149,204,255);
+  border: 3px solid rgba(149,204,255,1);
   color:  rgba(149,204,255,1);
+  fill: rgba(149,204,255,1);
 }
 .button-disabled {
   background-color: rgba(146,158,145,1);
-  border: 3px solid rgb(146,158,145);
+  border: 3px solid rgba(146,158,145,1);
 }
 .button-disabled:hover {
   background-color: rgba(146,158,145,.0);
-  border: 3px solid rgb(146,158,145);
+  border: 3px solid rgba(146,158,145,1);
   color: rgba(146,158,145,1);
+  fill: rgba(146,158,145,1);
 }
 /* ********************
   ヘッダー
 ******************** */
-.header {
+header {
   -webkit-app-region: drag;
   -webkit-user-select: none;
   background: #4A5459;
-  color: #fff;
+  color: rgba(255,255,255,1);
   display: flex;
   font-size: 15px;
   height: 25px;
 }
-.header-help, .header-help a,
-.header-setting,
-.header-minimize,
-.header-maximize,
-.header-close {
+header > div:first-child {
+  margin-right: auto;
+  padding-left: 5px;
+}
+header > div:first-child img {
+  height: calc(100% - 10px);
+  padding: 5px;
+  width: auto;
+}
+header > div:not(:first-child) {
   -webkit-app-region: no-drag;
   text-align: center;
   display: flex;
@@ -122,73 +188,20 @@
   align-items: center;
   width: 35px;
 }
-.header-help img,
-.header-setting img {
-  width: 16px;
-  height: 16px;
-}
-.header-logo {
-  margin-right: auto;
-  padding-left: 5px;
-}
-.header-logo img {
-  height: calc(100% - 10px);
-  padding: 5px;
-  width: auto;
-}
-.header-help:hover,
-.header-setting:hover,
-.header-minimize:hover,
-.header-maximize:hover {
+header > div:not(:first-child):not(:last-child):hover {
   background-color: #5C656A;
 }
-.header-close:hover {
+header > div:last-child:hover {
   background-color: #E81123;
 }
-.header-help:hover img,
-.header-setting:hover img {
-  animation: spin 3.5s linear infinite;
-}
-@keyframes spin {
-  0% {transform: rotate(0deg);}
-  100% {transform: rotate(360deg);}
-}
 /* ********************
-  ボディー
+  メイン
 ******************** */
-.body {
+main {
   overflow-y: scroll;
   height: calc(100vh - 96px);
 }
-/* ********************
-  フッター
-******************** */
-.footer {
-  box-shadow: -4px 0 6px #4A5459;
-  -webkit-user-select: none;
-  border-top: 1px solid #4A5459;
-  /*background: #4A5459;*/
-  color: #fff;
-  /*display: flex;*/
-  font-size: 15px;
-  height: 70px;
-}
-.footer .box {
-  display: flex;
-  margin: 0px auto;
-}
-.footer-setting,
-.footer-reload,
-.footer-help {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.footer-start,
-.footer-stop {
-  margin-right: auto !important;
-}
-.footer .button {
+main .button {
   width: 50px;
   height: 50px;
   margin: 10px;
@@ -196,27 +209,53 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  fill: #fff;
 }
-.footer .button:hover {
-  fill: #95ccff;
-}
-.footer svg {
+main svg {
   width: 32px;
   height: 32px;
 }
-.footer .footer-hidden {
+/* ********************
+  フッター
+******************** */
+footer {
+  box-shadow: -4px 0 6px #4A5459;
+  -webkit-user-select: none;
+  border-top: 1px solid #4A5459;
+  color: rgba(255,255,255,1);
+  font-size: 15px;
+  height: 70px;
+}
+footer .box {
+  display: flex;
+  margin: 0px auto;
+}
+footer .button {
+  width: 50px;
+  height: 50px;
+  margin: 10px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+footer .button:first-child,
+footer .button:nth-child(2) {
+  margin-right: auto;
+}
+footer .hidden {
   display: none;
 }
-.footer-stop {
-  background-color: rgba(146,158,145,1);
-  border: 3px solid rgb(146,158,145);
+footer svg {
+  width: 32px;
+  height: 32px;
 }
-.footer .footer-stop:hover {
-  background-color: rgba(146,158,145,.0);
-  border: 3px solid rgb(146,158,145);
-  color: rgba(146,158,145,1);
-  fill: rgba(146,158,145,1);
+footer .button:nth-child(3):hover svg,
+footer .button:nth-child(4):hover svg {
+  animation: spin 3.5s linear infinite;
+}
+@keyframes spin {
+  0% {transform: rotate(0deg);}
+  100% {transform: rotate(360deg);}
 }
 /* ********************
   フォーカス
@@ -231,13 +270,13 @@ textarea {
 }
 input[type="text"]:focus,
 textarea:focus {
-  border: 1px solid #95ccff;
-  box-shadow: 0 0 7px #95ccff;
+  border: 1px solid rgba(149,204,255,1);
+  box-shadow: 0 0 7px rgba(149,204,255,1);
 }
-.footer .button:focus,
+.button:focus,
 input[type="button"]:focus,
 input[type="radio"]:focus {
-  box-shadow: 0 0 7px #95ccff;
+  box-shadow: 0 0 7px rgba(149,204,255,1);
   outline: none;
 }
 /* ********************
@@ -245,7 +284,7 @@ input[type="radio"]:focus {
 ******************** */
 body {
   color: #333;
-  margin: 32px auto;
+  margin: 0;
   letter-spacing: 1px;
   line-height: 1.75;
   font-family:
@@ -277,7 +316,7 @@ h3:first-letter {
   font-size: 1.5em;
 }
 hr {
-  background-color: #95ccff;
+  background-color: rgba(149,204,255,1);
   border: none;
   height: 3px;
 }

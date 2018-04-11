@@ -1,29 +1,19 @@
 const {ipcRenderer} = require("electron");
-const directory = ipcRenderer.sendSync("directory-check").replace(/\\/g,"/"); // DiSpeakのディレクトリを取得
-const nowVersion = ipcRenderer.sendSync("now-version-check"); // 現在のバージョンを取得
-const bouyomiConnect = require(`${directory}/js/bouyomiConnect.js`);
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const fs = require("fs");
+const directory = ipcRenderer.sendSync("directory-check").replace(/\\/g,"/"); // DiSpeakのディレクトリを取得
+const bouyomiConnect = require(`${directory}/js/bouyomiConnect.js`);
+const $ = jQuery = require(`${directory}/js/jquery.min.js`);
 const fileName = "setting.json";
 const fileName_default = "setting_default.json";
-console.info(`Version ${nowVersion}`);
+const nowVersion = ipcRenderer.sendSync("now-version-check"); // 現在のバージョンを取得
+const jQueryVersion = $.fn.jquery;
+console.info(`DiSpeak v${nowVersion}`);
+console.info(`jQuery v${jQueryVersion}`);
 // 設定ファイルの読み込み
 readFile();
-// 更新ボタン
-function reload(){
-  location.reload();
-}
 // UIの挙動
-function settingOpn(){
-  if(document.getElementById("setting").classList.contains("box-hidden")){
-    document.getElementById("process").className = "box-hidden";
-    document.getElementById("setting").className = "box-open";
-  }else{
-    document.getElementById("process").className = "box-open";
-    document.getElementById("setting").className = "box-hidden";
-  }
-}
 function windowMin(){ipcRenderer.send("window-minimize");}
 function windowMax(){ipcRenderer.send("window-maximize");}
 function windowCls(){ipcRenderer.send("window-close");}
@@ -48,7 +38,7 @@ function filterArray(ary){
 }
 // エスケープ
 function escapeHtml(str) {
-  var str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  var str = str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   return str;
 }
 function logProcess(ary){
@@ -70,21 +60,18 @@ function logProcess(ary){
     }
   }
 }
-//function bouyomiDisabled(){
-//  document.getElementById("bouyomi_status").innerHTML =
-//    `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
-//    `<p class="comment">「画面を更新」してから「読み上げ開始」してください。</p>`;
-//}
+function reload(){
+  location.reload();
+}
 function bouyomiStart(){
   bouyomiExeStart();
-  document.getElementsByClassName("footer-start")[0].className = "button footer-start footer-hidden";
-  document.getElementsByClassName("footer-stop")[0].className = "button footer-stop";
+  $("#footer_start").addClass("hidden");
+  $("#footer_stop").removeClass("hidden");
+  //document.getElementsByClassName("footer-start")[0].className = "button footer-start footer-hidden";
+  //document.getElementsByClassName("footer-stop")[0].className = "button button-disabled footer-stop";
   var d_token = document.querySelector('input[name="d_token"]').value;
   var startTime = new Date();
   var startMess = "読み上げを開始しています。";
-//  document.getElementById("bouyomi_status").innerHTML =
-//    `<input type="button" class="button button-disabled" name="bouyomi_start" value="読み上げ開始">`+
-//    `<p class="comment">${startMess}</p>`;
   var ary = {
     time: startTime,
     type: "info",
@@ -249,6 +236,7 @@ function writeFile(){
       text: writMess
     };
     logProcess(ary);
+    modalAlert(writMess);
   });
 }
 function createFile(){
@@ -283,6 +271,7 @@ function errorHandling(error){
       text: "errorMess"
     };
   logProcess(ary);
+  modalAlert(errorMess);
   if(errorCode.match(/ENOENT/)){
     createFile();
   }
@@ -506,9 +495,9 @@ function errorLog(fnc, error){
   };
   logProcess(ary);
   debugLog(fnc, error);
-  document.getElementById("bouyomi_status").innerHTML =
-    `<input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">`+
-    `<p class="comment">エラーが発生しました。</p>`;
+//  document.getElementById("bouyomi_status").innerHTML =
+//    `<input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">`+
+//    `<p class="comment">エラーが発生しました。</p>`;
 }
 // デバッグ用
 var debugFnc = "start";
@@ -533,5 +522,33 @@ function debugLog(fnc, txt){
     console.log(txtStr);
     console.log(txt);
     console.groupEnd();
+  });
+}
+// モーダルウィンドウを表示
+$("#footer_setting").click(function(){
+  $(this).blur(); // ボタンからフォーカスを外す
+  $("#modal_overlay").stop(true, false).fadeIn("slow");
+  centeringModalSyncer();
+  $("#main_setting").stop(true, false).fadeIn("slow");
+});
+// モーダルウィンドウのボタン
+$("#modal_overlay").on("click", function(event) {
+  var targetData = $(event.target).data("modal");
+  if(targetData==null || targetData=="close"){
+    $("#main_setting, #modal_overlay").stop(true, false).fadeOut("slow");
+  } else if(targetData == "save"){
+    writeFile();
+  }
+});
+$(window).resize(centeringModalSyncer); //リサイズされたらセンタリング
+//センタリングを実行する関数
+function centeringModalSyncer(){
+  var w = $(window).width(); //ウィンドウの幅を取得
+  var cw = $("#main_setting").outerWidth(); // コンテンツの幅を取得
+  $("#main_setting").css({"left":((w - cw)/2) + "px"});//センタリングを実行する
+}
+function modalAlert(text){
+  $("#modal_alert").stop(true, false).fadeIn("slow",function(){
+    $(this).delay(5000).stop(true, false).fadeOut("slow");
   });
 }
