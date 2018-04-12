@@ -1,5 +1,11 @@
 DiSpeak - でぃすぴーく
 =====
+[![GitHub downloads](https://img.shields.io/github/downloads/micelle/dc_DiSpeak/total.svg)](https://github.com/micelle/dc_DiSpeak/releases)
+[![GitHub release](https://img.shields.io/github/release/micelle/dc_DiSpeak.svg)](https://github.com/micelle/dc_DiSpeak/releases/latest)
+[![GitHub Release Date](https://img.shields.io/github/release-date/micelle/dc_DiSpeak.svg)](https://github.com/micelle/dc_DiSpeak/releases/latest)
+[![GitHub last commit](https://img.shields.io/github/last-commit/micelle/dc_DiSpeak.svg)](https://github.com/micelle/dc_DiSpeak/commits/)
+[![GitHub license](https://img.shields.io/github/license/micelle/dc_DiSpeak.svg)](https://github.com/micelle/dc_DiSpeak/blob/master/LICENSE)
+
 Discordのチャット内容を棒読みちゃんで読み上げてくれるツールです。
 Discordを起動していなくても読み上げてくれます。
 
