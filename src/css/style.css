@@ -42,12 +42,13 @@
 ******************** */
 .overlay {
   background: rgba(255,255,255,1);
-  position: fixed;
   top: 25px;
   width: 100%;
   height: calc(100vh - 25px);
+  position: fixed;
   display: none;
   opacity: 0;
+  z-index: -1;
 }
 .overlay.show {
   display: block;
@@ -85,12 +86,14 @@
   アラート
 ******************** */
 .alert {
-opacity: 0;
   bottom: 10px;
-  position: fixed;
   height: 50px;
   width: 300px;
   left: calc(50% - 300px/2);
+  position: fixed;
+  display: none;
+  opacity: 0;
+  z-index: -1;
 }
 .alert p {
   text-align: center;
@@ -253,8 +256,14 @@ footer svg {
   100% {transform: rotate(360deg);}
 }
 @keyframes fade-in {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 0;
+    z-index: 1;
+  }
+  100% {
+    opacity: 1;
+    z-index: 1;
+  }
 }
 @keyframes fade-out {
   0% {

@@ -535,8 +535,7 @@ $("#modal_close").on("click", function() {
 });
 $("#modal_save").on("click", function() {
   $(this).blur();
-  var writMess = "saveクリックしました";
-  modalAlert(writMess);
+  writeFile();
 });
 function modalAlert(text){
   if($("#main_alert").hasClass("show")){return;}
