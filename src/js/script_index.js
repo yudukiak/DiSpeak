@@ -2,13 +2,15 @@ const {ipcRenderer} = require("electron");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const fs = require("fs");
-const directory = ipcRenderer.sendSync("directory-check").replace(/\\/g,"/"); // DiSpeakのディレクトリを取得
-const bouyomiConnect = require(`${directory}/js/bouyomiConnect.js`);
-const $ = jQuery = require(`${directory}/js/jquery.min.js`);
+const srcDirectory = ipcRenderer.sendSync("directory-src-check").replace(/\\/g, "/");
+const exeDirectory = ipcRenderer.sendSync("directory-exe-check").replace(/\\/g,"/").replace(/\/electron\.exe/,"");
+const bouyomiConnect = require(`${srcDirectory}/js/bouyomiConnect.js`);
+const $ = jQuery = require(`${srcDirectory}/js/jquery.min.js`);
 const fileName = "setting.json";
-const fileName_default = "setting_default.json";
 const nowVersion = ipcRenderer.sendSync("now-version-check"); // 現在のバージョンを取得
 const jQueryVersion = $.fn.jquery;
+console.info(srcDirectory);
+console.info(exeDirectory);
 console.info(`DiSpeak v${nowVersion}`);
 console.info(`jQuery v${jQueryVersion}`);
 // 設定ファイルの読み込み
@@ -186,7 +188,7 @@ function readFile(){
   });
 }
 // ファイルへ書き込み
-function writeFile(){
+function writeFile(status){
   var settingAry = {};
   // Discord 基本設定
   settingAry.d_token        = document.querySelector('input[name="d_token"]').value;
@@ -226,7 +228,10 @@ function writeFile(){
       return;
     }
     var writTime = new Date();
-    var writMess = "設定ファイルを保存しました。";
+    var writMess = (function(){
+      if(/save/.test(status)) return "設定ファイルを保存しました。";
+      if(/create/.test(status)) return "設定ファイルを作成しました。";
+    })();
 //    document.getElementsByClassName("save_information")[0].textContent = writMess;
 //    document.getElementsByClassName("save_information")[1].textContent = writMess;
     var ary = {
@@ -239,41 +244,42 @@ function writeFile(){
     modalAlert(writMess);
   });
 }
-function createFile(){
-  fs.readFile(`${directory}/files/${fileName_default}`, "utf8", (error, setting) => {
-    if(error){return;}
-    fs.writeFile(`${fileName}`, setting, (error) => {
-      if(error){return;}
-      var createTime = new Date();
-      var createText = "<info> 設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
-      var ary = {
-        time: createTime,
-        type: "info",
-        name: "",
-        text: "設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
-      };
-      logProcess(ary);
-      readFile();
-    });
-  });
-}
+//function createFile(){
+//  fs.readFile(`${srcDirectory}/files/${fileName_default}`, "utf8", (error, setting) => {
+//    if(error){return;}
+//    fs.writeFile(`${fileName}`, setting, (error) => {
+//      if(error){return;}
+//      var createTime = new Date();
+//      var createText = "<info> 設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
+//      var ary = {
+//        time: createTime,
+//        type: "info",
+//        name: "",
+//        text: "設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
+//      };
+//      logProcess(ary);
+//      readFile();
+//    });
+//  });
+//}
 function errorHandling(error){
   var errorTime = new Date(),
     errorCode = error.code,
     errorMess = (function(){
       if(errorCode.match(/ENOENT/)) return      "設定ファイルが存在しませんでした。";
-      if(errorCode.match(/EPERM|EBUSY/)) return `設定ファイルを保存できませんでした。${fileName}を開いている場合は閉じてください。`;
+      if(errorCode.match(/EPERM|EBUSY/)) return "設定ファイルを保存できませんでした。設定ファイルを開いている場合は閉じてください。";
     })(),
     ary = {
       time: errorTime,
       type: "info",
       name: "",
-      text: "errorMess"
+      text: errorMess
     };
   logProcess(ary);
   modalAlert(errorMess);
   if(errorCode.match(/ENOENT/)){
-    createFile();
+    //createFile();
+    writeFile("create");
   }
   return;
 }
@@ -505,9 +511,9 @@ var debugTxt = "Start debug mode.";
 debugLog(debugFnc, debugTxt);
 function debugLog(fnc, txt){
   fs.readFile(`${fileName}`, "utf8", (error, file) => {
-    if(error || file == void 0){return;}
+    if(error || file == void 0){ return; }
     var file = JSON.parse(file);
-    if(file.debug!=true){return;}
+    if(file.debug != true){ return; }
     var time = new Date();
     var hour = toDoubleDigits(time.getHours());
     var min = toDoubleDigits(time.getMinutes());
@@ -526,16 +532,13 @@ function debugLog(fnc, txt){
 }
 // モーダルウィンドウ
 $("#footer_setting").on("click", function() {
-  $(this).blur();
   $("#main_overlay").addClass("show").removeClass("hide");
 });
 $("#modal_close").on("click", function() {
-  $(this).blur();
   $("#main_overlay").addClass("hide").removeClass("show");
 });
 $("#modal_save").on("click", function() {
-  $(this).blur();
-  writeFile();
+  writeFile("save");
 });
 function modalAlert(text){
   if($("#main_alert").hasClass("show")){return;}

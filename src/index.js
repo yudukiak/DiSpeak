@@ -198,7 +198,7 @@ ipcMain.on("bouyomi-exe-start", (event, arg) => {
     }
   });
 });
-ipcMain.on("bouyomi-exe-alert", (event) => {
+ipcMain.on("bouyomi-exe-alert", () => {
   let mesOptions = {
     type: "error",
     buttons: ["OK"],
@@ -209,9 +209,12 @@ ipcMain.on("bouyomi-exe-alert", (event) => {
   dialog.showMessageBox(mesOptions);
 });
 // DiSpeakのディレクトリを返す
-ipcMain.on("directory-check", (event) => {
+ipcMain.on("directory-src-check", (event) => {
   event.returnValue = app.getAppPath();
-})
+});
+ipcMain.on("directory-exe-check", (event) => {
+  event.returnValue = app.getPath("exe");
+});
 // UIの挙動
 ipcMain.on("window-minimize", () => {
   mainWindow.minimize();

@@ -27,7 +27,7 @@
       <div class="box">
         <div class="box-table">
           <span class="box-title">ログ</span>
-          <table><tr><td id="log" class="bouyomi-log" colspan="2"></td></tr></table>
+          <div id="log" class="bouyomi-log"></div>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
               <tr>
                 <td>トークン</td>
                 <td>
-                  <input type="text" name="d_token">
+                  <input type="text" name="d_token" value="Please write Token.">
                 </td>
               </tr>
               <tr>
@@ -207,11 +207,11 @@
               </tr>
               <tr>
                 <td>IP</td>
-                <td><input type="text" name="b_ip"></td>
+                <td><input type="text" name="b_ip" value="127.0.0.1"></td>
               </tr>
               <tr>
                 <td>ポート</td>
-                <td><input type="text" name="b_port"></td>
+                <td><input type="text" name="b_port" value="50001"></td>
               </tr>
             </table>
           </div>
@@ -257,6 +257,6 @@
       </a>
     </div>
   </footer>
-  <script src="js/script_index.js"></script>
+  <script defer src="js/script_index.js"></script>
 </body>
 </html>

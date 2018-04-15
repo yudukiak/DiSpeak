@@ -9,15 +9,15 @@
   枠組み
 ******************** */
 .box-table {
-  border: solid 3px rgba(149,204,255,1);
+  border: solid 3px #95ccff;
   border-radius: 8px;
   margin: 32px 0;
   padding: 8px 16px;
   position: relative;
 }
 .box-title {
-  background: rgba(255,255,255,1);
-  color: rgba(149,204,255,1);
+  background: #fff;
+  color: #95ccff;
   display: inline-block;
   font-size: 1.188em;
   font-weight: bold;
@@ -32,7 +32,6 @@
 }
 .box-table table td {
   padding: 10px;
-  vertical-align: top;
 }
 .box-table table td:first-child {
   width: 140px;
@@ -41,7 +40,7 @@
   オーバーレイ
 ******************** */
 .overlay {
-  background: rgba(255,255,255,1);
+  background: #fff;
   top: 25px;
   width: 100%;
   height: calc(100vh - 25px);
@@ -69,10 +68,10 @@
   overflow-y: scroll;
 }
 .overlay > div:last-child {
-  box-shadow: -4px 0 6px #4A5459;
+  box-shadow: -4px 0 6px #4a5459;
   -webkit-user-select: none;
-  border-top: 1px solid #4A5459;
-  color: rgba(255,255,255,1);
+  border-top: 1px solid #4a5459;
+  color: #fff;
 }
 .overlay > div:last-child > div {
   margin: 0 auto;
@@ -80,16 +79,16 @@
   justify-content: space-between;
 }
 .overlay .button:hover {
-  background: rgba(255,255,255,1);
+  background: #fff;
 }
 /* ********************
   アラート
 ******************** */
 .alert {
   bottom: 10px;
-  height: 50px;
-  width: 300px;
-  left: calc(50% - 300px/2);
+  /*height: 50px;*/
+  width: 400px;
+  left: calc(50% - 400px/2);
   position: fixed;
   display: none;
   opacity: 0;
@@ -100,9 +99,9 @@
   background: #e0edff;
   margin: 5px;
   padding: 5px 10px;
-  height: 30px;
+  /*height: 30px;*/
   border-radius: 20px;
-  box-shadow: 0px 0px 6px #4A5459;
+  box-shadow: 0px 0px 6px #4a5459;
 }
 .alert.show {
   display: block;
@@ -122,10 +121,10 @@
 ボタン
 ******************** */
 .button {
-  background: rgba(149,204,255,1);
-  border: 3px solid rgba(149,204,255,1);
-  color: rgba(255,255,255,1);
-  fill: rgba(255,255,255,1);
+  background: #95ccff;
+  border: 3px solid #95ccff;
+  color: #fff;
+  fill: #fff;
   border-radius: 4px;
   box-sizing: border-box;
   cursor: pointer;
@@ -141,19 +140,19 @@
 }
 .button:hover {
   background: rgba(149,204,255,.0);
-  border: 3px solid rgba(149,204,255,1);
-  color:  rgba(149,204,255,1);
-  fill: rgba(149,204,255,1);
+  border: 3px solid #95ccff;
+  color:  #95ccff;
+  fill: #95ccff;
 }
 .button-disabled {
-  background: rgba(146,158,145,1);
-  border: 3px solid rgba(146,158,145,1);
+  background: #929e91;
+  border: 3px solid #929e91;
 }
 .button-disabled:hover {
   background: rgba(146,158,145,.0);
-  border: 3px solid rgba(146,158,145,1);
-  color: rgba(146,158,145,1);
-  fill: rgba(146,158,145,1);
+  border: 3px solid #929e91;
+  color: #929e91;
+  fill: #929e91;
 }
 /* ********************
   ヘッダー
@@ -161,8 +160,8 @@
 header {
   -webkit-app-region: drag;
   -webkit-user-select: none;
-  background: #4A5459;
-  color: rgba(255,255,255,1);
+  background: #4a5459;
+  color: #fff;
   display: flex;
   font-size: 15px;
   height: 25px;
@@ -185,10 +184,10 @@ header > div:not(:first-child) {
   width: 35px;
 }
 header > div:not(:first-child):not(:last-child):hover {
-  background: #5C656A;
+  background: #5c656a;
 }
 header > div:last-child:hover {
-  background: #E81123;
+  background: #e81123;
 }
 /* ********************
   メイン
@@ -214,10 +213,10 @@ main svg {
   フッター
 ******************** */
 footer {
-  box-shadow: -4px 0 6px #4A5459;
+  box-shadow: -4px 0 6px #4a5459;
   -webkit-user-select: none;
-  border-top: 1px solid #4A5459;
-  color: rgba(255,255,255,1);
+  border-top: 1px solid #4a5459;
+  color: #fff;
   font-size: 15px;
   height: 70px;
 }
@@ -288,13 +287,13 @@ textarea {
 }
 input[type="text"]:focus,
 textarea:focus {
-  border: 1px solid rgba(149,204,255,1);
-  box-shadow: 0 0 7px rgba(149,204,255,1);
+  border: 1px solid #95ccff;
+  box-shadow: 0 0 7px #95ccff;
 }
 .button:focus,
 input[type="button"]:focus,
 input[type="radio"]:focus {
-  box-shadow: 0 0 7px rgba(149,204,255,1);
+  box-shadow: 0 0 7px #95ccff;
   outline: none;
 }
 /* ********************
@@ -318,7 +317,7 @@ body {
   font-size: 1em;
 }
 a {
-  color: #C02942;
+  color: #c02942;
   font-weight: bold;
   text-decoration:none;
 }
@@ -334,13 +333,16 @@ h3:first-letter {
   font-size: 1.5em;
 }
 hr {
-  background: rgba(149,204,255,1);
+  background: #95ccff;
   border: none;
   height: 3px;
 }
 p {
   margin: 0;
   padding: 0;
+}
+.bouyomi-log {
+  padding: 10px;
 }
 .bouyomi-log,
 .comment {
