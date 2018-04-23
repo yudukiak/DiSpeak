@@ -202,6 +202,8 @@ function readFile() {
         case "b_dir":  $("input[name=b_dir]").val(settingAryKey); break;
         case "b_ip":   $("input[name=b_ip]").val(settingAryKey); break;
         case "b_port": $("input[name=b_port]").val(settingAryKey); break;
+        // その他
+        case "debug":   $("#debug input").eq(settingAryKey).prop("checked", true); break;
       }
     }
     let ary = {};
@@ -246,6 +248,8 @@ function writeFile(status) {
   settingAry.b_dir  = $("input[name=b_dir]").val();
   settingAry.b_ip   = $("input[name=b_ip]").val();
   settingAry.b_port = $("input[name=b_port]").val();
+  // その他
+  settingAry.debug = Number($("#debug input:checked").val());
   const setting = JSON.stringify(settingAry, null, 4);
   fs.writeFile(`${fileName}`, setting, (error) => {
     if(error){
@@ -502,7 +506,7 @@ function debugLog(fnc, txt){
   fs.readFile(`${fileName}`, "utf8", (error, file) => {
     if(error || file == null){ return; }
     const array = JSON.parse(file);
-    if(array.debug != true){ return; }
+    if(array.debug === "1"){ return; }
     const time = new Date();
     const hour = toDoubleDigits(time.getHours());
     const min = toDoubleDigits(time.getMinutes());
