@@ -5,20 +5,20 @@
   <meta charset="UTF-8">
   <title>でぃすぴーく</title>
   <link rel="stylesheet" type="text/css" href="css/style.css">
-  <link href="https://fonts.googleapis.com/earlyaccess/notosansjapanese.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/earlyaccess/notosansjapanese.css" rel="stylesheet">
 </head>
 <body>
   <header>
     <div id="header_logo">
       <img src="images/logo_w.png" alt="でぃすぴーく">
     </div>
-    <div id="header_minimize" onclick="windowMin();">
+    <div id="header_minimize">
       <svg width="12" height="12"><path stroke="#fff" stroke-width="2" d="M0 6h12"/></svg>
     </div>
-    <div id="header_maximize" onclick="windowMax();">
+    <div id="header_maximize">
       <svg width="12" height="12"><path stroke="#fff" stroke-width="2" d="M0 0v12M0 0h12M12 12H0M12 12V0"/></svg>
     </div>
-    <div id="header_close" onclick="windowCls();">
+    <div id="header_close">
       <svg width="12" height="12"><path stroke="#fff" stroke-width="1.3" d="M0 0l12 12M12 0L0 12"/></svg>
     </div>
   </header>
@@ -38,7 +38,8 @@
             <span class="box-title">Discord</span>
             <table>
               <tr>
-                <td colspan="2"><h3>基本設定</h3></td></tr>
+                <td colspan="2"><h3>基本設定</h3></td>
+              </tr>
               <tr>
                 <td>トークン</td>
                 <td>
@@ -200,7 +201,7 @@
               <tr>
                 <td>ディレクトリ</td>
                 <td>
-                  <button  onclick="bouyomiDialog()">選択</button>
+                  <button  id="setting_bouyomi_dialog">選択</button>
                   <span class="comment">棒読みちゃんの実行ファイルを選択してください。</span>
                   <input type="text" name="b_dir">
                 </td>
@@ -240,7 +241,7 @@
   </main>
   <footer>
     <div class="box">
-      <div id="footer_start" class="button" tabindex="0" onclick="bouyomiStart();">
+      <div id="footer_start" class="button" tabindex="0">
         <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512"><path d="M207 167h-3l-2 3v172a3 3 0 0 0 5 3l144-86 2-3-2-3-144-86z"/><path d="M256 0a256 256 0 1 0 0 512 256 256 0 0 0 0-512zm0 448a192 192 0 1 1 0-384 192 192 0 0 1 0 384z"/></svg>
       </div>
       <div id="footer_stop" class="button button-disabled hidden" tabindex="0">
@@ -249,7 +250,7 @@
       <div id="footer_setting" class="button spin" tabindex="0">
         <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512"><path d="M496 294c9-1 16-8 16-17v-42c0-9-7-16-16-17l-55-4c-3-1-6-3-8-6l-18-43c-1-4 0-7 2-10l36-42c5-7 5-17-1-23l-30-30c-6-6-16-6-23-1l-42 36c-3 2-6 3-10 2l-43-18c-3-2-5-5-6-8l-4-55c-1-9-8-16-17-16h-42c-9 0-16 7-17 16l-4 55c-1 3-3 6-6 8l-43 18c-4 1-7 0-10-2l-42-36c-7-5-17-5-23 1L60 90c-6 6-6 16-1 23l36 42c2 3 3 6 2 10l-18 43c-2 3-5 5-8 6l-55 4c-9 1-16 8-16 17v42c0 9 7 16 16 17l55 4c3 1 6 3 8 6l18 43c1 4 0 7-2 10l-36 42c-5 7-5 17 1 23l30 30c6 6 16 6 23 1l42-36c3-2 6-3 10-2l43 18c3 2 5 5 6 8l4 55c1 9 8 16 17 16h42c9 0 16-7 17-16l4-55c1-3 3-6 6-8l43-18c4-1 7 0 10 2l42 36c7 5 17 5 23-1l30-30c6-6 6-16 1-23l-36-42c-2-3-3-6-2-10l18-43c2-3 5-5 8-6l55-4zm-240 49a86 86 0 0 1-87-87 86 86 0 0 1 87-87 86 86 0 0 1 87 87 86 86 0 0 1-87 87z"/></svg>
       </div>
-      <div id="footer_reload" class="button spin" tabindex="0" onclick="reload();">
+      <div id="footer_reload" class="button spin" tabindex="0">
         <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512"><path d="M446 92c-41-42-97-69-160-72a29 29 0 0 0-3 57 178 178 0 0 1 172 179 178 178 0 0 1-179 179A178 178 0 0 1 97 246l34 16c4 2 8 2 12 0 3-1 5-5 5-8l-3-150c0-5-3-9-7-11-5-2-10-2-13 1L4 182c-3 3-4 6-4 10 1 4 3 7 7 9l36 18a237 237 0 0 0 233 273A236 236 0 0 0 446 92z"/></svg>
       </div>
       <a id="footer_help" class="button" tabindex="0" href="https://github.com/micelle/dc_DiSpeak/wiki" target="_blank">

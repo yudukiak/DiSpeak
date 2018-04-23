@@ -1,13 +1,13 @@
+const fileName = "setting.json";
 const {ipcRenderer} = require("electron");
 const Discord = require("discord.js");
-const client = new Discord.Client();
 const fs = require("fs");
 const srcDirectory = ipcRenderer.sendSync("directory-src-check").replace(/\\/g, "/");
 const exeDirectory = ipcRenderer.sendSync("directory-exe-check").replace(/\\/g,"/").replace(/\/electron\.exe/,"");
+const nowVersion = ipcRenderer.sendSync("now-version-check");
 const bouyomiConnect = require(`${srcDirectory}/js/bouyomiConnect.js`);
 const $ = jQuery = require(`${srcDirectory}/js/jquery.min.js`);
-const fileName = "setting.json";
-const nowVersion = ipcRenderer.sendSync("now-version-check"); // 現在のバージョンを取得
+const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
 console.info(srcDirectory);
 console.info(exeDirectory);
@@ -15,374 +15,373 @@ console.info(`DiSpeak v${nowVersion}`);
 console.info(`jQuery v${jQueryVersion}`);
 // 設定ファイルの読み込み
 readFile();
-// UIの挙動
-function windowMin(){ipcRenderer.send("window-minimize");}
-function windowMax(){ipcRenderer.send("window-maximize");}
-function windowCls(){ipcRenderer.send("window-close");}
-// 日時の0詰め https://tagamidaiki.com/javascript-0-chink/
-function toDoubleDigits(num){
-  num += "";
-  if (num.length === 1) {
-    num = `0${num}`;
-  }
-  return num;
+// ヘッダー
+$("#header_minimize").on("click", function() {
+  ipcRenderer.send("window-minimize");
+});
+$("#header_maximize").on("click", function() {
+  ipcRenderer.send("window-maximize");
+});
+$("#header_close").on("click", function() {
+  ipcRenderer.send("window-close");
+});
+// フッター
+$("#footer_start").on("click", function() {
+  bouyomiExeStart();
+  bouyomiStart();
+  $("#footer_start").addClass("hidden");
+  $("#footer_stop").removeClass("hidden");
+});
+$("#footer_setting").on("click", function() {
+  $("#main_overlay").addClass("show").removeClass("hide");
+});
+$("#footer_reload").on("click", function() {
+  location.reload();
+});
+// モーダル
+$("#modal_close").on("click", function() {
+  $("#main_overlay").addClass("hide").removeClass("show");
+});
+$("#modal_save").on("click", function() {
+  writeFile("save");
+});
+// 設定
+$("#setting_bouyomi_dialog").on("click", function() {
+  bouyomiDialog();
+});
+// 日時の0詰め
+function toDoubleDigits(num) {
+  const str = String(num);
+  const txt = (function() {
+    if(str.length === 1) return `0${str}`;
+    return str;
+  })();
+  return txt;
 }
 // 正規表現
-function replaceNewline(str) {
-  var strRep = str.replace(/\n/g, "|");
-  var strReg = new RegExp(`^(${strRep})$`);
+function regularExpression(str) {
+  const strRep = str.replace(/[ 　\t]/g, "").replace(/\n/g, "|");
+  const strReg = new RegExp(`^(${strRep})$`);
   return strReg;
 }
-// 配列の空要素除去filter https://qiita.com/akameco/items/1636e0448e81e17e3646
-function filterArray(ary){
-  var ary = ary.filter(Boolean);
-  return ary;
+// 配列の空を除去
+function filterArray(ary) {
+  const aryFilter = ary.filter(Boolean);
+  return aryFilter;
+}
+// 改行を配列化
+function createArray(ary) {
+  const aryRep = ary.replace(/[ 　\t]/g, "").split("\n");
+  return aryRep;
 }
 // エスケープ
 function escapeHtml(str) {
-  var str = str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  return str;
+  const strRep = str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  return strRep;
 }
-function logProcess(ary){
-  var hour = toDoubleDigits(ary.time.getHours());
-  var min  = toDoubleDigits(ary.time.getMinutes());
-  var sec  = toDoubleDigits(ary.time.getSeconds());
-  var text = ary.text.replace(/\r\n|\n|\r/,"");
-  var textEsc = escapeHtml(`[${hour}:${min}:${sec}] <${ary.type}> ${ary.name} ${text}`); // [time] <type> name text
-  var textRep = textEsc.replace(/&lt;(:.+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">');
-  var pElement = document.createElement("p"); // 要素作成
-  pElement.innerHTML = textRep; // 要素にテキストを設定
-  document.getElementById("log").prepend(pElement); // 要素を追加
+function logProcess(ary) {
+  const hour = toDoubleDigits(ary.time.getHours());
+  const min = toDoubleDigits(ary.time.getMinutes());
+  const sec = toDoubleDigits(ary.time.getSeconds());
+  const text = ary.text.replace(/\r\n|\n|\r/, "");
+  const textEsc = escapeHtml(`[${hour}:${min}:${sec}] <${ary.type}> ${ary.name} ${text}`); // [time] <type> name text
+  const textRep = textEsc.replace(/&lt;(:.+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">');
+  $("#log").prepend(`<p>${textRep}</p>`);
   // ログの削除
-  var logP = document.querySelectorAll("#log p");
-  var maxLine = 50; // 表示される最大行数
-  if(logP.length > maxLine){ // 行数を超えたら古いログを削除
-    for(var i=maxLine,n=logP.length; i<n; i++){
+  const logP = $("#log p");
+  const maxLine = 50; // 表示される最大行数
+  if(logP.length > maxLine) { // 行数を超えたら古いログを削除
+    for(let i=maxLine, n=logP.length; i<n; i++) {
       logP[i].remove();
     }
   }
 }
-function reload(){
-  location.reload();
-}
-function bouyomiStart(){
-  bouyomiExeStart();
-  $("#footer_start").addClass("hidden");
-  $("#footer_stop").removeClass("hidden");
-  //document.getElementsByClassName("footer-start")[0].className = "button footer-start footer-hidden";
-  //document.getElementsByClassName("footer-stop")[0].className = "button button-disabled footer-stop";
-  var d_token = document.querySelector('input[name="d_token"]').value;
-  var startTime = new Date();
-  var startMess = "読み上げを開始しています。";
-  var ary = {
-    time: startTime,
-    type: "info",
-    name: "",
-    text: startMess
-  };
+function bouyomiStart() {
+  const d_token = $("input[name=d_token]").val();
+  let ary = {};
+  ary.time = new Date();
+  ary.type = "info";
+  ary.name = "";
+  ary.text = "読み上げを開始しています。";
   logProcess(ary);
-  if(d_token == ""){
-    var tokenText = "Error: The token is not filled in.";
-    errorLog("token", tokenText);
+  if(d_token == null) {
+    errorLog("token", "Error: The token is not filled in.");
     return;
   }
-  client.login(d_token).catch(function(error){
+  client.login(d_token).catch(function(error) {
     errorLog("login", error);
   });
 }
-function bouyomiProcess(ary){
+function bouyomiProcess(ary) {
   // チャンネル（DM, Group, Server）を読ませるか
-  var d_channel = document.getElementById("d_channel").d_channel.value;
-  var type = (function() {
-    if(d_channel=="1") return "";
+  const d_channel = $("#d_channel").val();
+  const type = (function() {
+    if(d_channel === "1") return "";
     return ary.type;
   })();
   // 名前を読ませるか
-  var d_dm_name = document.getElementById("d_dm_name").d_dm_name.value;
-  var d_gr_name = document.getElementById("d_gr_name").d_gr_name.value;
-  var d_sv_name = document.getElementById("d_sv_name").d_sv_name.value;
-  var name = (function() {
-    if(d_dm_name=="1" && ary.type=="dm") return "";
-    if(d_gr_name=="1" && ary.type=="group") return "";
-    if(d_sv_name=="1" && ary.type!="dm" && ary.type!="group") return "";
+  const d_dm_name = $("#d_dm_name").val();
+  const d_gr_name = $("#d_gr_name").val();
+  const d_sv_name = $("#d_sv_name").val();
+  const name = (function() {
+    if(d_dm_name === "1" && ary.type === "dm") return "";
+    if(d_gr_name === "1" && ary.type === "group") return "";
+    if(d_sv_name === "1" && ary.type !== "dm" && ary.type !== "group") return "";
     return ary.name;
   })();
   // 読ませる文章を生成
-  var text = `${type} ${name} ${ary.text}`;
+  const text = `${type} ${name} ${ary.text}`;
   // 読ませる文章の調整
-  var textBym = text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）").replace(/\s+/g, " ").trim();
+  const textBym = text.replace(/<:(.+):([0-9]+)>/g, "（スタンプ）").replace(/\s+/g, " ").trim();
   // 棒読みちゃんの処理
-  var ip   = document.querySelector('input[name="b_ip"]').value;
-  var port = document.querySelector('input[name="b_port"]').value;
-  var bouyomiServer = {};
+  const ip   = $("input[name=b_ip]").val();
+  const port = $("input[name=b_port]").val();
+  const bouyomiServer = {};
   bouyomiServer.host = ip;
   bouyomiServer.port = port;
   bouyomiConnect.sendBouyomi(bouyomiServer, textBym);
 }
-function bouyomiDialog(){
-  var bouyomiDir = ipcRenderer.sendSync("bouyomi-dir-dialog");
-  if(bouyomiDir == ""){return;}
-  if(!bouyomiDir.match(/BouyomiChan\.exe/)){
+function bouyomiDialog() {
+  const bouyomiDir = ipcRenderer.sendSync("bouyomi-dir-dialog");
+  if(bouyomiDir === "") {
+    return;
+  } else if(!/BouyomiChan\.exe/.test(bouyomiDir)) {
     ipcRenderer.send("bouyomi-exe-alert");
     return;
+  } else {
+    $("input[name=b_dir]").val(bouyomiDir);
   }
-  document.querySelector('input[name="b_dir"]').value = bouyomiDir;
 }
-function bouyomiExeStart(){
-  var bouyomiDir = document.querySelector('input[name="b_dir"]').value;
-  if(bouyomiDir == "" || !bouyomiDir.match(/BouyomiChan\.exe/)){return;}
-  ipcRenderer.send("bouyomi-exe-start", bouyomiDir);
+function bouyomiExeStart() {
+  const bouyomiDir = $("input[name=b_dir]").val();
+  if(bouyomiDir === "" || !/BouyomiChan\.exe/.test(bouyomiDir)) {
+    return;
+  } else {
+    ipcRenderer.send("bouyomi-exe-start", bouyomiDir);
+  }
 }
 // ファイルを表示
-function readFile(){
+function readFile() {
   fs.readFile(`${fileName}`, "utf8", (error, setting) => {
-    if(error){
+    if(error) {
       errorHandling(error);
       return;
     }
-    var settingAry = JSON.parse(setting);
+    const settingAry = JSON.parse(setting);
     for(key in settingAry){
-      var settingAryKey = settingAry[key];
+      const settingAryKey = settingAry[key];
       switch(key){
         // Discord 基本設定
-        case "d_token":        document.querySelector('input[name="d_token"]').value = settingAryKey; break;
-        case "d_user":         document.getElementById("d_user").d_user[settingAryKey].checked = true; break;
-        case "d_channel":      document.getElementById("d_channel").d_channel[settingAryKey].checked = true; break;
+        case "d_token":   $("input[name=d_token]").val(settingAryKey); break;
+        case "d_user":    $("#d_user input").eq(settingAryKey).prop("checked", true); break;
+        case "d_channel": $("#d_channel input").eq(settingAryKey).prop("checked", true); break;
         // Discord DM設定
-        case "d_dm":           document.getElementById("d_dm").d_dm[settingAryKey].checked = true; break;
-        case "d_dm_name":      document.getElementById("d_dm_name").d_dm_name[settingAryKey].checked = true; break;
-        case "d_dm_list":      document.getElementById("d_dm_list").d_dm_list[settingAryKey].checked = true; break;
-        case "d_dm_list_b":    document.querySelector('textarea[name="d_dm_list_b"]').value = settingAryKey.join("\n"); break;
-        case "d_dm_list_w":    document.querySelector('textarea[name="d_dm_list_w"]').value = settingAryKey.join("\n"); break;
+        case "d_dm":        $("#d_dm input").eq(settingAryKey).prop("checked", true); break;
+        case "d_dm_name":   $("#d_dm_name input").eq(settingAryKey).prop("checked", true); break;
+        case "d_dm_list":   $("#d_dm_list input").eq(settingAryKey).prop("checked", true); break;
+        case "d_dm_list_b": $("textarea[name=d_dm_list_b]").val(settingAryKey.join("\n")); break;
+        case "d_dm_list_w": $("textarea[name=d_dm_list_w]").val(settingAryKey.join("\n")); break;
         // Discord グループ設定
-        case "d_gr":           document.getElementById("d_gr").d_gr[settingAryKey].checked = true; break;
-        case "d_gr_name":      document.getElementById("d_gr_name").d_gr_name[settingAryKey].checked = true; break;
-        case "d_gr_list":      document.getElementById("d_gr_list").d_gr_list[settingAryKey].checked = true; break;
-        case "d_gr_list_b":    document.querySelector('textarea[name="d_gr_list_b"]').value = settingAryKey.join("\n"); break;
-        case "d_gr_list_w":    document.querySelector('textarea[name="d_gr_list_w"]').value = settingAryKey.join("\n"); break;
+        case "d_gr":        $("#d_gr input").eq(settingAryKey).prop("checked", true); break;
+        case "d_gr_name":   $("#d_gr_name input").eq(settingAryKey).prop("checked", true); break;
+        case "d_gr_list":   $("#d_gr_list input").eq(settingAryKey).prop("checked", true); break;
+        case "d_gr_list_b": $("textarea[name=d_gr_list_b]").val(settingAryKey.join("\n")); break;
+        case "d_gr_list_w": $("textarea[name=d_gr_list_w]").val(settingAryKey.join("\n")); break;
         // Discord サーバ設定
-        case "d_sv":           document.getElementById("d_sv").d_sv[settingAryKey].checked = true; break;
-        case "d_sv_nick":      document.getElementById("d_sv_nick").d_sv_nick[settingAryKey].checked = true; break;
-        case "d_sv_name":      document.getElementById("d_sv_name").d_sv_name[settingAryKey].checked = true; break;
-        case "d_sv_voice":     document.getElementById("d_sv_voice").d_sv_voice[settingAryKey].checked = true; break;
-        case "d_sv_sv_list":   document.getElementById("d_sv_sv_list").d_sv_sv_list[settingAryKey].checked = true; break;
-        case "d_sv_sv_list_b": document.querySelector('textarea[name="d_sv_sv_list_b"]').value = settingAryKey.join("\n"); break;
-        case "d_sv_sv_list_w": document.querySelector('textarea[name="d_sv_sv_list_w"]').value = settingAryKey.join("\n"); break;
-        case "d_sv_ch_list":   document.getElementById("d_sv_ch_list").d_sv_ch_list[settingAryKey].checked = true; break;
-        case "d_sv_ch_list_b": document.querySelector('textarea[name="d_sv_ch_list_b"]').value = settingAryKey.join("\n"); break;
-        case "d_sv_ch_list_w": document.querySelector('textarea[name="d_sv_ch_list_w"]').value = settingAryKey.join("\n"); break;
+        case "d_sv":           $("#d_sv input").eq(settingAryKey).prop("checked", true); break;
+        case "d_sv_nick":      $("#d_sv_nick input").eq(settingAryKey).prop("checked", true); break;
+        case "d_sv_name":      $("#d_sv_name input").eq(settingAryKey).prop("checked", true); break;
+        case "d_sv_voice":     $("#d_sv_voice input").eq(settingAryKey).prop("checked", true); break;
+        case "d_sv_sv_list":   $("#d_sv_sv_list input").eq(settingAryKey).prop("checked", true); break;
+        case "d_sv_sv_list_b": $("textarea[name=d_sv_sv_list_b]").val(settingAryKey.join("\n")); break;
+        case "d_sv_sv_list_w": $("textarea[name=d_sv_sv_list_w]").val(settingAryKey.join("\n")); break;
+        case "d_sv_ch_list":   $("#d_sv_ch_list input").eq(settingAryKey).prop("checked", true); break;
+        case "d_sv_ch_list_b": $("textarea[name=d_sv_ch_list_b]").val(settingAryKey.join("\n")); break;
+        case "d_sv_ch_list_w": $("textarea[name=d_sv_ch_list_w]").val(settingAryKey.join("\n")); break;
         // 棒読みちゃん 基本設定
-        case "b_dir":           document.querySelector('input[name="b_dir"]').value = settingAryKey; break;
-        case "b_ip":           document.querySelector('input[name="b_ip"]').value = settingAryKey; break;
-        case "b_port":         document.querySelector('input[name="b_port"]').value = settingAryKey; break;
+        case "b_dir":  $("input[name=b_dir]").val(settingAryKey); break;
+        case "b_ip":   $("input[name=b_ip]").val(settingAryKey); break;
+        case "b_port": $("input[name=b_port]").val(settingAryKey); break;
       }
     }
-    var readTime = new Date();
-    var ary = {
-      time: readTime,
-      type: "info",
-      name: "",
-      text: "設定ファイルを読み込みました。"
-    };
+    let ary = {};
+    ary.time = new Date();
+    ary.type = "info";
+    ary.name = "";
+    ary.text = "設定ファイルを読み込みました。";
     logProcess(ary);
   });
 }
 // ファイルへ書き込み
-function writeFile(status){
-  var settingAry = {};
+function writeFile(status) {
+  let settingAry = {};
   // Discord 基本設定
-  settingAry.d_token        = document.querySelector('input[name="d_token"]').value;
-  settingAry.d_user         = Number(document.getElementById("d_user").d_user.value);
-  settingAry.d_channel      = Number(document.getElementById("d_channel").d_channel.value);
+  settingAry.d_token   = $("input[name=d_token]").val();
+  settingAry.d_user    = Number($("#d_user input:checked").val());
+  settingAry.d_channel = Number($("#d_channel input:checked").val());
   // Discord DM設定
-  settingAry.d_dm           = Number(document.getElementById("d_dm").d_dm.value);
-  settingAry.d_dm_name  = Number(document.getElementById("d_dm_name").d_dm_name.value);
-  settingAry.d_dm_list      = Number(document.getElementById("d_dm_list").d_dm_list.value);
-  settingAry.d_dm_list_b    = filterArray(document.querySelector('textarea[name="d_dm_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
-  settingAry.d_dm_list_w    = filterArray(document.querySelector('textarea[name="d_dm_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
+  settingAry.d_dm        = Number($("#d_dm input:checked").val());
+  settingAry.d_dm_name   = Number($("#d_dm_name input:checked").val());
+  settingAry.d_dm_list   = Number($("#d_dm_list input:checked").val());
+  settingAry.d_dm_list_b = filterArray(createArray($("textarea[name=d_dm_list_b]").val()));
+  settingAry.d_dm_list_w = filterArray(createArray($("textarea[name=d_dm_list_w]").val()));
   // Discord グループ設定
-  settingAry.d_gr           = Number(document.getElementById("d_gr").d_gr.value);
-  settingAry.d_gr_name  = Number(document.getElementById("d_gr_name").d_gr_name.value);
-  settingAry.d_gr_list      = Number(document.getElementById("d_gr_list").d_gr_list.value);
-  settingAry.d_gr_list_b    = filterArray(document.querySelector('textarea[name="d_gr_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
-  settingAry.d_gr_list_w    = filterArray(document.querySelector('textarea[name="d_gr_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
+  settingAry.d_gr        = Number($("#d_gr input:checked").val());
+  settingAry.d_gr_name   = Number($("#d_gr_name input:checked").val());
+  settingAry.d_gr_list   = Number($("#d_gr_list input:checked").val());
+  settingAry.d_gr_list_b = filterArray(createArray($("textarea[name=d_gr_list_b]").val()));
+  settingAry.d_gr_list_w = filterArray(createArray($("textarea[name=d_gr_list_w]").val()));
   // Discord サーバ設定
-  settingAry.d_sv           = Number(document.getElementById("d_sv").d_sv.value);
-  settingAry.d_sv_nick      = Number(document.getElementById("d_sv_nick").d_sv_nick.value);
-  settingAry.d_sv_name  = Number(document.getElementById("d_sv_name").d_sv_name.value);
-  settingAry.d_sv_voice     = Number(document.getElementById("d_sv_voice").d_sv_voice.value);
-  settingAry.d_sv_sv_list   = Number(document.getElementById("d_sv_sv_list").d_sv_sv_list.value);
-  settingAry.d_sv_sv_list_b = filterArray(document.querySelector('textarea[name="d_sv_sv_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
-  settingAry.d_sv_sv_list_w = filterArray(document.querySelector('textarea[name="d_sv_sv_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
-  settingAry.d_sv_ch_list   = Number(document.getElementById("d_sv_ch_list").d_sv_ch_list.value);
-  settingAry.d_sv_ch_list_b = filterArray(document.querySelector('textarea[name="d_sv_ch_list_b"]').value.replace(/[ 　\t]/g,"").split("\n"));
-  settingAry.d_sv_ch_list_w = filterArray(document.querySelector('textarea[name="d_sv_ch_list_w"]').value.replace(/[ 　\t]/g,"").split("\n"));
+  settingAry.d_sv           = Number($("#d_sv input:checked").val());
+  settingAry.d_sv_nick      = Number($("#d_sv_nick input:checked").val());
+  settingAry.d_sv_name      = Number($("#d_sv_name input:checked").val());
+  settingAry.d_sv_voice     = Number($("#d_sv_voice input:checked").val());
+  settingAry.d_sv_sv_list   = Number($("#d_sv_sv_list input:checked").val());
+  settingAry.d_sv_sv_list_b = filterArray(createArray($("textarea[name=d_sv_sv_list_b]").val()));
+  settingAry.d_sv_sv_list_w = filterArray(createArray($("textarea[name=d_sv_sv_list_w]").val()));
+  settingAry.d_sv_ch_list   = Number($("#d_sv_ch_list input:checked").val());
+  settingAry.d_sv_ch_list_b = filterArray(createArray($("textarea[name=d_sv_ch_list_b]").val()));
+  settingAry.d_sv_ch_list_w = filterArray(createArray($("textarea[name=d_sv_ch_list_w]").val()));
   // 棒読みちゃん 基本設定
-  settingAry.b_dir          = document.querySelector('input[name="b_dir"]').value;
-  settingAry.b_ip           = document.querySelector('input[name="b_ip"]').value;
-  settingAry.b_port         = document.querySelector('input[name="b_port"]').value;
-  var setting = JSON.stringify(settingAry, null, 4);
+  settingAry.b_dir  = $("input[name=b_dir]").val();
+  settingAry.b_ip   = $("input[name=b_ip]").val();
+  settingAry.b_port = $("input[name=b_port]").val();
+  const setting = JSON.stringify(settingAry, null, 4);
   fs.writeFile(`${fileName}`, setting, (error) => {
     if(error){
       errorHandling(error);
       return;
     }
-    var writTime = new Date();
-    var writMess = (function(){
+    const writMess = (function() {
       if(/save/.test(status)) return "設定ファイルを保存しました。";
       if(/create/.test(status)) return "設定ファイルを作成しました。";
     })();
-//    document.getElementsByClassName("save_information")[0].textContent = writMess;
-//    document.getElementsByClassName("save_information")[1].textContent = writMess;
-    var ary = {
-      time: writTime,
-      type: "info",
-      name: "",
-      text: writMess
-    };
+    let ary = {};
+    ary.time = new Date();
+    ary.type = "info";
+    ary.name = "";
+    ary.text = writMess;
     logProcess(ary);
     modalAlert(writMess);
   });
 }
-//function createFile(){
-//  fs.readFile(`${srcDirectory}/files/${fileName_default}`, "utf8", (error, setting) => {
-//    if(error){return;}
-//    fs.writeFile(`${fileName}`, setting, (error) => {
-//      if(error){return;}
-//      var createTime = new Date();
-//      var createText = "<info> 設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
-//      var ary = {
-//        time: createTime,
-//        type: "info",
-//        name: "",
-//        text: "設定ファイルを作成しました。「設定を編集」より設定を行ってください。"
-//      };
-//      logProcess(ary);
-//      readFile();
-//    });
-//  });
-//}
-function errorHandling(error){
-  var errorTime = new Date(),
-    errorCode = error.code,
-    errorMess = (function(){
-      if(errorCode.match(/ENOENT/)) return      "設定ファイルが存在しませんでした。";
-      if(errorCode.match(/EPERM|EBUSY/)) return "設定ファイルを保存できませんでした。設定ファイルを開いている場合は閉じてください。";
-    })(),
-    ary = {
-      time: errorTime,
-      type: "info",
-      name: "",
-      text: errorMess
-    };
+function errorHandling(error) {
+  const errorCode = error.code;
+  const errorMess = (function() {
+    if(/ENOENT/.test(errorCode)) return "設定ファイルが存在しませんでした。";
+    if(/EPERM|EBUSY/.test(errorCode)) return "設定ファイルを保存できませんでした。設定ファイルを開いている場合は閉じてください。";
+  })();
+  let ary = {};
+  ary.time = new Date();
+  ary.type = "info";
+  ary.name = "";
+  ary.text = errorMess;
   logProcess(ary);
   modalAlert(errorMess);
-  if(errorCode.match(/ENOENT/)){
-    //createFile();
+  if(/ENOENT/.test(errorCode)) {
     writeFile("create");
   }
   return;
 }
+function modalAlert(text){
+  if($("#main_alert").hasClass("show")){return;}
+  $("#main_alert p").text(text);
+  $("#main_alert").addClass("show").removeClass("hide");
+  setTimeout(function(){
+    $("#main_alert").addClass("hide").removeClass("show");
+  },2000);
+}
 client.on("ready", () => {
-  var readyTime    = new Date();
-  var readyMess = "読み上げを開始しました。";
-//  document.querySelector("#bouyomi_status p").textContent = readyMess;
-  var ary = {
-    time: readyTime,
-    type: "info",
-    name: "",
-    text: readyMess
-  };
+  let ary = {};
+  ary.time = new Date();
+  ary.type = "info";
+  ary.name = "";
+  ary.text = "読み上げを開始しました。";
   logProcess(ary);
   bouyomiProcess(ary);
 });
 client.on("reconnecting", () => {
-  var reconnectTime    = new Date();
-  var reconnectMess = "再接続をします。";
-//  document.querySelector("#bouyomi_status p").textContent = reconnectMess;
-  var ary = {
-    time: reconnectTime,
-    type: "info",
-    name: "",
-    text: reconnectMess
-  };
+  let ary = {};
+  ary.time = new Date();
+  ary.type = "info";
+  ary.name = "";
+  ary.text = "再接続をします。";
   logProcess(ary);
 });
 // ボイスチャンネルに参加（マイク、スピーカーのON/OFFも）
 client.on("voiceStateUpdate", message => {
   debugLog("voiceStateUpdate", message);
-  var d_sv_voice = document.getElementById("d_sv_voice").d_sv_voice.value;
-  if(d_sv_voice == "1"){return;}
-  var clientUserId = client.user.id; // 自分のID
-  var messageUserId = message.id; // 参加者のID
-  if(clientUserId == messageUserId){return;} // 自分自身のイベント
-  var messageGuildId = message.guild.id; // サーバのID
-  var d_sv_sv_list   = document.getElementById("d_sv_sv_list").d_sv_sv_list.value;
-  var d_sv_sv_list_b = document.querySelector('textarea[name="d_sv_sv_list_b"]').value;
-  var d_sv_sv_list_w = document.querySelector('textarea[name="d_sv_sv_list_w"]').value;
-  if(d_sv_sv_list=="0" &&  messageGuildId.match(replaceNewline(d_sv_sv_list_b))){return;} // ブラックリストにある時
-  if(d_sv_sv_list=="1" && !messageGuildId.match(replaceNewline(d_sv_sv_list_w))){return;} // ホワイトリストにない時
-  var d_sv_nick = document.getElementById("d_sv_nick").d_sv_nick.value;
-  var nickname = message.nickname;
-  var username = (function() {
-    if(d_sv_nick=="1" || nickname==null) return message.user.username; // d_sv_nickが無効の時、サーバで未設定のとき
+  const d_sv_voice = $("#d_sv_voice input:checked").val();
+  if(d_sv_voice === "1"){return;}
+  const clientUserId = client.user.id; // 自分のID
+  const messageUserId = message.id; // 参加者のID
+  if(clientUserId === messageUserId){return;} // 自分自身のイベント
+  const messageGuildId = message.guild.id; // サーバのID
+  const d_sv_sv_list   = $("#d_sv_sv_list input:checked").val();
+  const d_sv_sv_list_b = $("textarea[name=d_sv_sv_list_b]").val();
+  const d_sv_sv_list_w = $("textarea[name=d_sv_sv_list_w]").val();
+  if(d_sv_sv_list==="0" &&  regularExpression(d_sv_sv_list_b).test(messageGuildId)){return;} // ブラックリストにある時
+  if(d_sv_sv_list==="1" && !regularExpression(d_sv_sv_list_w).test(messageGuildId)){return;} // ホワイトリストにない時
+  const d_sv_nick = $("#d_sv_nick input:checked").val();
+  const nickname = message.nickname;
+  const username = (function() {
+    if(d_sv_nick==="1" || nickname==null) return message.user.username; // d_sv_nickが無効の時、サーバで未設定のとき
     return nickname;
   })();
-  var guildChannel = message.guild.channels; // サーバのチャンネル一覧
+  const guildChannel = message.guild.channels; // サーバのチャンネル一覧
   // 切断チャンネル（参加時:undefined, 切断時:123456789012345678）
-  var channelID = message.voiceChannelID;
-  var channelName = guildChannel.map(function(value, index){
-    if(channelID == index){return value.name;}
+  const channelID = message.voiceChannelID;
+  const channelName = guildChannel.map(function(value, index){
+    if(channelID === index){return value.name;}
   }).filter(Boolean);
   // 参加チャンネル（参加時:123456789012345678, 切断時:null）
-  var protoChannelID = message.__proto__.voiceChannelID;
-  var protoChannelName = guildChannel.map(function(value, index){
-    if(protoChannelID == index){return value.name;}
+  const protoChannelID = message.__proto__.voiceChannelID;
+  const protoChannelName = guildChannel.map(function(value, index){
+    if(protoChannelID === index){return value.name;}
   }).filter(Boolean);
   // テキストの生成
-  var text = (function() {
+  const text = (function() {
     if(channelID == null) return `${username}が「${protoChannelName}」に参加しました。`; // チャンネルへ参加
     if(protoChannelID==null) return `${username}が「${channelName}」から切断しました。`; // チャンネルから切断
-    if(channelID != protoChannelID) return `${username}が「${channelName}」から「${protoChannelName}」へ移動しました。`; // チャンネルの移動
+    if(channelID !== protoChannelID) return `${username}が「${channelName}」から「${protoChannelName}」へ移動しました。`; // チャンネルの移動
   })();
-  var ary = {
-    time: new Date(),
-    type: "info",
-    name: "",
-    text: text
-  };
+  let ary = {};
+  ary.time = new Date();
+  ary.type = "info";
+  ary.name = "";
+  ary.text = text;
   // 処理
-  if(channelID == protoChannelID){return;}
+  if(channelID === protoChannelID){return;}
   logProcess(ary);
-  if(d_sv_voice == "0"){bouyomiProcess(ary);}
+  if(d_sv_voice === "0"){bouyomiProcess(ary);}
 });
 client.on("message", message => {
   debugLog("message", message);
   // Discord 基本設定
-  var d_user         = document.getElementById("d_user").d_user.value;
+  const d_user         = $("#d_user input:checked").val();
   // Discord DM設定
-  var d_dm           = document.getElementById("d_dm").d_dm.value;
-  var d_dm_list      = document.getElementById("d_dm_list").d_dm_list.value;
-  var d_dm_list_b    = document.querySelector('textarea[name="d_dm_list_b"]').value;
-  var d_dm_list_w    = document.querySelector('textarea[name="d_dm_list_w"]').value;
+  const d_dm           = $("#d_dm input:checked").val();
+  const d_dm_list      = $("#d_dm_list input:checked").val();
+  const d_dm_list_b    = $("textarea[name=d_dm_list_b]").val();
+  const d_dm_list_w    = $('textarea[name=d_dm_list_w]').val();
   // Discord グループ設定
-  var d_gr           = document.getElementById("d_gr").d_gr.value;
-  var d_gr_list      = document.getElementById("d_gr_list").d_gr_list.value;
-  var d_gr_list_b    = document.querySelector('textarea[name="d_gr_list_b"]').value;
-  var d_gr_list_w    = document.querySelector('textarea[name="d_gr_list_w"]').value;
+  const d_gr           = $("#d_gr input:checked").val();
+  const d_gr_list      = $("#d_gr_list input:checked").val();
+  const d_gr_list_b    = $("textarea[name=d_gr_list_b]").val();
+  const d_gr_list_w    = $("textarea[name=d_gr_list_w]").val();
   // Discord サーバ設定
-  var d_sv           = document.getElementById("d_sv").d_sv.value;
-  var d_sv_nick      = document.getElementById("d_sv_nick").d_sv_nick.value;
-  var d_sv_sv_list   = document.getElementById("d_sv_sv_list").d_sv_sv_list.value;
-  var d_sv_sv_list_b = document.querySelector('textarea[name="d_sv_sv_list_b"]').value;
-  var d_sv_sv_list_w = document.querySelector('textarea[name="d_sv_sv_list_w"]').value;
-  var d_sv_ch_list   = document.getElementById("d_sv_ch_list").d_sv_ch_list.value;
-  var d_sv_ch_list_b = document.querySelector('textarea[name="d_sv_ch_list_b"]').value;
-  var d_sv_ch_list_w = document.querySelector('textarea[name="d_sv_ch_list_w"]').value;
+  const d_sv           = $("#d_sv input:checked").val();
+  const d_sv_nick      = $("#d_sv_nick input:checked").val();
+  const d_sv_sv_list   = $("#d_sv_sv_list input:checked").val();
+  const d_sv_sv_list_b = $("textarea[name=d_sv_sv_list_b]").val();
+  const d_sv_sv_list_w = $("textarea[name=d_sv_sv_list_w]").val();
+  const d_sv_ch_list   = $("#d_sv_ch_list input:checked").val();
+  const d_sv_ch_list_b = $("textarea[name=d_sv_ch_list_b]").val();
+  const d_sv_ch_list_w = $("textarea[name=d_sv_ch_list_w]").val();
   // 自身の通知を読むか
-  var user_id = client.user.id;
-  var authorId = message.author.id;
-  if(d_user=="1" && user_id==authorId){return;}
+  const user_id = client.user.id;
+  const authorId = message.author.id;
+  if(d_user==="1" && user_id===authorId){return;}
   // 使用するID
   // DM SV 判定   message.channel.type
   // DM UserId    message.channel.recipient.id
@@ -393,65 +392,60 @@ client.on("message", message => {
   // SV ServerID  message.member.guild.id
   // SV ServerID  message.mentions._guild.id
   // DM・グループ・サーバを読む・読まないの処理
-  var channelType = message.channel.type;
-  if(channelType=="dm"   && d_dm=="1"){return;}else
-  if(channelType=="group" && d_gr=="1"){return;}else
-  if(channelType=="text" && d_sv=="1"){return;}
+  const channelType = message.channel.type;
+  if(channelType==="dm"   && d_dm==="1"){return;}else
+  if(channelType==="group" && d_gr==="1"){return;}else
+  if(channelType==="text" && d_sv==="1"){return;}
   // ホワイトリスト・ブラックリストの処理
   // 1.  DMかグループかサーバを確認        channelType
   // 2.  リスト設定がどっちかを確認        d_dm_list,   d_sv_sv_list,   d_sv_ch_list   0ブラックリスト, 1ホワイトリスト
   // 3-1.ブラックリストのIDならreturn      d_dm_list_b, d_sv_sv_list_b, d_sv_ch_list_b
   // 3-2.ホワイトリスト以外のIDならreturn  d_dm_list_w, d_sv_sv_list_w, d_sv_ch_list_w
-  if(channelType == "dm"){
-    var dmUserId = message.channel.recipient.id;
-    if(d_dm_list=="0" &&  dmUserId.match(replaceNewline(d_dm_list_b))){return;}else
-    if(d_dm_list=="1" && !dmUserId.match(replaceNewline(d_dm_list_w))){return;}
-  }else if(channelType == "group"){
-    var grUserId = message.channel.id;
-    if(d_gr_list=="0" &&  grUserId.match(replaceNewline(d_gr_list_b))){return;}else
-    if(d_gr_list=="1" && !grUserId.match(replaceNewline(d_gr_list_w))){return;}
-  }else if(channelType == "text"){
-    var svServerId  = message.channel.guild.id;
-    var svChannelId = message.channel.id;
-    if(d_sv_sv_list=="0" &&  svServerId.match(replaceNewline(d_sv_sv_list_b))){return;}else
-    if(d_sv_sv_list=="1" && !svServerId.match(replaceNewline(d_sv_sv_list_w))){return;}else
-    if(d_sv_ch_list=="0" &&  svChannelId.match(replaceNewline(d_sv_ch_list_b))){return;}else
-    if(d_sv_ch_list=="1" && !svChannelId.match(replaceNewline(d_sv_ch_list_w))){return;}
+  if(channelType === "dm"){
+    const dmUserId = message.channel.recipient.id;
+    if(d_dm_list==="0" &&  regularExpression(d_dm_list_b).test(dmUserId)){return;}else
+    if(d_dm_list==="1" && !regularExpression(d_dm_list_w).test(dmUserId)){return;}
+  }else if(channelType === "group"){
+    const grUserId = message.channel.id;
+    if(d_gr_list==="0" &&  regularExpression(d_gr_list_b).test(grUserId)){return;}else
+    if(d_gr_list==="1" && !regularExpression(d_gr_list_w).test(grUserId)){return;}
+  }else if(channelType === "text"){
+    const svServerId = message.channel.guild.id;
+    const svChannelId = message.channel.id;
+    if(d_sv_sv_list==="0" &&  regularExpression(d_sv_sv_list_b).test(svServerId)){return;}else
+    if(d_sv_sv_list==="1" && !regularExpression(d_sv_sv_list_w).test(svServerId)){return;}else
+    if(d_sv_ch_list==="0" &&  regularExpression(d_sv_ch_list_b).test(svChannelId)){return;}else
+    if(d_sv_ch_list==="1" && !regularExpression(d_sv_ch_list_w).test(svChannelId)){return;}
   }
   // 名前の処理
-  var nickname = (function() {
-    if(channelType=="text" && message.member!==null) return message.member.nickname;
+  const nickname = (function() {
+    if(channelType==="text" && message.member!==null) return message.member.nickname;
     return "";
   })();
-  var username = (function() {
+  const username = (function() {
     // d_sv_nickが無効の時、DMの時、グループの時、nicknameが無いとき(DM)、サーバで未設定のとき
-    if(d_sv_nick=="1" || channelType=="dm" || channelType=="group" || nickname=="" || nickname===null) return message.author.username;
+    if(d_sv_nick==="1" || channelType==="dm" || channelType==="group" || nickname==="" || nickname===null) return message.author.username;
     return nickname;
   })();
   // サーバー名
-  var guildName = (function() {
-    if(channelType == "dm") return "dm";
-    if(channelType == "group") return "group";
+  const guildName = (function() {
+    if(channelType === "dm") return "dm";
+    if(channelType === "group") return "group";
     return message.channel.guild.name;
   })();
-  // チャットの内容
-  var content = message.content;
-  // リプライを読ませない
-  var content = content.replace(/<@!?[0-9]+>/g, "");
-  // チャンネルタグを読ませない
-  var content = content.replace(/<#[0-9]+>/g, "");
+  // チャットの内容 (リプライ/チャンネルタグを読ませない)
+  const content = message.content.replace(/<@!?[0-9]+>/g, "").replace(/<#[0-9]+>/g, "");
   // 画像オンリー、スペースのみを読ませない
-  if(content=="" || /^([\s]+)$/.test(content)){return;}
+  if(content==="" || /^([\s]+)$/.test(content)){return;}
   // チャットの時間
-  var utc  = message.createdTimestamp; // UTC
-  var jst  = utc + (60 * 60 * 9); // +9hour
-  var time = new Date(jst);
-  var ary = {
-    time: time,
-    type: guildName,
-    name: username,
-    text: content
-  };
+  const utc  = message.createdTimestamp; // UTC
+  const jst  = utc + (60 * 60 * 9); // +9hour
+  const time = new Date(jst);
+  let ary = {};
+  ary.time = time;
+  ary.type = guildName;
+  ary.name = username;
+  ary.text = content;
   // 処理
   logProcess(ary);
   bouyomiProcess(ary);
@@ -474,12 +468,12 @@ process.on("unhandledRejection", (message) => {
 });
 // エラーをログへ書き出す
 function errorLog(fnc, error){
-  var errorStr = (function(){
-    if(toString.call(error) == "[object Event]") return JSON.stringify(error);
+  const errorStr = (function(){
+    if(toString.call(error) === "[object Event]") return JSON.stringify(error);
     return String(error);
   })();
   if(errorStr.match(/Error: Cannot find module '\.\.\/setting\.json'/)){return;}
-  var errorMess = (function(){
+  const errorMess = (function(){
     if(errorStr.match(/{"isTrusted":true}/)) return "インターネットに接続できません。再接続をします。";
     if(errorStr.match(/TypeError: Failed to fetch/)) return "インターネットに接続できません。";
     if(errorStr.match(/Error: Something took too long to do/)) return "Discordに接続できません。";
@@ -492,35 +486,30 @@ function errorLog(fnc, error){
     if(errorStr.match(/ReferenceError: ([\s\S]*?) is not defined/)) return `変数 ${errorStr.split(" ")[1]} が定義されていません。@micelle9までご連絡ください。`;
     return `不明なエラーが発生しました。（${errorStr}）`;
   })();
-  var errTime = new Date();
-  var ary = {
-    time: errTime,
-    type: "error",
-    name: "",
-    text: errorMess
-  };
+  let ary = {};
+  ary.time = new Date();
+  ary.type = "error";
+  ary.name = "";
+  ary.text = errorMess;
   logProcess(ary);
   debugLog(fnc, error);
-//  document.getElementById("bouyomi_status").innerHTML =
-//    `<input type="button" class="button" name="setting_save" value="画面を更新" onclick="reload();">`+
-//    `<p class="comment">エラーが発生しました。</p>`;
 }
 // デバッグ用
-var debugFnc = "start";
-var debugTxt = "Start debug mode.";
+const debugFnc = "start";
+const debugTxt = "Start debug mode.";
 debugLog(debugFnc, debugTxt);
 function debugLog(fnc, txt){
   fs.readFile(`${fileName}`, "utf8", (error, file) => {
-    if(error || file == void 0){ return; }
-    var file = JSON.parse(file);
-    if(file.debug != true){ return; }
-    var time = new Date();
-    var hour = toDoubleDigits(time.getHours());
-    var min = toDoubleDigits(time.getMinutes());
-    var sec = toDoubleDigits(time.getSeconds());
-    var txtCall = toString.call(txt);
-    var txtStr = (function(){
-      if(txtCall == "[object Event]") return JSON.stringify(txt);
+    if(error || file == null){ return; }
+    const array = JSON.parse(file);
+    if(array.debug != true){ return; }
+    const time = new Date();
+    const hour = toDoubleDigits(time.getHours());
+    const min = toDoubleDigits(time.getMinutes());
+    const sec = toDoubleDigits(time.getSeconds());
+    const txtCall = toString.call(txt);
+    const txtStr = (function(){
+      if(txtCall === "[object Event]") return JSON.stringify(txt);
       return String(txt);
     })();
     console.groupCollapsed(`${hour}:${min}:${sec} %s`, fnc);
@@ -530,25 +519,9 @@ function debugLog(fnc, txt){
     console.groupEnd();
   });
 }
-// モーダルウィンドウ
-$("#footer_setting").on("click", function() {
-  $("#main_overlay").addClass("show").removeClass("hide");
-});
-$("#modal_close").on("click", function() {
-  $("#main_overlay").addClass("hide").removeClass("show");
-});
-$("#modal_save").on("click", function() {
-  writeFile("save");
-});
-function modalAlert(text){
-  if($("#main_alert").hasClass("show")){return;}
-  $("#main_alert p").text(text);
-  $("#main_alert").addClass("show").removeClass("hide");
-  setTimeout(function(){
-      $("#main_alert").addClass("hide").removeClass("show");
-  },2000);
-}
+/*
 $(document).on("click", function(event) {
-  var target = $(event.target);
+  const target = $(event.target);
   console.log(target);
 });
+*/
