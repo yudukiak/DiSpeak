@@ -9,10 +9,6 @@ const bouyomiConnect = require(`${srcDirectory}/js/bouyomiConnect.js`);
 const $ = jQuery = require(`${srcDirectory}/js/jquery.min.js`);
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
-console.info(srcDirectory);
-console.info(exeDirectory);
-console.info(`DiSpeak v${nowVersion}`);
-console.info(`jQuery v${jQueryVersion}`);
 // 設定ファイルの読み込み
 readFile();
 // ヘッダー
@@ -96,6 +92,14 @@ function logProcess(ary) {
     }
   }
 }
+function bouyomiAutoStart(){
+  const d_start = $("#d_start input:checked").val();
+  if(d_start !== "0"){ return; }
+  bouyomiExeStart();
+  bouyomiStart();
+  $("#footer_start").addClass("hidden");
+  $("#footer_stop").removeClass("hidden");
+}
 function bouyomiStart() {
   const d_token = $("input[name=d_token]").val();
   let ary = {};
@@ -175,6 +179,7 @@ function readFile() {
         case "d_token":   $("input[name=d_token]").val(settingAryKey); break;
         case "d_user":    $("#d_user input").eq(settingAryKey).prop("checked", true); break;
         case "d_channel": $("#d_channel input").eq(settingAryKey).prop("checked", true); break;
+        case "d_start":   $("#d_start input").eq(settingAryKey).prop("checked", true); break;
         // Discord DM設定
         case "d_dm":        $("#d_dm input").eq(settingAryKey).prop("checked", true); break;
         case "d_dm_name":   $("#d_dm_name input").eq(settingAryKey).prop("checked", true); break;
@@ -212,6 +217,8 @@ function readFile() {
     ary.name = "";
     ary.text = "設定ファイルを読み込みました。";
     logProcess(ary);
+    bouyomiAutoStart(); // 自動読み上げ
+    debugLogStart(); // デバッグ
   });
 }
 // ファイルへ書き込み
@@ -221,6 +228,7 @@ function writeFile(status) {
   settingAry.d_token   = $("input[name=d_token]").val();
   settingAry.d_user    = Number($("#d_user input:checked").val());
   settingAry.d_channel = Number($("#d_channel input:checked").val());
+  settingAry.d_start   = Number($("#d_start input:checked").val());
   // Discord DM設定
   settingAry.d_dm        = Number($("#d_dm input:checked").val());
   settingAry.d_dm_name   = Number($("#d_dm_name input:checked").val());
@@ -499,33 +507,30 @@ function errorLog(fnc, error){
   debugLog(fnc, error);
 }
 // デバッグ用
-const debugFnc = "start";
-const debugTxt = "Start debug mode.";
-debugLog(debugFnc, debugTxt);
-function debugLog(fnc, txt){
-  fs.readFile(`${fileName}`, "utf8", (error, file) => {
-    if(error || file == null){ return; }
-    const array = JSON.parse(file);
-    if(array.debug === "1"){ return; }
-    const time = new Date();
-    const hour = toDoubleDigits(time.getHours());
-    const min = toDoubleDigits(time.getMinutes());
-    const sec = toDoubleDigits(time.getSeconds());
-    const txtCall = toString.call(txt);
-    const txtStr = (function(){
-      if(txtCall === "[object Event]") return JSON.stringify(txt);
-      return String(txt);
-    })();
-    console.groupCollapsed(`${hour}:${min}:${sec} %s`, fnc);
-    console.log(txtCall);
-    console.log(txtStr);
-    console.log(txt);
-    console.groupEnd();
-  });
+function debugLogStart(){
+  const fnc = "start";
+  const txt = "Start debug mode.";
+  debugLog(fnc, txt);
+  debugLog("src", srcDirectory);
+  debugLog("exe", exeDirectory);
+  debugLog("DiSpeak", `v${nowVersion}`);
+  debugLog("jQuery", `v${jQueryVersion}`);
 }
-/*
-$(document).on("click", function(event) {
-  const target = $(event.target);
-  console.log(target);
-});
-*/
+function debugLog(fnc, txt){
+  const debug = $("#debug input:checked").val();
+  if(debug !== "0"){ return; }
+  const time = new Date();
+  const hour = toDoubleDigits(time.getHours());
+  const min = toDoubleDigits(time.getMinutes());
+  const sec = toDoubleDigits(time.getSeconds());
+  const txtCall = toString.call(txt);
+  const txtStr = (function(){
+    if(txtCall === "[object Event]") return JSON.stringify(txt);
+    return String(txt);
+  })();
+  console.groupCollapsed(`${hour}:${min}:${sec} %s`, fnc);
+  console.log(txtCall);
+  console.log(txtStr);
+  console.log(txt);
+  console.groupEnd();
+}
