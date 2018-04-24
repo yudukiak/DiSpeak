@@ -35,6 +35,53 @@
       <div>
         <div class="box">
           <div class="box-table">
+            <span class="box-title">DiSpeak</span>
+            <table>
+              <tr>
+                <td colspan="2"><h3>基本設定</h3></td>
+              </tr>
+              <tr>
+                <td>「閉じる」の設定</td>
+                <td>
+                  <form id="s_close">
+                    <label><input type="radio" name="s_close" value="0" checked>アプリを終了する</label>
+                    <label><input type="radio" name="s_close" value="1">ウィンドウを閉じる</label>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>ウィンドウの位置</td>
+                <td>
+                  <form id="s_window">
+                    <label><input type="radio" name="s_window" value="0" checked>保存する</label>
+                    <label><input type="radio" name="s_window" value="1">保存しない</label>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td>自動読み上げ</td>
+                <td>
+                  <form id="s_start">
+                    <label><input type="radio" name="s_start" value="0">する</label>
+                    <label><input type="radio" name="s_start" value="1" checked>しない</label>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2"><h3>その他設定</h3></td>
+              </tr>
+              <tr>
+                <td>デバッグ</td>
+                <td>
+                  <form id="s_debug">
+                    <label><input type="radio" name="s_debug" value="0">ON</label>
+                    <label><input type="radio" name="s_debug" value="1" checked>OFF</label>
+                  </form>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="box-table">
             <span class="box-title">Discord</span>
             <table>
               <tr>
@@ -43,7 +90,7 @@
               <tr>
                 <td>トークン</td>
                 <td>
-                  <input type="text" name="d_token" value="Please write Token.">
+                  <form id="d_token"><input type="text" name="d_token" value="Please write Token."></form>
                 </td>
               </tr>
               <tr>
@@ -61,15 +108,6 @@
                   <form id="d_channel">
                     <label><input type="radio" name="d_channel" value="0" checked>読む</label>
                     <label><input type="radio" name="d_channel" value="1">読まない</label>
-                  </form>
-                </td>
-              </tr>
-              <tr>
-                <td>自動読み上げ</td>
-                <td>
-                  <form id="d_start">
-                    <label><input type="radio" name="d_start" value="0">する</label>
-                    <label><input type="radio" name="d_start" value="1" checked>しない</label>
                   </form>
                 </td>
               </tr>
@@ -212,33 +250,16 @@
                 <td>
                   <button  id="setting_bouyomi_dialog">選択</button>
                   <span class="comment">棒読みちゃんの実行ファイルを選択してください。</span>
-                  <input type="text" name="b_dir">
+                  <form id="b_dir"><input type="text" name="b_dir"></form>
                 </td>
               </tr>
               <tr>
                 <td>IP</td>
-                <td><input type="text" name="b_ip" value="127.0.0.1"></td>
+                <td><form id="b_ip"><input type="text" name="b_ip" value="127.0.0.1"></form></td>
               </tr>
               <tr>
                 <td>ポート</td>
-                <td><input type="text" name="b_port" value="50001"></td>
-              </tr>
-            </table>
-          </div>
-          <div class="box-table">
-            <span class="box-title">その他</span>
-            <table>
-              <tr>
-                <td colspan="2"><h3>基本設定</h3></td>
-              </tr>
-              <tr>
-                <td>デバッグ</td>
-                <td>
-                  <form id="debug">
-                    <label><input type="radio" name="debug" value="0">ON</label>
-                    <label><input type="radio" name="debug" value="1" checked>OFF</label>
-                  </form>
-                </td>
+                <td><form id="b_port"><input type="text" name="b_port" value="50001"></form></td>
               </tr>
             </table>
           </div>
@@ -246,24 +267,25 @@
       </div>
       <div>
         <div class="box">
-          <div id="modal_save" class="button" data-modal="save" tabindex="0">
-            <svg data-modal="save" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512">
-              <path data-modal="save" d="M502 106L396 0h-15v121H131V0H60C27 0 0 27 0 60v392c0 33 27 60 60 60h392c33 0 60-27 60-60V129c0-8-3-17-10-23zm-94 322H104V217h304v211z"/>
-              <path data-modal="save" d="M282 0h68v94h-68z"/>
+          <!--
+          <div id="modal_save" class="button" tabindex="0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512">
+              <path d="M502 106L396 0h-15v121H131V0H60C27 0 0 27 0 60v392c0 33 27 60 60 60h392c33 0 60-27 60-60V129c0-8-3-17-10-23zm-94 322H104V217h304v211z"/>
+              <path d="M282 0h68v94h-68z"/>
             </svg>
           </div>
-          <div id="modal_close" class="button" data-modal="close" tabindex="0">
-            <svg data-modal="close" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512">
-              <path data-modal="close" d="M327 157l-71 72-71-72-28 28 72 71-72 71 28 28 71-72 71 72 28-28-72-71 72-71z"/>
-              <path data-modal="close" d="M437 75A255 255 0 0 0 0 256a255 255 0 0 0 437 181 255 255 0 0 0 0-362zm-29 333A215 215 0 0 1 41 256a215 215 0 0 1 367-152 215 215 0 0 1 0 304z"/>
+          -->
+          <div></div>
+          <div id="modal_close" class="button" tabindex="0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512">
+              <path d="M327 157l-71 72-71-72-28 28 72 71-72 71 28 28 71-72 71 72 28-28-72-71 72-71z"/>
+              <path d="M437 75A255 255 0 0 0 0 256a255 255 0 0 0 437 181 255 255 0 0 0 0-362zm-29 333A215 215 0 0 1 41 256a215 215 0 0 1 367-152 215 215 0 0 1 0 304z"/>
             </svg>
           </div>
         </div>
       </div>
     </div>
-    <div id="main_alert" class="alert">
-      <p>てきすと</p>
-    </div>
+    <div id="main_alert" class="alert"><p></p></div>
   </main>
   <footer>
     <div class="box">
