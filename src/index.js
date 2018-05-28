@@ -1,116 +1,136 @@
-"use strct";
+'use strct ';
 // モジュールの読み込み
-const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain} = require("electron");
-const {execFile} = require("child_process");
-const request = require("request");
-const fs = require("fs");
-const package = require("./package.json");
-const appPath = app.getAppPath(); // "\dc_DiSpeak.git\src" "\DiSpeak\resources\app.asar"
-const exePath = app.getPath("exe"); // "\dc_DiSpeak.git\node_modules\electron\dist\electron.exe" "\DiSpeak\DiSpeak.exe"
-const crtPath = appPath.replace(/\\src/, "").replace(/\\resources\\app\.asar/, "");
-const userData = app.getPath("userData"); // \AppData\Roaming\DiSpeak
+const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain} = require('electron');
+const execFile = require('child_process');
+const request = require('request');
+const fs = require('fs');
+const package = require('./package.json');
+const appPath = app.getAppPath().replace(/\\src/, '').replace(/\\resources\\app\.asar/, ''); // '\dc_DiSpeak.git\src' '\DiSpeak\resources\app.asar'
+const exePath = app.getPath('exe'); // '\dc_DiSpeak.git\node_modules\electron\dist\electron.exe' '\DiSpeak\DiSpeak.exe'
+const userData = app.getPath('userData'); // \AppData\Roaming\DiSpeak
 // DiSpeakの設定ファイル
-const appSetting = `${crtPath}\\setting.json`;
-let appSettingAry = readFileSync(appSetting);
+const appSetting = `${appPath}\\setting.json`;
 // windowの設定ファイル
 const winSetting = `${userData}\\setting.json`;
 let winSettingAry = readFileSync(winSetting);
 // 変数の指定
-const nowVersion = package["version"];
+const nowVersion = package['version'];
 const appName = app.getName();
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let tray = null;
 // 起動時にバージョンのチェックを行う
-apiCheck("start");
+apiCheck('start');
 // Electronの初期化完了後に実行
-app.on("ready", () => {
+app.on('ready', () => {
   createMainwindow(); // mainWindowの生成
 });
 // 全てのウィンドウが閉じたら終了
-app.on("window-all-closed", () => {
-  if(process.platform != "darwin"){
+app.on('window-all-closed', () => {
+  if (process.platform != 'darwin') {
     app.quit();
   }
 });
 // ------------------------------
 // 処理用の関数
 // ------------------------------
-function apiCheck(status){
+// APIチェック
+function apiCheck(status) {
   const apiOptions = {
-    url: "https://api.github.com/repos/micelle/dc_DiSpeak/releases/latest",
-    headers: {"User-Agent": "Awesome-Octocat-App"},
+    url: 'https://api.github.com/repos/micelle/dc_DiSpeak/releases/latest',
+    headers: {'User-Agent': 'Awesome-Octocat-App'},
     json: true
   };
-  request.get(apiOptions, function (err, res, data) {
-    if(!err && res.statusCode==200){
-      resCheck(data, status);
-    }
+  request.get(apiOptions, function(err, res, data) {
+    if (!err && res.statusCode == 200) resCheck(data, status);
   });
 }
-function resCheck(data, status){
+
+function resCheck(data, status) {
   // APIの上限を超えたとき
-  if(data.message !== void 0 && status == "check"){
+  if (data.message !== void 0 && status == 'check') {
     const mesOptions = {
-      type: "error",
-      buttons: ["OK"],
-      title: "エラー",
-      message: "最新のバージョン取得に失敗しました。",
-      detail: "時間を置いてからご確認ください。お願いします。"
+      type: 'error',
+      buttons: ['OK'],
+      title: 'エラー',
+      message: '最新のバージョン取得に失敗しました。',
+      detail: '時間を置いてからご確認ください。お願いします。'
     };
     dialog.showMessageBox(mesOptions);
     return;
   }
   // APIを取得できたとき
   const relVer = data.tag_name;
-  //let relVer = (function(){if(status == "check") return data.tag_name;return "v11.45.14";})(); // テスト用
-  const relVer_v = relVer.replace(/v/g, "");
+  //let relVer = (function(){if(status == 'check') return data.tag_name;return 'v11.45.14';})(); // テスト用
+  const relVer_v = relVer.replace(/v/g, '');
   const relName = data.name;
   // バージョンチェック
   const nowVer = arraySplit(nowVersion);
   const newVer = arraySplit(relVer_v);
   const result = updateCheck(nowVer, newVer);
-  if(result){
+  if (result) {
     const mesOptions = {
-      type: "warning",
-      buttons: ["Yes", "No"],
+      type: 'warning',
+      buttons: ['Yes', 'No'],
       title: relName,
-      message: "おぉっと？",
+      message: 'おぉっと？',
       detail: `お使いのバージョンは古いっす。ダウンロードページ開く？？\n\n` +
-          `現在のバージョン：${nowVersion}\n最新のバージョン：${relVer_v}`
+        `現在のバージョン：${nowVersion}\n最新のバージョン：${relVer_v}`
     };
-    dialog.showMessageBox(mesOptions, function(res){if(res == 0){shell.openExternal(data.html_url);}});
-  }else if(status == "check"){
+    dialog.showMessageBox(mesOptions, function(res) {
+      if (res == 0) {
+        shell.openExternal(data.html_url);
+      }
+    });
+  } else if (status == 'check') {
     const mesOptions = {
-      type: "info",
-      buttons: ["OK"],
+      type: 'info',
+      buttons: ['OK'],
       title: relName,
-      message: "おぉ…！！",
+      message: 'おぉ…！！',
       detail: `最新のバージョンを使ってるっす。ありがとおぉおおぉっ！！\n\n` +
-          `現在のバージョン：${nowVersion}\n最新のバージョン：${relVer_v}`
+        `現在のバージョン：${nowVersion}\n最新のバージョン：${relVer_v}`
     };
     dialog.showMessageBox(mesOptions);
   }
 }
 // バージョンを配列化
-function arraySplit(txt){
-  const ary = txt.split(".");
+function arraySplit(txt) {
+  const ary = txt.split('.');
   const obj = [];
-  for(let v of ary) {
+  for (let v of ary) {
     const num = Number(v);
     obj.push(num);
   }
   return obj;
 }
 // バージョンの確認
-function updateCheck(nowVer, newVer){
-  const nowMajor=nowVer[0], nowMinor=nowVer[1], nowBuild=nowVer[2],
-     newMajor=newVer[0], newMinor=newVer[1], newBuild=newVer[2];
-  if(newMajor>nowMajor){return true;}else if(newMajor<nowMajor){return false;}else
-  if(newMinor>nowMinor){return true;}else if(newMinor<nowMinor){return false;}else
-  if(newBuild>nowBuild){return true;}else if(newBuild<nowBuild){return false;}else{return false;}
+function updateCheck(nowVer, newVer) {
+  const nowMajor = nowVer[0],
+    nowMinor = nowVer[1],
+    nowBuild = nowVer[2],
+    newMajor = newVer[0],
+    newMinor = newVer[1],
+    newBuild = newVer[2];
+  if (newMajor > nowMajor) {
+    return true;
+  } else if (newMajor < nowMajor) {
+    return false;
+  } else
+  if (newMinor > nowMinor) {
+    return true;
+  } else if (newMinor < nowMinor) {
+    return false;
+  } else
+  if (newBuild > nowBuild) {
+    return true;
+  } else if (newBuild < nowBuild) {
+    return false;
+  } else {
+    return false;
+  }
 }
 // メインウィンドウの処理
-function createMainwindow(){
+function createMainwindow() {
   // タスクトレイを表示
   createTray();
   //ウィンドウサイズを設定する
@@ -130,230 +150,253 @@ function createMainwindow(){
   // 使用するhtmlファイルを指定する
   mainWindow.loadURL(`file://${__dirname}/index.html`);
   // リンクをデフォルトブラウザで開く
-  mainWindow.webContents.on("new-window", (ev, url) => {
+  mainWindow.webContents.on('new-window', (ev, url) => {
     ev.preventDefault();
     shell.openExternal(url);
   });
   // winSettingAryに設定があれば処理する
   const bounds = winSettingAry.bounds;
-  if(bounds){mainWindow.setBounds(bounds);}
-  if(winSettingAry.maximized){mainWindow.maximize();}
-  if(winSettingAry.minimized){mainWindow.minimize();}
+  if (bounds) mainWindow.setBounds(bounds);
+  if (winSettingAry.maximized) mainWindow.maximize();
+  if (winSettingAry.minimized) mainWindow.minimize();
   // ウィンドウの準備ができたら表示
-  mainWindow.on("ready-to-show", () => {
+  mainWindow.on('ready-to-show', () => {
     mainWindow.show();
   });
   // ウィンドウが閉じる時
-  mainWindow.on("close", () => {
+  mainWindow.on('close', () => {
     let ary = {};
     const isMaximized = mainWindow.isMaximized(); // true, false
     const isMinimized = mainWindow.isMinimized();
     const bounds = mainWindow.getBounds(); // {x:0, y:0, width:0, height:0}
     ary.maximized = isMaximized;
     ary.minimized = isMinimized;
-    if(isMaximized){
-      ary.bounds = winSettingAry.bounds;
+    if (isMaximized) {
+      ary.bounds = winSettingAry.bounds; // 最大化してるときは変更しない
     } else {
       ary.bounds = bounds;
     }
-    writeFile(winSetting, ary);
+    writeFileSync(winSetting, ary);
   });
   // ウィンドウが閉じられたらアプリも終了
-  mainWindow.on("closed", () => {
+  mainWindow.on('closed', () => {
     mainWindow = null;
   });
 }
 // タスクトレイ
-function createTray(){
+function createTray() {
   tray = new Tray(`${__dirname}/images/icon.png`);
   const template = taskTrayMenu();
   const menu = Menu.buildFromTemplate(template)
   tray.setContextMenu(menu);
   tray.setToolTip(`${appName} v${nowVersion}`);
-  tray.on('click', function(){
+  tray.on('click', function() {
     mainWindow.show();
   });
 }
-// 設定ファイルの読み込み
+// 設定ファイルの読み書き
 function readFileSync(target) {
   try {
-    const data = fs.readFileSync(target, "utf8");
-    try {
-      const res = JSON.parse(data);
-      return res;
-    } catch(err) {
-      return {};
-    }
-  } catch(err) {
+    const data = fs.readFileSync(target, 'utf8');
+    const ary = JSON.parse(data);
+  } catch (err) {
     return {};
   }
+  return ary;
 }
-function writeFile(target, data) {
+
+function writeFileSync(target, data) {
   const json = JSON.stringify(data, null, 2);
-  fs.writeFile(target, json, (error) => {
-    if(error){
-      errorHandling(error);
-      return;
-    }
-  });
-}
-function errorHandling(error) {
-  const errorCode = error.code;
+  try {
+    fs.writeFileSync(target, json, 'utf8');
+  } catch (err) {
+    return err.code;
+  }
+  return true;
 }
 // ------------------------------
 // レンダラープロセスとのやりとり
 // ------------------------------
+// DiSpeakのディレクトリを返す
+ipcMain.on('directory-src-check', (event) => {
+  event.returnValue = appPath;
+});
+ipcMain.on('directory-exe-check', (event) => {
+  event.returnValue = exePath;
+});
 // 現在のバージョンを返す
-ipcMain.on("now-version-check", (event) => {
+ipcMain.on('now-version-check', (event) => {
   event.returnValue = nowVersion;
-})
+});
+// 設定ファイルを返す
+ipcMain.on('setting-file-read', (event) => {
+  event.returnValue = readFileSync(appSetting);
+});
+// 設定ファイルを保存する
+ipcMain.on('setting-file-write', (event, data) => {
+  event.returnValue = writeFileSync(appSetting, data);
+});
+// UIの挙動
+ipcMain.on('window-minimize', () => {
+  mainWindow.minimize();
+});
+ipcMain.on('window-maximize', () => {
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+  } else {
+    mainWindow.maximize();
+  }
+});
+ipcMain.on('window-close', () => {
+  mainWindow.hide();
+});
 // 棒読みちゃんのディレクトリ
-ipcMain.on("bouyomi-dir-dialog", (event) => {
+ipcMain.on('bouyomi-dir-dialog', (event) => {
   let options = {
-    title: "選択",
-    filters: [{name: "EXE File", extensions: ["exe"]}],
-    defaultPath: ".",
-    properties: ["openFile"],
+    title: '選択',
+    filters: [{
+      name: 'EXE File',
+      extensions: ['exe']
+    }],
+    defaultPath: '.',
+    properties: ['openFile'],
   };
   dialog.showOpenDialog(options, (filePaths) => {
-    let filePath = (function(){
-      if(filePaths == void 0) return "";
+    let filePath = (function() {
+      if (filePaths == void 0) return '';
       return filePaths[0];
     })();
     event.returnValue = filePath;
   });
 });
-ipcMain.on("bouyomi-exe-start", (event, arg) => {
+ipcMain.on('bouyomi-exe-start', (event, arg) => {
   execFile(arg, function(error, stdout, stderr) {
     if (error != null) {
       let mesOptions = {
-        type: "error",
-        buttons: ["OK"],
-        title: "エラー",
-        message: "棒読みちゃんを起動できませんでした。",
+        type: 'error',
+        buttons: ['OK'],
+        title: 'エラー',
+        message: '棒読みちゃんを起動できませんでした。',
         detail: `ディレクトリを間違えていないか、ご確認ください。\n\n${error.cmd}`
       };
       dialog.showMessageBox(mesOptions);
     }
   });
 });
-ipcMain.on("bouyomi-exe-alert", () => {
+ipcMain.on('bouyomi-exe-alert', () => {
   let mesOptions = {
-    type: "error",
-    buttons: ["OK"],
-    title: "エラー",
-    message: "選択したファイルが異なります。",
-    detail: "「BouyomiChan.exe」を選択してください。"
+    type: 'error',
+    buttons: ['OK'],
+    title: 'エラー',
+    message: '選択したファイルが異なります。',
+    detail: '「BouyomiChan.exe」を選択してください。'
   };
   dialog.showMessageBox(mesOptions);
-});
-// DiSpeakのディレクトリを返す
-ipcMain.on("directory-src-check", (event) => {
-  event.returnValue = appPath;
-});
-ipcMain.on("directory-exe-check", (event) => {
-  event.returnValue = exePath;
-});
-// UIの挙動
-ipcMain.on("window-minimize", () => {
-  mainWindow.minimize();
-});
-ipcMain.on("window-maximize", () => {
-  if(mainWindow.isMaximized()){
-    mainWindow.unmaximize();
-  } else {
-    mainWindow.maximize();
-  }
-});
-ipcMain.on("window-close", () => {
-  mainWindow.hide();
 });
 // ------------------------------
 // その他
 // ------------------------------
 // エラーの処理
-process.on("uncaughtException", (err) => {
+process.on('uncaughtException', (err) => {
   let errStr = String(err);
-  let errMess = (function(){
-    if(errStr.match(/'toggleDevTools' of null/)) return "「でぃすぴーくについて」が開かれていません";
-    return "不明なエラー";
+  let errMess = (function() {
+    if (errStr.match(/'toggleDevTools' of null/)) return '「でぃすぴーくについて」が開かれていません';
+    return '不明なエラー';
   })();
   let mesOptions = {
-    type: "error",
-    buttons: ["OK"],
-    title: "エラーが発生しました",
+    type: 'error',
+    buttons: ['OK'],
+    title: 'エラーが発生しました',
     message: `${errMess}`,
     detail: `詳細：\n${errStr}`
   };
   dialog.showMessageBox(mesOptions);
 });
 // ウィンドウメニューをカスタマイズ
-function mainWindowMenu(){
-  let template = [
-    {
-      label: "メニュー",
-      submenu: [
-        {
-          label: "リロード",
-          accelerator: "CmdOrCtrl+R",
-          click: function(){mainWindow.reload();}
+function mainWindowMenu() {
+  let template = [{
+      label: 'メニュー',
+      submenu: [{
+          label: 'リロード',
+          accelerator: 'CmdOrCtrl+R',
+          click: function() {
+            mainWindow.reload();
+          }
         },
         {
-          label: "終了する",
-          accelerator: "CmdOrCtrl+W",
-          position: "endof=cmd",
-          click: function(){app.quit();}
+          label: '終了する',
+          accelerator: 'CmdOrCtrl+W',
+          position: 'endof=cmd',
+          click: function() {
+            app.quit();
+          }
         }
       ]
     },
     {
-      label: "ヘルプ",
-      submenu: [
-        {
-          label: "Wikiを開く",
-          accelerator: "F1",
-          click: function(){shell.openExternal("https://github.com/micelle/dc_DiSpeak/wiki");}
+      label: 'ヘルプ',
+      submenu: [{
+          label: 'Wikiを開く',
+          accelerator: 'F1',
+          click: function() {
+            shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki');
+          }
         },
         {
-          label: "デバッグ - main",
-          accelerator: "CmdOrCtrl+Shift+I",
-          position: "endof=debug",
-          click: function(){mainWindow.toggleDevTools();}
+          label: 'デバッグ - main',
+          accelerator: 'CmdOrCtrl+Shift+I',
+          position: 'endof=debug',
+          click: function() {
+            mainWindow.toggleDevTools();
+          }
         },
         {
-          label: "最新のバージョンを確認",
-          accelerator: "CmdOrCtrl+H",
-          position: "endof=info",
-          click: function(){apiCheck("check");}
+          label: '最新のバージョンを確認',
+          accelerator: 'CmdOrCtrl+H',
+          position: 'endof=info',
+          click: function() {
+            apiCheck('check');
+          }
         }
       ]
     }
   ];
   return template;
 }
-function taskTrayMenu(){
-  let template = [
-    {
-      label: "表示する",
-      click: function(){mainWindow.show();}
+
+function taskTrayMenu() {
+  let template = [{
+      label: '表示する',
+      click: function() {
+        mainWindow.show();
+      }
     },
     {
-      label: "サイズを元に戻す",
-      click: function(){mainWindow.setSize(640, 480);mainWindow.center();}
+      label: 'サイズを元に戻す',
+      click: function() {
+        mainWindow.setSize(640, 480);
+        mainWindow.center();
+      }
     },
     {
-      label: "バージョンの確認",
-      click: function(){apiCheck("check");}
+      label: 'バージョンの確認',
+      click: function() {
+        apiCheck('check');
+      }
     },
     {
-      label: "Wikiを開く",
-      position: "endof=info",
-      click: function(){shell.openExternal("https://github.com/micelle/dc_DiSpeak/wiki");}
+      label: 'Wikiを開く',
+      position: 'endof=info',
+      click: function() {
+        shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki');
+      }
     },
     {
-      label: "終了する",
-      position: "endof=cmd",
-      click: function(){mainWindow.close();}
+      label: '終了する',
+      position: 'endof=cmd',
+      click: function() {
+        mainWindow.close();
+      }
     }
   ];
   return template;

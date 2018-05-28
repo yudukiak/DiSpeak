@@ -12,7 +12,8 @@
     "gulp-clean-css": "^3.9.3",
     "gulp-cli": "^2.0.1",
     "gulp-uglify": "^3.0.0",
-    "request": "^2.85.0"
+    "request": "^2.85.0",
+    "sweetalert2": "^7.21.1"
   },
   "devDependencies": {},
   "scripts": {},
