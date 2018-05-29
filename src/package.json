@@ -1,11 +1,11 @@
 {
   "name": "DiSpeak",
-  "version": "1.6.18",
+  "version": "1.6.19",
   "description": "Bouyomi speaks the notice of Discord.",
   "main": "index.js",
   "dependencies": {
     "discord.js": "^11.3.2",
-    "request": "^2.85.0"
+    "request": "^2.87.0"
   },
   "devDependencies": {},
   "scripts": {},
