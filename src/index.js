@@ -1,20 +1,21 @@
-'use strct ';
+'use strict';
 // モジュールの読み込み
 const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain} = require('electron');
 const execFile = require('child_process');
 const request = require('request');
 const fs = require('fs');
-const package = require('./package.json');
-const appPath = app.getAppPath().replace(/\\src/, '').replace(/\\resources\\app\.asar/, ''); // '\dc_DiSpeak.git\src' '\DiSpeak\resources\app.asar'
+const packageJson = require('./package.json');
+const appPath = app.getAppPath(); // "\dc_DiSpeak.git\src" "\DiSpeak\resources\app.asar"
+const repPath = appPath.replace(/\\src/, '').replace(/\\resources\\app\.asar/, ''); // '\dc_DiSpeak.git' '\DiSpeak'
 const exePath = app.getPath('exe'); // '\dc_DiSpeak.git\node_modules\electron\dist\electron.exe' '\DiSpeak\DiSpeak.exe'
 const userData = app.getPath('userData'); // \AppData\Roaming\DiSpeak
 // DiSpeakの設定ファイル
-const appSetting = `${appPath}\\setting.json`;
+const appSetting = `${repPath}\\setting.json`;
 // windowの設定ファイル
 const winSetting = `${userData}\\setting.json`;
 let winSettingAry = readFileSync(winSetting);
 // 変数の指定
-const nowVersion = package['version'];
+const nowVersion = packageJson['version'];
 const appName = app.getName();
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let tray = null;
@@ -142,6 +143,7 @@ function createMainwindow() {
     minWidth: 640,
     minHeight: 480,
     icon: `${__dirname}/images/icon.png`,
+    //webPreferences: {nodeIntegration: false}
   });
   // ウィンドウメニューをカスタマイズ
   const template = mainWindowMenu();
@@ -196,13 +198,15 @@ function createTray() {
 }
 // 設定ファイルの読み書き
 function readFileSync(target) {
+  let res = {};
   try {
     const data = fs.readFileSync(target, 'utf8');
     const ary = JSON.parse(data);
+    Object.assign(res, ary);
   } catch (err) {
     return {};
   }
-  return ary;
+  return res;
 }
 
 function writeFileSync(target, data) {
@@ -218,12 +222,15 @@ function writeFileSync(target, data) {
 // レンダラープロセスとのやりとり
 // ------------------------------
 // DiSpeakのディレクトリを返す
-ipcMain.on('directory-src-check', (event) => {
+ipcMain.on('directory-app-check', (event) => {
   event.returnValue = appPath;
 });
-ipcMain.on('directory-exe-check', (event) => {
-  event.returnValue = exePath;
-});
+//ipcMain.on('directory-rep-check', (event) => {
+//  event.returnValue = repPath;
+//});
+//ipcMain.on('directory-exe-check', (event) => {
+//  event.returnValue = exePath;
+//});
 // 現在のバージョンを返す
 ipcMain.on('now-version-check', (event) => {
   event.returnValue = nowVersion;

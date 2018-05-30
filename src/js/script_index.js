@@ -1,14 +1,16 @@
-const fileName = 'setting.json';
-const ipcRenderer = require('electron');
+'use strict';
+//const fileName = 'setting.json';
+const {ipcRenderer} = require('electron');
 const Discord = require('discord.js');
 //const fs = require('fs');
 const swal = require('sweetalert2');
-const srcDirectory = ipcRenderer.sendSync('directory-src-check').replace(/\\/g, '/');
-const exeDirectory = ipcRenderer.sendSync('directory-exe-check').replace(/\\/g, '/').replace(/\/electron\.exe/, '');
+const $ = require('jquery');
+const srcDirectory = ipcRenderer.sendSync('directory-app-check').replace(/\\/g, '/');
+//const exeDirectory = ipcRenderer.sendSync('directory-exe-check').replace(/\\/g, '/').replace(/\/electron\.exe/, '');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const appSettingAry = ipcRenderer.sendSync('setting-file-read');
 const bouyomiConnect = require(`${srcDirectory}/js/bouyomiConnect.js`);
-const $ = jQuery = require(`${srcDirectory}/js/jquery.min.js`);
+//const $ = jQuery = require(`${srcDirectory}/js/jquery.min.js`);
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
 // 設定ファイルの読み込み
@@ -175,6 +177,7 @@ function bouyomiExeStart() {
 }
 // ファイルを表示
 function readFile() {
+  let key;
   for (key in fileData) {
     const settingAryKey = fileData[key];
     const type = $.type(settingAryKey);
@@ -236,14 +239,14 @@ function writeFile(status) {
   debugLog(`setting ${status}`, settingAry);
 }
 
-function modalAlert(text) {
-  if ($('#main_alert').hasClass('show')) return;
-  $('#main_alert p').text(text);
-  $('#main_alert').addClass('show').removeClass('hide');
-  setTimeout(function() {
-    $('#main_alert').addClass('hide').removeClass('show');
-  }, 2000);
-}
+//function modalAlert(text) {
+//  if ($('#main_alert').hasClass('show')) return;
+//  $('#main_alert p').text(text);
+//  $('#main_alert').addClass('show').removeClass('hide');
+//  setTimeout(function() {
+//    $('#main_alert').addClass('hide').removeClass('show');
+//  }, 2000);
+//}
 client.on('ready', () => {
   let ary = {};
   ary.time = new Date();
@@ -346,15 +349,7 @@ client.on('message', message => {
   // SV ServerID  message.mentions._guild.id
   // DM・グループ・サーバを読む・読まないの処理
   const channelType = message.channel.type;
-  if (channelType == 'dm' && d_dm == 1) {
-    return;
-  } else
-  if (channelType == 'group' && d_gr == 1) {
-    return;
-  } else
-  if (channelType == 'text' && d_sv == 1) {
-    return;
-  }
+  if (channelType == 'dm' && d_dm == 1 || channelType == 'group' && d_gr == 1 || channelType == 'text' && d_sv == 1) return;
   // ホワイトリスト・ブラックリストの処理
   // 1.  DMかグループかサーバを確認        channelType
   // 2.  リスト設定がどっちかを確認        d_dm_list,   d_sv_sv_list,   d_sv_ch_list   0ブラックリスト, 1ホワイトリスト
@@ -362,35 +357,25 @@ client.on('message', message => {
   // 3-2.ホワイトリスト以外のIDならreturn  d_dm_list_w, d_sv_sv_list_w, d_sv_ch_list_w
   if (channelType == 'dm') {
     const dmUserId = message.channel.recipient.id;
-    if (d_dm_list == 0 && regularExpression(d_dm_list_b).test(dmUserId)) {
-      return;
-    } else
-    if (d_dm_list == 1 && !regularExpression(d_dm_list_w).test(dmUserId)) {
-      return;
-    }
+    if (
+      d_dm_list == 0 && regularExpression(d_dm_list_b).test(dmUserId) ||
+      d_dm_list == 1 && !regularExpression(d_dm_list_w).test(dmUserId)
+    ) return;
   } else if (channelType == 'group') {
     const grUserId = message.channel.id;
-    if (d_gr_list == 0 && regularExpression(d_gr_list_b).test(grUserId)) {
-      return;
-    } else
-    if (d_gr_list == 1 && !regularExpression(d_gr_list_w).test(grUserId)) {
-      return;
-    }
+    if (
+      d_gr_list == 0 && regularExpression(d_gr_list_b).test(grUserId) ||
+      d_gr_list == 1 && !regularExpression(d_gr_list_w).test(grUserId)
+    ) return;
   } else if (channelType == 'text') {
     const svServerId = message.channel.guild.id;
     const svChannelId = message.channel.id;
-    if (d_sv_sv_list == 0 && regularExpression(d_sv_sv_list_b).test(svServerId)) {
-      return;
-    } else
-    if (d_sv_sv_list == 1 && !regularExpression(d_sv_sv_list_w).test(svServerId)) {
-      return;
-    } else
-    if (d_sv_ch_list == 0 && regularExpression(d_sv_ch_list_b).test(svChannelId)) {
-      return;
-    } else
-    if (d_sv_ch_list == 1 && !regularExpression(d_sv_ch_list_w).test(svChannelId)) {
-      return;
-    }
+    if (
+      d_sv_sv_list == 0 && regularExpression(d_sv_sv_list_b).test(svServerId) ||
+      d_sv_sv_list == 1 && !regularExpression(d_sv_sv_list_w).test(svServerId) ||
+      d_sv_ch_list == 0 && regularExpression(d_sv_ch_list_b).test(svChannelId) ||
+      d_sv_ch_list == 1 && !regularExpression(d_sv_ch_list_w).test(svChannelId)
+    ) return;
   }
   // 名前の処理
   const nickname = (function() {
@@ -475,7 +460,7 @@ function debugLogStart() {
   const txt = 'Start debug mode.';
   debugLog(fnc, txt);
   debugLog('src', srcDirectory);
-  debugLog('exe', exeDirectory);
+  //debugLog('exe', exeDirectory);
   debugLog('DiSpeak', `v${nowVersion}`);
   debugLog('jQuery', `v${jQueryVersion}`);
 }
