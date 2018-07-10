@@ -1,7 +1,7 @@
 'use strict';
 // モジュールの読み込み
 const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain} = require('electron');
-const execFile = require('child_process');
+const {execFile} = require('child_process');
 const request = require('request');
 const fs = require('fs');
 const packageJson = require('./package.json');
