@@ -6,7 +6,8 @@
   "dependencies": {
     "discord.js": "^11.3.2",
     "jquery": "^3.3.1",
-    "request": "^2.87.0"
+    "request": "^2.87.0",
+    "sweetalert2": "^7.21.1"
   },
   "devDependencies": {},
   "scripts": {},
