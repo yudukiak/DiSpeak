@@ -138,8 +138,8 @@ function createMainwindow() {
   mainWindow = new BrowserWindow({
     frame: false,
     show: false,
-    width: 640,
-    height: 480,
+    width: 940,
+    height: 500,
     minWidth: 640,
     minHeight: 480,
     icon: `${__dirname}/images/icon.png`,
@@ -204,7 +204,7 @@ function readFileSync(target) {
     const ary = JSON.parse(data);
     Object.assign(res, ary);
   } catch (err) {
-    return {};
+    return null;
   }
   return res;
 }
@@ -290,16 +290,16 @@ ipcMain.on('bouyomi-exe-start', (event, arg) => {
     }
   });
 });
-ipcMain.on('bouyomi-exe-alert', () => {
-  let mesOptions = {
-    type: 'error',
-    buttons: ['OK'],
-    title: 'エラー',
-    message: '選択したファイルが異なります。',
-    detail: '「BouyomiChan.exe」を選択してください。'
-  };
-  dialog.showMessageBox(mesOptions);
-});
+//ipcMain.on('bouyomi-exe-alert', () => {
+//  let mesOptions = {
+//    type: 'error',
+//    buttons: ['OK'],
+//    title: 'エラー',
+//    message: '選択したファイルが異なります。',
+//    detail: '「BouyomiChan.exe」を選択してください。'
+//  };
+//  dialog.showMessageBox(mesOptions);
+//});
 // ------------------------------
 // その他
 // ------------------------------
@@ -381,7 +381,7 @@ function taskTrayMenu() {
     {
       label: 'サイズを元に戻す',
       click: function() {
-        mainWindow.setSize(640, 480);
+        mainWindow.setSize(940, 500);
         mainWindow.center();
       }
     },

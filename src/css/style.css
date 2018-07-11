@@ -1,160 +1,4 @@
 /* ********************
-  ボックス
-******************** */
-.box {
-  width: 580px;
-  margin: 10px auto;
-}
-/* ********************
-  枠組み
-******************** */
-.box-table {
-  border: solid 3px #95ccff;
-  border-radius: 8px;
-  margin: 32px 0;
-  padding: 8px 16px;
-  position: relative;
-}
-.box-title {
-  background: #fff;
-  color: #95ccff;
-  display: inline-block;
-  font-size: 1.188em;
-  font-weight: bold;
-  left: 10px;
-  line-height: 1;
-  padding: 0 9px;
-  position: absolute;
-  top: -13px;
-}
-.box-table table {
-  width: 100%;
-}
-.box-table table td {
-  padding: 10px;
-}
-.box-table table td:first-child {
-  width: 140px;
-}
-/* ********************
-  オーバーレイ
-******************** */
-.overlay {
-  background: #fff;
-  top: 25px;
-  width: 100%;
-  height: calc(100vh - 25px);
-  position: fixed;
-  display: none;
-  opacity: 0;
-  z-index: -1;
-}
-.overlay.show {
-  display: block;
-  z-index: 1;
-  opacity: 1;
-  animation-duration: 0.5s;
-  animation-name: fade-in;
-}
-.overlay.hide {
-  display: block;
-  z-index: -1;
-  opacity: 0;
-  animation-duration: 0.5s;
-  animation-name: fade-out;
-}
-.overlay > div:first-child {
-  height: calc(100vh - 96px);
-  overflow-y: scroll;
-}
-.overlay > div:last-child {
-  box-shadow: -4px 0 6px #4a5459;
-  -webkit-user-select: none;
-  border-top: 1px solid #4a5459;
-  color: #fff;
-}
-.overlay > div:last-child > div {
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-}
-.overlay .button:hover {
-  background: #fff;
-}
-/* ********************
-  アラート
-******************** */
-.alert {
-  bottom: 10px;
-  /*height: 50px;*/
-  width: 400px;
-  left: calc(50% - 400px/2);
-  position: fixed;
-  display: none;
-  opacity: 0;
-  z-index: -1;
-}
-.alert p {
-  text-align: center;
-  background: #e0edff;
-  margin: 5px;
-  padding: 5px 10px;
-  /*height: 30px;*/
-  border-radius: 20px;
-  box-shadow: 0px 0px 6px #4a5459;
-}
-.alert.show {
-  display: block;
-  z-index: 1;
-  opacity: 1;
-  animation-duration: 0.5s;
-  animation-name: fade-in;
-}
-.alert.hide {
-  display: block;
-  z-index: -1;
-  opacity: 0;
-  animation-duration: 0.5s;
-  animation-name: fade-out;
-}
-/* ********************
-ボタン
-******************** */
-.button {
-  background: #95ccff;
-  border: 3px solid #95ccff;
-  color: #fff;
-  fill: #fff;
-  border-radius: 4px;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-block;
-  font-size: 0.75em;
-  position: relative;
-  text-align: center;
-  transition: 0.1s all;
-}
-.button::before,
-.button::after {
-  box-sizing: border-box;
-}
-.button:hover {
-  background: rgba(149,204,255,.0);
-  border: 3px solid #95ccff;
-  color:  #95ccff;
-  fill: #95ccff;
-}
-.button-disabled {
-  background: #929e91;
-  border: 3px solid #929e91;
-}
-.button-disabled:hover {
-  background: rgba(146,158,145,.0);
-  border: 3px solid #929e91;
-  color: #929e91;
-  fill: #929e91;
-}
-/* ********************
   ヘッダー
 ******************** */
 header {
@@ -171,9 +15,11 @@ header > div:first-child {
   padding-left: 5px;
 }
 header > div:first-child img {
-  height: calc(100% - 10px);
-  padding: 5px;
+  /*height: calc(100% - 10px);*/
+  height: 100%;
   width: auto;
+  padding: 5px;
+  padding: 5px;
 }
 header > div:not(:first-child) {
   -webkit-app-region: no-drag;
@@ -194,111 +40,130 @@ header > div:last-child:hover {
 ******************** */
 main {
   overflow-y: scroll;
-  height: calc(100vh - 96px);
+  height: calc(100vh - 25px);
+  padding-top: .5rem;
 }
-main .button {
-  width: 50px;
-  height: 50px;
-  margin: 10px;
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-main svg {
-  width: 32px;
-  height: 32px;
+main > .container {
+  width:100%;
 }
 /* ********************
-  フッター
+  tabs
 ******************** */
-footer {
-  box-shadow: -4px 0 6px #4a5459;
-  -webkit-user-select: none;
-  border-top: 1px solid #4a5459;
-  color: #fff;
-  font-size: 15px;
-  height: 70px;
+main .tabs .tab a {
+  color: rgba(33,150,243,0.7);
 }
-footer .box {
-  display: flex;
-  margin: 0px auto;
+main .tabs .tab a:hover, main .tabs .tab a.active {
+  color: #2196f3;
 }
-footer .spin:hover svg {
-  animation: spin 3.5s linear infinite;
+main .tabs .tab a:focus, main .tabs .tab a:focus.active {
+  background-color: rgba(33,150,243,0.2);
 }
-footer .button {
-  width: 50px;
-  height: 50px;
-  margin: 10px;
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-footer .button:first-child,
-footer .button:nth-child(2) {
-  margin-right: auto;
-}
-footer .hidden {
-  display: none;
-}
-footer svg {
-  width: 32px;
-  height: 32px;
+main .tabs .indicator {
+  background-color: #2196f3;
 }
 /* ********************
-  アニメーション
+  log
 ******************** */
-@keyframes spin {
-  0% {transform: rotate(0deg);}
-  100% {transform: rotate(360deg);}
-}
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    z-index: 1;
-  }
-  100% {
-    opacity: 1;
-    z-index: 1;
-  }
-}
-@keyframes fade-out {
-  0% {
-    opacity: 1;
-    z-index: 1;
-  }
-  100% {
-    opacity: 0;
-    z-index: 1;
-  }
+#log .collection .collection-item.avatar {
+  min-height: 50px;
 }
 /* ********************
-  フォーカス
+  setting
 ******************** */
-input[type="text"],
-textarea {
-  border: 1px solid #aaa;
-  outline: none;
-  transition: all .3s;
-  -webkit-transition: all .3s;
-  width: 350px;
+#setting_menu .collection .collection-item {
+  padding: 10px;
+  cursor: pointer;
 }
-input[type="text"]:focus,
-textarea:focus {
-  border: 1px solid #95ccff;
-  box-shadow: 0 0 7px #95ccff;
+#setting_table .row {
+  margin-bottom: 0;
 }
-.button:focus,
-input[type="button"]:focus,
-input[type="radio"]:focus {
-  box-shadow: 0 0 7px #95ccff;
-  outline: none;
+#server .row.section.right-align {
+  margin-bottom: 20px;
+  padding-top: 0px;
+}
+#server .collection .collection-item {
+  border-bottom: 0;
+  border-top: 1px solid #ddd;
+}
+#server .collection .collection-item:first-child {
+  border-top: 0;
+}
+#blacklist .chip {
+  display: block;
+}
+#blacklist .chips .input {
+  width: 100%  !important
+}
+#blacklist .chips.focus {
+  border-bottom: 1px solid #5c6bc0;
+  -webkit-box-shadow: 0 1px 0 0 #5c6bc0;
+  box-shadow: 0 1px 0 0 #5c6bc0;
+}
+#blacklist .chip:focus {
+  background-color: #5c6bc0;
+}
+
+/* ********************
+  input
+******************** */
+.switch label input[type=checkbox]:checked+.lever {
+  background-color: #9fa8da;
+}
+.switch label input[type=checkbox]:checked+.lever:after {
+  background-color: #5c6bc0;
+}
+input[type=checkbox]:checked:not(:disabled) ~ .lever:active::before,
+input[type=checkbox]:checked:not(:disabled).tabbed:focus ~ .lever::before {
+  background-color: rgba(92,107,192,0.15);
+}
+input:not([type]):focus:not([readonly]),
+input[type=text]:not(.browser-default):focus:not([readonly]),
+input[type=password]:not(.browser-default):focus:not([readonly]),
+input[type=email]:not(.browser-default):focus:not([readonly]),
+input[type=url]:not(.browser-default):focus:not([readonly]),
+input[type=time]:not(.browser-default):focus:not([readonly]),
+input[type=date]:not(.browser-default):focus:not([readonly]),
+input[type=datetime]:not(.browser-default):focus:not([readonly]),
+input[type=datetime-local]:not(.browser-default):focus:not([readonly]),
+input[type=tel]:not(.browser-default):focus:not([readonly]),
+input[type=number]:not(.browser-default):focus:not([readonly]),
+input[type=search]:not(.browser-default):focus:not([readonly]),
+textarea.materialize-textarea:focus:not([readonly]) {
+  border-bottom: 1px solid #3949ab;
+  -webkit-box-shadow: 0 1px 0 0 #3949ab;
+  box-shadow: 0 1px 0 0 #3949ab;
+}
+input:not([type]):focus:not([readonly])+label,
+input[type=text]:not(.browser-default):focus:not([readonly])+label,
+input[type=password]:not(.browser-default):focus:not([readonly])+label,
+input[type=email]:not(.browser-default):focus:not([readonly])+label,
+input[type=url]:not(.browser-default):focus:not([readonly])+label,
+input[type=time]:not(.browser-default):focus:not([readonly])+label,
+input[type=date]:not(.browser-default):focus:not([readonly])+label,
+input[type=datetime]:not(.browser-default):focus:not([readonly])+label,
+input[type=datetime-local]:not(.browser-default):focus:not([readonly])+label,
+input[type=tel]:not(.browser-default):focus:not([readonly])+label,
+input[type=number]:not(.browser-default):focus:not([readonly])+label,
+input[type=search]:not(.browser-default):focus:not([readonly])+label,
+textarea.materialize-textarea:focus:not([readonly])+label {
+    color: #3949ab;
+}
+.toast {
+  background-color: rgba(50, 50, 50, 0.95);
+}
+#toast-container {
+  top: auto;
+  right: auto;
+  left: 5%;
+  bottom: 7%;
+  width: 320px;
 }
 /* ********************
   その他
 ******************** */
+html {
+  background: #fff;
+}
 body {
   color: #333;
   margin: 0;
@@ -316,40 +181,9 @@ body {
     sans-serif;
   font-size: 1em;
 }
-a {
-  color: #c02942;
-  font-weight: bold;
-  text-decoration:none;
+b, strong {
+  font-weight: bolder;
 }
-h2 {
-  margin: 0;
-  padding: 0;
-}
-h3 {
-  font-size: 1em;
-  margin: 0;
-}
-h3:first-letter {
-  font-size: 1.5em;
-}
-hr {
-  background: #95ccff;
-  border: none;
-  height: 3px;
-}
-p {
-  margin: 0;
-  padding: 0;
-}
-.bouyomi-log {
-  padding: 10px;
-}
-.bouyomi-log,
-.comment {
-  font-size: 0.625em;
-}
-.emoji {
-  height: 20px;
-  width: 20px;
-  margin: 0 1px;
+.display-none {
+  display: none;
 }
