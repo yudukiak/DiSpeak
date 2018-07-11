@@ -1,13 +1,12 @@
 {
   "name": "DiSpeak_build",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "For DiSpeak build.",
   "main": "index.js",
   "dependencies": {
     "discord.js": "^11.3.2",
     "jquery": "^3.3.1",
-    "request": "^2.87.0",
-    "sweetalert2": "^7.21.1"
+    "request": "^2.87.0"
   },
   "devDependencies": {
     "archiver": "^2.1.1",
