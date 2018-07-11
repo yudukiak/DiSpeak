@@ -4,4 +4,5 @@
 /dist/
 /test/
 /node_modules/
+/src/node_modules/
 /setting.json
