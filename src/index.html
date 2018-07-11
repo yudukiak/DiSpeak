@@ -5,9 +5,12 @@
   <meta charset="utf-8">
   <title>でぃすぴーく</title>
   <link rel="shortcut icon" href="images/icon.png">
-  <link rel="stylesheet" href="css/notosansjapanese.css"> <!-- https://fonts.googleapis.com/earlyaccess/notosansjapanese.css -->
-  <link rel="stylesheet" href="css/icon.css"> <!-- https://fonts.googleapis.com/icon?family=Material+Icons -->
-  <link rel="stylesheet" href="css/materialize.min.css"> <!-- https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css -->
+  <link rel="stylesheet" href="css/notosansjapanese.css">
+  <!-- https://fonts.googleapis.com/earlyaccess/notosansjapanese.css -->
+  <link rel="stylesheet" href="css/icon.css">
+  <!-- https://fonts.googleapis.com/icon?family=Material+Icons -->
+  <link rel="stylesheet" href="css/materialize.min.css">
+  <!-- https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -136,29 +139,53 @@
             <!-- DM -->
             <div id="directmessage" class="collection col s12 display-none">
               <div class="row section">
-                <div class="input-field col s9">
-                  <input id="dm_log_template" name="log_template" type="text" value="[$time$] <DM> $name$$br$$text$">
-                  <label for="dm_log_template">テンプレート - ログ</label>
+                <div class="input-field col s12"><strong>テンプレート - ログ</strong></div>
+                <div class="template" data-template="$time$ [DM] $name$<br>$text$">
+                  <div class="input-field col s8">
+                    <input id="dm_template_log" name="template_log" type="text">
+                    <label for="dm_template_log">チャット</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
-                <div class="input-field col s9">
-                  <input id="dm_bym_template" name="bym_template" type="text" value="DM $name$さん $text$">
-                  <label for="dm_bym_template">テンプレート - 棒読みちゃん</label>
-                </div>
-                <div class="col s12">
-                  <div id="directmessage-list" class="collection"></div>
+                <div class="input-field col s12"><strong>テンプレート - 棒読みちゃん</strong></div>
+                <div class="template" data-template="DM $name$さん $text$">
+                  <div class="input-field col s8">
+                    <input id="dm_template_bym" name="template_bym" type="text">
+                    <label for="dm_template_bym">チャット</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
+                  <div class="col s12">
+                    <div id="directmessage-list" class="collection"></div>
+                  </div>
                 </div>
               </div>
             </div>
             <!-- グループDM -->
             <div id="group" class="collection col s12 display-none">
               <div class="row section">
-                <div class="input-field col s9">
-                  <input id="gr_log_template" name="log_template" type="text" value="[$time$] <GroupDM> $name$$br$$text$">
-                  <label for="gr_log_template">テンプレート - ログ</label>
+                <div class="input-field col s12"><strong>テンプレート - ログ</strong></div>
+                <div class="template" data-template="$time$ [GroupDM] $name$<br>$text$">
+                  <div class="input-field col s8">
+                    <input id="gr_template_log" name="template_log" type="text">
+                    <label for="gr_template_log">チャット</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
-                <div class="input-field col s9">
-                  <input id="gr_bym_template" name="bym_template" type="text" value="グループDM $name$さん $text$">
-                  <label for="gr_bym_template">テンプレート - 棒読みちゃん</label>
+                <div class="input-field col s12"><strong>テンプレート - 棒読みちゃん</strong></div>
+                <div class="template" data-template="グループDM $name$さん $text$">
+                  <div class="input-field col s8">
+                    <input id="gr_template_bym" name="template_bym" type="text">
+                    <label for="gr_template_bym">チャット</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
                 <div class="col s12">
                   <div id="group-list" class="collection"></div>
@@ -168,21 +195,79 @@
             <!-- サーバー -->
             <div id="server" class="collection col s12 display-none">
               <div class="row section">
-                <div class="input-field col s9">
-                  <input id="sv_log_template" name="sv_log_template" type="text" value="[$time$] <$server$ $channel$> $name$$br$$text$">
-                  <label for="sv_log_template">テンプレート - ログ</label>
+                <div class="input-field col s12"><strong>テンプレート - ログ</strong></div>
+                <div class="template" data-template="$time$ [$server$ $channel$] $name$<br>$text$">
+                  <div class="input-field col s8">
+                    <input id="sv_template_log" name="template_log" type="text">
+                    <label for="sv_template_log">チャット</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
-                <div class="input-field col s9">
-                  <input id="sv_bym_template" name="sv_bym_template" type="text" value="$server$ $channel$ $name$さん $text$">
-                  <label for="sv_bym_template">テンプレート - 棒読みちゃん</label>
+                <div class="template" data-template="$time$ [$server$] <br>$name$が$channel$に参加しました">
+                  <div class="input-field col s8">
+                    <input id="sv_template_log_vc_in" name="template_log_vc_in" type="text">
+                    <label for="sv_template_log_vc_in">ボイスチャンネル 参加時</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
-                <div class="input-field col s9">
-                  <input id="sv_vc_log_template" name="sv_vc_log_template" type="text" value="[$time$] <$server$ $channel$> $name$$br$$text$">
-                  <label for="sv_vc_log_template">テンプレート - ボイスチャンネル ログ</label>
+                <div class="template" data-template="$time$ [$server$] <br>$name$が$channel-prev$から$channel-next$に移動しました">
+                  <div class="input-field col s8">
+                    <input id="sv_template_log_vc_change" name="template_log_vc_change" type="text">
+                    <label for="sv_template_log_vc_change">ボイスチャンネル 移動時</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
-                <div class="input-field col s9">
-                  <input id="sv_vc_bym_template" name="sv_vc_bym_template" type="text" value="$server$ $channel$ $name$さん $text$">
-                  <label for="sv_vc_bym_template">テンプレート - ボイスチャンネル 棒読みちゃん</label>
+                <div class="template" data-template="$time$ [$server$] <br>$name$が$channel$から退出しました">
+                  <div class="input-field col s8">
+                    <input id="sv_template_log_vc_out" name="template_log_vc_out" type="text">
+                    <label for="sv_template_log_vc_out">ボイスチャンネル 退出時</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
+                </div>
+                <div class="input-field col s12"><strong>テンプレート - 棒読みちゃん</strong></div>
+                <div class="template" data-template="$server$ $channel$ $name$さん $text$">
+                  <div class="input-field col s8">
+                    <input id="sv_template_bym" name="template_bym" type="text">
+                    <label for="sv_template_bym">チャット</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
+                </div>
+                <div class="template" data-template="$server$ $name$が$channel$に参加しました">
+                  <div class="input-field col s8">
+                    <input id="sv_template_bym_vc_in" name="template_bym_vc_in" type="text">
+                    <label for="sv_template_bym_vc_in">ボイスチャンネル 参加時</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
+                </div>
+                <div class="template" data-template="$server$ $name$が$channel-prev$から$channel-next$に移動しました">
+                  <div class="input-field col s8">
+                    <input id="sv_template_bym_vc_change" name="template_bym_vc_change" type="text">
+                    <label for="sv_template_bym_vc_change">ボイスチャンネル 移動時</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
+                </div>
+                <div class="template" data-template="$server$ $name$が$channel$から退出しました">
+                  <div class="input-field col s8">
+                    <input id="sv_template_bym_vc_out" name="template_bym_vc_out" type="text">
+                    <label for="sv_template_bym_vc_change">ボイスチャンネル 退出時</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
                 <div class="col s12">
                   <div id="server-list" class="collection"></div>
@@ -233,8 +318,44 @@
         <i class="large material-icons">mic_off</i>
       </a>
     </div>
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <div class="row">
+          <div class="col s12 center-align row section">
+            <h4>Discordへログイン中です</h4>
+            <p>しばらくお待ちください</p>
+          </div>
+          <div class="col s12 center-align row section">
+            <div class="preloader-wrapper big active">
+              <div class="spinner-layer spinner-blue">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+              </div>
+              <div class="spinner-layer spinner-red">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+              </div>
+              <div class="spinner-layer spinner-yellow">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div>
+                </div>
+              </div>
+              <div class="spinner-layer spinner-green">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
   <script defer src="js/materialize.js"></script>
   <script defer src="js/script.js"></script>
 </body>
+
 </html>

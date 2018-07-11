@@ -10,30 +10,47 @@ const jQueryVersion = $.fn.jquery;
 
 // 設定ファイルを読み込む
 let setting = ipcRenderer.sendSync('setting-file-read');
-
-// デバッグログ
-debugLog('[info] DiSpeak', `v${nowVersion}`);
-debugLog('[info] jQuery', `v${jQueryVersion}`);
+// 多重動作を防ぐ為の変数
+let loginDiscordCheck = false; // Discordは f:未ログイン, t:ログイン
+let bouyomiSpeakCheck = false; // 棒読みちゃんは f:読み上げない, t:読み上げる
+let bouyomiExeStartCheck = false; // 棒読みちゃんは f:起動してない, t:起動している
 
 $(function() {
   // materializeの処理
   M.AutoInit();
+  M.Chips.init($('.chips'), {
+    placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
+    secondaryPlaceholder: '+ ユーザーのIDを追加する'
+  });
+  // デフォルトのテンプレートを反映
+  $('#directmessage .template, #group .template, #server .template').each(function() {
+    const data = $(this).data('template');
+    $(this).find('input').val(data);
+    M.updateTextFields();
+  });
   // 設定ファイルが存在しないとき（初回起動時）
   if (setting == null) {
     writeFile();
   }
+  // 古い設定ファイルを使用しているとき
+  else if (setting.version == null) {
+    M.toast({
+      html: 'v2.0未満の設定ファイルです<br>設定の読み込みを中止しました',
+      classes: 'toast-load'
+    });
+  }
   // 設定ファイルが存在するとき
   else {
     M.toast({
-      html: '設定ファイルを読み込みました',
-      classes: 'toast-load',
-      //displayLength:'stay',
+      html: '設定ファイルを読み込んでいます',
+      classes: 'toast-load'
     });
+    // デバッグログ
+    debugLog('[info] DiSpeak', `v${nowVersion}`);
+    debugLog('[info] jQuery', `v${jQueryVersion}`);
     // ログインの処理
     loginDiscord(setting.discord.token);
     M.Chips.init($('.chips'), {
-      placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
-      secondaryPlaceholder: '+ ユーザーのIDを追加する',
       data: setting.blacklist,
       onChipAdd: function() {
         const instance = M.Chips.getInstance($('.chips'));
@@ -90,19 +107,22 @@ $(function() {
   $(document).on('click', '.fixed-action-btn a', function() {
     if ($('.toast-bouyomi').length) return;
     // 既にログインしていた場合
-    if (login) {
+    if (loginDiscordCheck) {
       $(this).css('display', 'none');
       $(this).siblings().css('display', 'block');
       const id = $(this).attr('id');
       if (id == 'start') {
+        bouyomiSpeakCheck = true; // 読み上げる状態に変更
         M.toast({
           html: '再生を開始しています…',
-          classes: 'toast-bouyomi',
+          classes: 'toast-bouyomi'
         });
+        bouyomiExeStart();
       } else if (id == 'stop') {
+        bouyomiSpeakCheck = false; // 読み上げない状態に変更
         M.toast({
           html: '再生を停止しました',
-          classes: 'toast-bouyomi',
+          classes: 'toast-bouyomi'
         });
       }
     }
@@ -110,7 +130,7 @@ $(function() {
     else {
       M.toast({
         html: 'Discordにログインをしてください',
-        classes: 'toast-bouyomi',
+        classes: 'toast-bouyomi'
       });
     }
   });
@@ -139,8 +159,16 @@ $(function() {
       });
     }
   });
+  // テンプレートのリセット
+  $(document).on('click', '#directmessage .template button, #group .template button, #server .template button', function() {
+    const data = $(this).parents('.template').data('template');
+    $(this).parents('.template').find('input').val(data);
+    M.updateTextFields();
+    writeFile();
+  });
   // 棒読み
   $(document).on('click', '#bouyomi button', function() {
+    if ($('.toast-exe').length) return;
     const bouyomiDir = ipcRenderer.sendSync('bouyomi-dir-dialog');
     if (bouyomiDir == '') {
       M.toast({
@@ -160,13 +188,21 @@ $(function() {
   });
 });
 
+// ------------------------------
 // Discord
+// ------------------------------
+// ログイン時
 client.on('ready', function() {
   debugLog('[Discord] ready', client);
+  loginDiscordCheck = true; // ログインしたのでtrueへ変更
+  M.Modal.init($('.modal'), {
+    dismissible: false
+  });
+  M.Modal.getInstance($('#modal')).close();
   $('#offline').css('display', 'none');
   $('#online').css('display', 'inline-block');
   M.toast({
-    html: 'ログインに成功しました',
+    html: 'Discordのログインに成功しました',
     classes: 'toast-discord'
   });
   // アカウント
@@ -257,6 +293,46 @@ client.on('ready', function() {
   // 設定ファイルを反映
   readFile();
 });
+// 再接続時
+client.on('reconnecting', function() {
+  if ($('.toast-reconnecting').length) return;
+  M.toast({
+    html: '再接続をします',
+    classes: 'toast-reconnecting'
+  });
+});
+// ボイスチャンネルに参加（マイク、スピーカーのON/OFFも）
+client.on('voiceStateUpdate', function(data) {
+  debugLog('[Discord] voiceStateUpdate', data);
+  if (client.user.id == data.id) return; // 自分自身のイベントは処理しない
+  const messageGuildId = data.guild.id; // サーバのID
+  const voice = setting.server[messageGuildId].voice; // settingのtrueもしくはfalseを取得
+  console.log(voice);
+  if (!voice) return; // falseのとき読まない
+  // 処理を後で書きます
+});
+// チャットが送信された時
+client.on('message', function(data) {
+  debugLog('[Discord] message', data);
+});
+// WebSocketに接続エラーが起きたときの処理
+client.on('error', function(data) {
+  errorLog('[Discord] error', data);
+});
+// 警告があった際の処理
+client.on('warn', function(data) {
+  errorLog('[Discord] warn', data);
+});
+
+// ------------------------------
+// 各種エラーをキャッチ
+// ------------------------------
+process.on('uncaughtException', function(message) {
+  errorLog('[Error] uncaughtException', message);
+});
+process.on('unhandledRejection', function(message) {
+  errorLog('[Error] unhandledRejection', message);
+});
 
 // ------------------------------
 // 各種関数
@@ -288,8 +364,7 @@ function readFile() {
   if ($('.toast-readFile').length) return;
   M.toast({
     html: '設定を反映しました',
-    classes: 'toast-readFile',
-    //displayLength:'stay',
+    classes: 'toast-readFile'
   });
   M.updateTextFields();
   debugLog('[readFile] obj', setting);
@@ -297,7 +372,7 @@ function readFile() {
 // ファイルへ書き込み
 function writeFile() {
   let setting_AutoSave = {};
-  $('#dispeak, #discord, #directmessage, #group, #bouyomi, #server .input-field.col.s9, #server .collection-item.row').each(function() {
+  $('#dispeak, #discord, #directmessage, #group, #bouyomi, #server .template, #server-list > div').each(function() {
     const divId = $(this).attr('id');
     const id = (function() {
       if (divId == null) return 'server';
@@ -322,6 +397,7 @@ function writeFile() {
     }
   });
   setting_AutoSave.blacklist = M.Chips.getInstance($('.chips')).chipsData;
+  setting_AutoSave.version = nowVersion;
   if (JSON.stringify(setting) == JSON.stringify(setting_AutoSave)) return;
   setting = $.extend(true, {}, setting_AutoSave);
   const res = ipcRenderer.sendSync('setting-file-write', setting_AutoSave);
@@ -332,8 +408,7 @@ function writeFile() {
     if ($('.toast-writeFile').length) return;
     M.toast({
       html: '設定を保存できません<br>設定ファイルを開いている場合は閉じてください',
-      classes: 'toast-writeFile',
-      //displayLength:'stay',
+      classes: 'toast-writeFile'
     });
   }
   // ファイルが存在しない
@@ -348,6 +423,10 @@ function loginDiscord(token) {
     html: 'ログインを開始しています',
     classes: 'toast-discord'
   });
+  M.Modal.init($('.modal'), {
+    dismissible: false
+  });
+  M.Modal.getInstance($('#modal')).open();
   // 成功したらclient.on('ready')の処理が走る
   client.login(token).catch(function(error) {
     M.toast({
@@ -356,6 +435,34 @@ function loginDiscord(token) {
     });
   });
 }
+// 棒読みちゃん起動
+function bouyomiExeStart() {
+  debugLog('[bouyomiExeStart] check', bouyomiExeStartCheck);
+  // 起動していない（false）場合のみ処理する
+  if (!bouyomiExeStartCheck) {
+    const bouyomiDir = setting.bouyomi.dir;
+    if (bouyomiDir == '' || !/BouyomiChan\.exe/.test(bouyomiDir)) return;
+    const res = ipcRenderer.sendSync('bouyomi-exe-start', bouyomiDir);
+    bouyomiExeStartCheck = res; // true:起動成功, false:起動失敗
+    if (!res) {
+      M.toast({
+        html: `棒読みちゃんを起動できませんでした<br>ディレクトリを間違えていないかご確認ください<br>${bouyomiDir}`,
+        classes: 'toast-bouyomiExe'
+      });
+    }
+  }
+  // 棒読みちゃんに起動した旨を読ませる
+  const data = '読み上げを開始しました';
+  bouyomiSpeak(data);
+};
+// 棒読みちゃんにdataを渡す
+function bouyomiSpeak(data) {
+  if (!bouyomiSpeakCheck) return;
+  const bouyomiServer = {};
+  bouyomiServer.host = setting.bouyomi.ip;
+  bouyomiServer.port = setting.bouyomi.port;
+  bouyomiConnect.sendBouyomi(bouyomiServer, data);
+};
 // ゼロパディング
 function zeroPadding(num) {
   const str = String(num);
@@ -369,6 +476,33 @@ function zeroPadding(num) {
 function escapeHtml(str) {
   const rep = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   return rep;
+}
+// エラーをログへ書き出す
+function errorLog(fnc, error) {
+  debugLog(fnc, error);
+  const errorStr = (function() {
+    if (toString.call(error) == '[object Event]') return JSON.stringify(error);
+    return String(error);
+  })();
+  if (errorStr.match(/Error: Cannot find module '\.\.\/setting\.json'/)) return;
+  const errorMess = (function() {
+    if (errorStr.match(/{"isTrusted":true}/)) return 'インターネットに接続できません。再接続をします。';
+    if (errorStr.match(/TypeError: Failed to fetch/)) return 'インターネットに接続できません。';
+    if (errorStr.match(/Error: Something took too long to do/)) return 'Discordに接続できません。';
+    if (errorStr.match(/Error: connect ECONNREFUSED/)) return '棒読みちゃんが起動していない、もしくは接続できません。';
+    if (errorStr.match(/Error: getaddrinfo ENOTFOUND/)) return 'IPが正しくありません。';
+    if (errorStr.match(/RangeError: "port" option should be/)) return 'ポートが正しくありません。';
+    if (errorStr.match(/Error: Incorrect login details were provided/)) return 'トークンが正しくありません。';
+    if (errorStr.match(/Error: Uncaught, unspecified "error" event/)) return 'エラーが発生しました。';
+    if (errorStr.match(/Error: The token is not filled in/)) return 'トークンが記入されていません。';
+    if (errorStr.match(/ReferenceError: ([\s\S]*?) is not defined/)) return `変数 ${errorStr.split(' ')[1]} が定義されていません。@micelle9までご連絡ください。`;
+    return `不明なエラーが発生しました。（${errorStr}）`;
+  })();
+  M.toast({
+    //displayLength:'stay',
+    html: errorMess,
+    classes: 'toast-error'
+  });
 }
 // デバッグ
 function debugLog(fnc, data) {

@@ -11,6 +11,7 @@ const exePath = app.getPath('exe'); // '\dc_DiSpeak.git\node_modules\electron\di
 const userData = app.getPath('userData'); // \AppData\Roaming\DiSpeak
 // DiSpeakの設定ファイル
 const appSetting = `${repPath}\\setting.json`;
+let appSettingObj = {};
 // windowの設定ファイル
 const winSetting = `${userData}\\setting.json`;
 let winSettingAry = readFileSync(winSetting);
@@ -241,6 +242,7 @@ ipcMain.on('setting-file-read', (event) => {
 });
 // 設定ファイルを保存する
 ipcMain.on('setting-file-write', (event, data) => {
+  appSettingObj = data;
   event.returnValue = writeFileSync(appSetting, data);
 });
 // UIの挙動
@@ -276,30 +278,15 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
     event.returnValue = filePath;
   });
 });
-ipcMain.on('bouyomi-exe-start', (event, arg) => {
-  execFile(arg, function(error, stdout, stderr) {
+ipcMain.on('bouyomi-exe-start', (event, data) => {
+  execFile(data, function(error, stdout, stderr) {
     if (error != null) {
-      let mesOptions = {
-        type: 'error',
-        buttons: ['OK'],
-        title: 'エラー',
-        message: '棒読みちゃんを起動できませんでした。',
-        detail: `ディレクトリを間違えていないか、ご確認ください。\n\n${error.cmd}`
-      };
-      dialog.showMessageBox(mesOptions);
+      event.returnValue = false;
+    } else {
+      event.returnValue = true;
     }
   });
 });
-//ipcMain.on('bouyomi-exe-alert', () => {
-//  let mesOptions = {
-//    type: 'error',
-//    buttons: ['OK'],
-//    title: 'エラー',
-//    message: '選択したファイルが異なります。',
-//    detail: '「BouyomiChan.exe」を選択してください。'
-//  };
-//  dialog.showMessageBox(mesOptions);
-//});
 // ------------------------------
 // その他
 // ------------------------------
