@@ -7,7 +7,6 @@ const nowVersion = ipcRenderer.sendSync('now-version-check');
 const bouyomiConnect = require(`${srcDirectory}/js/bouyomiConnect.js`);
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
-
 // 設定ファイルを読み込む
 let setting = ipcRenderer.sendSync('setting-file-read');
 // 多重動作を防ぐ為の変数
@@ -20,7 +19,44 @@ $(function() {
   M.AutoInit();
   M.Chips.init($('.chips'), {
     placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
-    secondaryPlaceholder: '+ ユーザーのIDを追加する'
+    secondaryPlaceholder: '+ ユーザーのIDを追加する',
+    data: (function() {
+      if (setting == null) return [];
+      return setting.blacklist; // メモ 正規表現は/\((\d+)\)$/
+    })(),
+    onChipAdd: function() {
+      const instance = M.Chips.getInstance($('.chips'));
+      const ary = instance.chipsData;
+      const aryLen = ary.length - 1;
+      const lastAry = ary[aryLen];
+      const lastTag = lastAry.tag;
+      const lastImg = lastAry.image;
+      if (setting == null || !loginDiscordCheck) {
+        instance.deleteChip(aryLen);
+        M.toast({
+          html: 'Discordにログインをしてください',
+          classes: 'toast-chips'
+        });
+      } else if (lastImg == null) {
+        const userData = client.users.get(lastTag);
+        const userName = userData.username;
+        const userDiscriminator = userData.discriminator;
+        const useAvatarURL = (function() {
+          if (userData.avatarURL == null) return userData.defaultAvatarURL;
+          return userData.avatarURL.replace(/\?size=\d+/, '');
+        })();
+        instance.deleteChip(aryLen);
+        instance.addChip({
+          tag: `${userName}#${userDiscriminator} (${lastTag})`,
+          image: useAvatarURL
+        });
+        // 少し時間差を置いてファイルへ書き込みさせます。ダサい実装なので調整したい
+        setTimeout(function() {
+          writeFile();
+          debugLog('[Discord] onChipAdd', userData);
+        }, 100);
+      }
+    }
   });
   // デフォルトのテンプレートを反映
   $('#directmessage .template, #group .template, #server .template').each(function() {
@@ -41,40 +77,17 @@ $(function() {
   }
   // 設定ファイルが存在するとき
   else {
-    M.toast({
-      html: '設定ファイルを読み込んでいます',
-      classes: 'toast-load'
-    });
     // デバッグログ
     debugLog('[info] DiSpeak', `v${nowVersion}`);
     debugLog('[info] jQuery', `v${jQueryVersion}`);
     // ログインの処理
     loginDiscord(setting.discord.token);
-    M.Chips.init($('.chips'), {
-      data: setting.blacklist,
-      onChipAdd: function() {
-        const instance = M.Chips.getInstance($('.chips'));
-        const ary = instance.chipsData;
-        const aryLen = ary.length - 1;
-        const lastAry = ary[aryLen];
-        const lastTag = lastAry.tag;
-        const lastImg = lastAry.image;
-        if (lastImg != null) return;
-        // ここあとで作ります…（仮の関数置いてます）
-        setTimeout(function() {
-          instance.deleteChip(aryLen);
-          instance.addChip({
-            tag: `ユーザー (${lastTag})`,
-            image: 'images/discord.png'
-          });
-          setTimeout(function() {
-            console.log(`aryLen:${aryLen} / lastTag:${lastTag}`);
-            writeFile();
-          }, 500);
-        }, 100);
-      },
-    });
   }
+  // Discordのトークン 入力制限（半角英数字記号以外を削除）
+  $(document).on('blur', '#discord input', function() {
+    const val = $(this).val();
+    $(this).val(val.replace(/[^a-zA-Z0-9!-/:-@¥[-`{-~]/g, '').replace(/"/g, ''));
+  });
   // NGユーザー 入力制限（数字以外を削除）
   $(document).on('blur input keyup', '#blacklist input', function() {
     const val = $(this).val();
@@ -154,7 +167,7 @@ $(function() {
       }
     } else {
       M.toast({
-        html: 'ログイン済みです',
+        html: 'ログイン済みです<br>ログアウトする場合は設定ファイルを削除してください',
         classes: 'toast-discord'
       });
     }
@@ -195,10 +208,8 @@ $(function() {
 client.on('ready', function() {
   debugLog('[Discord] ready', client);
   loginDiscordCheck = true; // ログインしたのでtrueへ変更
-  M.Modal.init($('.modal'), {
-    dismissible: false
-  });
-  M.Modal.getInstance($('#modal')).close();
+  M.Modal.init($('.modal'));
+  M.Modal.getInstance($('#modal_discord')).close();
   $('#offline').css('display', 'none');
   $('#online').css('display', 'inline-block');
   M.toast({
@@ -215,8 +226,11 @@ client.on('ready', function() {
   const discriminator = user.discriminator;
   $('#discord-profile img').attr('src', avatarURL);
   $('#discord-profile p').eq(1).text(`${username}#${discriminator}`);
+  const loginTime = whatTimeIsIt();
+  const loginHtml = `${loginTime} [info] <br>Discordのログインに成功しました`;
+  logProcess(loginHtml, avatarURL);
   // 各チャンネル
-  let serverObj = {};
+  let serverObj = {}; // サーバーの処理を考える
   client.channels.map(function(val, key) {
     // ダイレクトメッセージ
     if (val.type == 'dm') {
@@ -304,16 +318,149 @@ client.on('reconnecting', function() {
 // ボイスチャンネルに参加（マイク、スピーカーのON/OFFも）
 client.on('voiceStateUpdate', function(data) {
   debugLog('[Discord] voiceStateUpdate', data);
+  //if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return; // 棒読みちゃんの読み上げが始まっていないときは処理しない
   if (client.user.id == data.id) return; // 自分自身のイベントは処理しない
-  const messageGuildId = data.guild.id; // サーバのID
-  const voice = setting.server[messageGuildId].voice; // settingのtrueもしくはfalseを取得
-  console.log(voice);
+  const guildId = data.guild.id; // サーバのID
+  const voice = setting.server[guildId].voice; // settingのtrueもしくはfalseを取得
   if (!voice) return; // falseのとき読まない
-  // 処理を後で書きます
+  const guildChannel = data.guild.channels; // サーバのチャンネル一覧を取得
+  // 切断チャンネル（参加時:undefined, 切断時:123456789012345678）
+  const channelPrevID = data.voiceChannelID;
+  const channelPrevName = (function() {
+    const channelPrevData = guildChannel.get(channelPrevID);
+    if (channelPrevData == null) return '';
+    return channelPrevData.name;
+  })();
+  // 参加チャンネル（参加時:123456789012345678, 切断時:null）
+  const channelNextID = data.__proto__.voiceChannelID;
+  const channelNextName = (function() {
+    const channelNextData = guildChannel.get(channelNextID);
+    if (channelNextData == null) return '';
+    return channelNextData.name;
+  })();
+  // テキストの生成
+  const time = whatTimeIsIt(); // 現在の時刻
+  const guildName = data.guild.name; // 対象サーバーの名前
+  const username = data.user.username; // 対象者の名前
+  const nickname = (function() { // 対象者のニックネーム。未設定はnull
+    if (data.nickname == null) return username;
+    return data.nickname;
+  })();
+  const vcSettingAry = (function() {
+    if (channelPrevID == null) return [channelNextName, setting.server.template_bym_vc_in, setting.server.template_log_vc_in]; // チャンネルへ参加
+    if (channelNextID == null) return [channelPrevName, setting.server.template_bym_vc_out, setting.server.template_log_vc_out]; // チャンネルから切断
+    if (channelPrevID != channelNextID) return ['', setting.server.template_bym_vc_change, setting.server.template_log_vc_change]; // チャンネルの移動
+  })();
+  if (vcSettingAry == null) return; // 参加・移動・退出以外の場合は処理を終了
+  const channelName = vcSettingAry[0];
+  const template_bym = vcSettingAry[1];
+  const template_log = vcSettingAry[2];
+  const note = (function() {
+    if (data.user.note == null) return '';
+    return data.user.note;
+  })();
+  const avatarURL = (function() {
+    if (data.user.avatarURL == null) return data.user.defaultAvatarURL;
+    return data.user.avatarURL.replace(/\?size=\d+/, '');
+  })();
+  const template_bymRep = template_bym
+    .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
+    .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
+    .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
+  const template_logRep = template_log
+    .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
+    .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
+    .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
+  bouyomiSpeak(template_bymRep);
+  logProcess(template_logRep, avatarURL);
 });
 // チャットが送信された時
 client.on('message', function(data) {
   debugLog('[Discord] message', data);
+  //if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return; // 棒読みちゃんの読み上げが始まっていないときは処理しない
+  const userId = client.user.id; // 自分のID
+  const authorId = data.author.id; // チャットユーザーのID
+  const settingMyChat = setting.dispeak.my_chat;
+  const settingOtherChat = setting.dispeak.other_chat;
+  if (userId == authorId && !settingMyChat) return; // 自分が発言したとき、読み上げない設定の場合は処理を行わない
+  if (userId != authorId && !settingOtherChat) return; // 他人が発言したとき、読み上げない設定の場合は処理を行わない
+  const channelType = (function() { // チャンネルごとに判定
+    const channel = data.channel.type;
+    if (channel == 'dm') return 'directmessage';
+    if (channel == 'group') return 'group';
+    if (channel == 'text') return 'server';
+  })();
+  const channelId = data.channel.id;
+  const guildId = (function() {
+    if (channelType == 'server') return data.channel.guild.id;
+    return '';
+  })();
+  if (
+    channelType == 'directmessage' && !setting.directmessage[authorId] // 特定のDMを読み上げない時
+    && setting.directmessage[authorId] != null // settingに無い場合はスルー（主に自分のチャット）
+    || channelType == 'group' && setting.group[channelId] == null // settingに無い場合は処理させない
+    || channelType == 'group' && !setting.group[channelId] // 特定のグループDMを読み上げない時
+    || channelType == 'server' && setting.server[guildId].chat == null // settingに無い場合は処理させない
+    || channelType == 'server' && !setting.server[guildId].chat // 特定のサーバーを読み上げない時
+    || channelType == 'server' && setting.server[guildId][channelId] == null // settingに無い場合は処理させない
+    || channelType == 'server' && !setting.server[guildId][channelId] // 特定のサーバーのチャンネルを読み上げない時
+  ) return;
+  // ここにブラックリストの処理を書きます
+
+  // テキストの生成
+  const template_bym = setting[channelType].template_bym;
+  const template_log = setting[channelType].template_log;
+  const time = whatTimeIsIt(); // 現在の時刻
+  const guildName = (function() { // 対象サーバーの名前
+    if (channelType == 'server') return data.channel.guild.name;
+    return '';
+  })();
+  const channelName = (function() { // 対象チャンネルの名前
+    if (channelType == 'server') return data.channel.name;
+    return '';
+  })();
+  const groupName = (function() { // グループ名を作成
+    if (channelType != 'group') return '';
+    const obj = data.channel.recipients.map(function(v) {
+      return v.username;
+    }).join(', ');
+    return obj;
+  })();
+  const username = data.author.username; // 対象者の名前
+  const nickname = (function() { // 対象者のニックネーム。未設定はnull
+    if (data.member == null || data.member.nickname == null) return username;
+    return data.member.nickname;
+  })();
+  const note = (function() {
+    if (data.author.note == null) return '';
+    return data.author.note;
+  })();
+  const avatarURL = (function() {
+    if (data.author.avatarURL == null) return data.author.defaultAvatarURL;
+    return data.author.avatarURL.replace(/\?size=\d+/, '');
+  })();
+  // チャットの内容 (リプライ/チャンネルタグを読ませない)
+  const content = data.content.replace(/<@!?[0-9]+>/g, '').replace(/<#[0-9]+>/g, '');
+  // 画像オンリー、スペースのみを読ませない
+  if (content == '' || /^([\s]+)$/.test(content)) return;
+  // チャットをエスケープ処理する
+  const contentEsc = escapeHtml(content);
+  // 絵文字の処理をする
+  const contentEscRep = contentEsc
+    .replace(/&lt;(:[0-9a-zA-Z]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
+    .replace(/&lt;a(:[0-9a-zA-Z]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
+  // テンプレートにはめ込み
+  // $time$ $server$ $channel$ $group$ $channel-prev$ $channel-next$ $username$ $nickname$ $memo$ $text$
+  const template_bymRep = template_bym
+    .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
+    //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
+    .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, content);
+  const template_logRep = template_log
+    .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
+    //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
+    .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
+  bouyomiSpeak(template_bymRep);
+  logProcess(template_logRep, avatarURL);
 });
 // WebSocketに接続エラーが起きたときの処理
 client.on('error', function(data) {
@@ -362,10 +509,6 @@ function readFile() {
     }
   }
   if ($('.toast-readFile').length) return;
-  M.toast({
-    html: '設定を反映しました',
-    classes: 'toast-readFile'
-  });
   M.updateTextFields();
   debugLog('[readFile] obj', setting);
 }
@@ -419,16 +562,15 @@ function writeFile() {
 // ログイン
 function loginDiscord(token) {
   if (token == null || token == '') return;
-  M.toast({
-    html: 'ログインを開始しています',
-    classes: 'toast-discord'
-  });
+  debugLog('[loginDiscord] token', token);
   M.Modal.init($('.modal'), {
     dismissible: false
   });
-  M.Modal.getInstance($('#modal')).open();
+  M.Modal.getInstance($('#modal_discord')).open();
   // 成功したらclient.on('ready')の処理が走る
   client.login(token).catch(function(error) {
+    M.Modal.init($('.modal'));
+    M.Modal.getInstance($('#modal_discord')).close();
     M.toast({
       html: `ログインに失敗しました<br>${error}`,
       classes: 'toast-discord'
@@ -438,31 +580,64 @@ function loginDiscord(token) {
 // 棒読みちゃん起動
 function bouyomiExeStart() {
   debugLog('[bouyomiExeStart] check', bouyomiExeStartCheck);
+  const bouyomiDir = setting.bouyomi.dir;
   // 起動していない（false）場合のみ処理する
   if (!bouyomiExeStartCheck) {
-    const bouyomiDir = setting.bouyomi.dir;
     if (bouyomiDir == '' || !/BouyomiChan\.exe/.test(bouyomiDir)) return;
     const res = ipcRenderer.sendSync('bouyomi-exe-start', bouyomiDir);
+    debugLog('[bouyomiExeStart] ipcRenderer', res);
     bouyomiExeStartCheck = res; // true:起動成功, false:起動失敗
-    if (!res) {
-      M.toast({
-        html: `棒読みちゃんを起動できませんでした<br>ディレクトリを間違えていないかご確認ください<br>${bouyomiDir}`,
-        classes: 'toast-bouyomiExe'
-      });
-    }
   }
   // 棒読みちゃんに起動した旨を読ませる
-  const data = '読み上げを開始しました';
-  bouyomiSpeak(data);
+  if (bouyomiExeStartCheck) {
+    const data = '読み上げを開始しました';
+    // 少し時間差を置いて読ませる。ダサい実装なので調整したい
+    setTimeout(function() {
+      bouyomiSpeak(data);
+    }, 3000);
+  } else {
+    bouyomiSpeakCheck = false; // 読み上げない状態に変更
+    $('#stop').css('display', 'none');
+    $('#start').css('display', 'block');
+    M.toast({
+      html: `棒読みちゃんを起動できませんでした<br>ディレクトリを間違えていないかご確認ください<br>${bouyomiDir}`,
+      classes: 'toast-bouyomiExe'
+    });
+  }
 };
 // 棒読みちゃんにdataを渡す
 function bouyomiSpeak(data) {
-  if (!bouyomiSpeakCheck) return;
+  debugLog('[bouyomiSpeak] data', data);
+  if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return;
   const bouyomiServer = {};
   bouyomiServer.host = setting.bouyomi.ip;
   bouyomiServer.port = setting.bouyomi.port;
   bouyomiConnect.sendBouyomi(bouyomiServer, data);
 };
+// ログを書き出す
+function logProcess(html, image) {
+  debugLog('[logProcess] html', html);
+  $('#log .collection').prepend(`<li class="collection-item avatar valign-wrapper"><img src="${image}" class="circle"><p>${html}</p></li>`);
+  // ログの削除
+  const logDom = $('#log .collection li');
+  const maxLine = 50; // 表示される最大行数
+  if (logDom.length > maxLine) { // 行数を超えたら古いログを削除
+    for (let i = maxLine, n = logDom.length; i < n; i++) {
+      logDom[i].remove();
+    }
+  }
+}
+// 現在の時刻を取得
+function whatTimeIsIt() {
+  const time = new Date();
+  const year = time.getFullYear();
+  const month = zeroPadding(time.getMonth() + 1);
+  const day = zeroPadding(time.getDate());
+  const hours = zeroPadding(time.getHours());
+  const minutes = zeroPadding(time.getMinutes());
+  const text = `${year}/${month}/${day} ${hours}:${minutes}`;
+  return text;
+}
 // ゼロパディング
 function zeroPadding(num) {
   const str = String(num);
@@ -498,6 +673,7 @@ function errorLog(fnc, error) {
     if (errorStr.match(/ReferenceError: ([\s\S]*?) is not defined/)) return `変数 ${errorStr.split(' ')[1]} が定義されていません。@micelle9までご連絡ください。`;
     return `不明なエラーが発生しました。（${errorStr}）`;
   })();
+  if ($('toast-error').length > 6) return;
   M.toast({
     //displayLength:'stay',
     html: errorMess,
@@ -513,7 +689,7 @@ function debugLog(fnc, data) {
   const sec = zeroPadding(time.getSeconds());
   const type = toString.call(data);
   const text = (function() {
-    if (/Discord/.test(fnc)) return '';
+    if (/\[Discord\]/.test(fnc)) return '';
     if (/object (Event|Object)/.test(type)) return JSON.stringify(data);
     return String(data);
   })();

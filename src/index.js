@@ -14,7 +14,7 @@ const appSetting = `${repPath}\\setting.json`;
 let appSettingObj = {};
 // windowの設定ファイル
 const winSetting = `${userData}\\setting.json`;
-let winSettingAry = readFileSync(winSetting);
+let winSettingObj = readFileSync(winSetting);
 // 変数の指定
 const nowVersion = packageJson['version'];
 const appName = app.getName();
@@ -157,11 +157,11 @@ function createMainwindow() {
     ev.preventDefault();
     shell.openExternal(url);
   });
-  // winSettingAryに設定があれば処理する
-  const bounds = winSettingAry.bounds;
+  // winSettingObjに設定があれば処理する
+  const bounds = winSettingObj.bounds;
   if (bounds) mainWindow.setBounds(bounds);
-  if (winSettingAry.maximized) mainWindow.maximize();
-  if (winSettingAry.minimized) mainWindow.minimize();
+  if (winSettingObj.maximized) mainWindow.maximize();
+  if (winSettingObj.minimized) mainWindow.minimize();
   // ウィンドウの準備ができたら表示
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();
@@ -175,11 +175,12 @@ function createMainwindow() {
     ary.maximized = isMaximized;
     ary.minimized = isMinimized;
     if (isMaximized) {
-      ary.bounds = winSettingAry.bounds; // 最大化してるときは変更しない
+      ary.bounds = winSettingObj.bounds; // 最大化してるときは変更しない
     } else {
       ary.bounds = bounds;
     }
-    writeFileSync(winSetting, ary);
+    const close = appSettingObj.dispeak.window;
+    if (close) writeFileSync(winSetting, ary);
   });
   // ウィンドウが閉じられたらアプリも終了
   mainWindow.on('closed', () => {
@@ -257,7 +258,12 @@ ipcMain.on('window-maximize', () => {
   }
 });
 ipcMain.on('window-close', () => {
-  mainWindow.hide();
+  const close = appSettingObj.dispeak.close;
+  if (close) {
+    app.quit();
+  } else {
+    mainWindow.hide();
+  }
 });
 // 棒読みちゃんのディレクトリ
 ipcMain.on('bouyomi-dir-dialog', (event) => {
@@ -279,19 +285,24 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
   });
 });
 ipcMain.on('bouyomi-exe-start', (event, data) => {
-  execFile(data, function(error, stdout, stderr) {
-    if (error != null) {
-      event.returnValue = false;
-    } else {
-      event.returnValue = true;
-    }
+  let child = execFile(data, (error, stdout, stderr) => {
+    //console.error("error=>", error);
+    //console.error("stdout=>", stdout);
+    //console.error("stderr=>", stderr);
   });
+  let res = (function(){
+    if (child.pid == null) return false;
+    return true;
+  })();
+  //console.error("child=>", child);
+  event.returnValue = res;
 });
 // ------------------------------
 // その他
 // ------------------------------
 // エラーの処理
 process.on('uncaughtException', (err) => {
+  console.log(err);
   let errStr = String(err);
   let errMess = (function() {
     if (errStr.match(/'toggleDevTools' of null/)) return '「でぃすぴーくについて」が開かれていません';

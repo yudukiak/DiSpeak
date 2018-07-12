@@ -5,12 +5,12 @@
   <meta charset="utf-8">
   <title>でぃすぴーく</title>
   <link rel="shortcut icon" href="images/icon.png">
-  <link rel="stylesheet" href="css/notosansjapanese.css">
   <!-- https://fonts.googleapis.com/earlyaccess/notosansjapanese.css -->
-  <link rel="stylesheet" href="css/icon.css">
+  <link rel="stylesheet" href="css/notosansjapanese.css">
   <!-- https://fonts.googleapis.com/icon?family=Material+Icons -->
-  <link rel="stylesheet" href="css/materialize.min.css">
+  <link rel="stylesheet" href="css/icon.css">
   <!-- https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css -->
+  <link rel="stylesheet" href="css/materialize.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -30,8 +30,10 @@
     </div>
   </header>
   <main>
+    <!-- 本体 -->
     <div class="container">
       <div class="row">
+        <!-- タブ -->
         <div class="col s12">
           <ul class="tabs">
             <li class="tab col s2"><a class="active" href="#log">ログ</a></li>
@@ -39,59 +41,38 @@
             <li class="tab col s2"><a href="https://github.com/" target="_blank">ヘルプ</a></li>
           </ul>
         </div>
+        <!-- コンテンツ - ログ -->
         <div id="log" class="col s12">
-          <div class="col s12">
-            <ul class="collection">
-              <li class="collection-item avatar valign-wrapper">
-                <img src="images/discord.png" alt="" class="circle">
-                <p>2018/07/01 12:00 [Server - Channel] Name<br>これはチャットの本文です。</p>
-              </li>
-              <li class="collection-item avatar valign-wrapper">
-                <img src="images/discord.png" alt="" class="circle">
-                <p>2018/07/01 12:00 [Server - Channel] Name<br>これはチャットの本文です。これはチャットの本文です。これはチャットの本文です。これはチャットの本文です。これはチャットの本文です。これはチャットの本文です。これはチャットの本文です。これはチャットの本文です。</p>
-              </li>
-              <li class="collection-item avatar valign-wrapper">
-                <img src="images/discord.png" alt="" class="circle">
-                <p>2018/07/01 12:00 [Server - Channel] Name<br>これはチャットの本文です。</p>
-              </li>
-              <li class="collection-item avatar valign-wrapper">
-                <img src="images/discord.png" alt="" class="circle">
-                <p>2018/07/01 12:00 [Server - Channel] Name<br>これはチャットの本文です。</p>
-              </li>
-              <li class="collection-item avatar valign-wrapper">
-                <img src="images/discord.png" alt="" class="circle">
-                <p>2018/07/01 12:00 [Server - Channel] Name<br>これはチャットの本文です。</p>
-              </li>
-            </ul>
-          </div>
+          <div class="col s12"><ul class="collection"></ul></div>
         </div>
+        <!-- コンテンツ - 設定 -->
         <div id="setting" class="col s12">
           <div id="setting_menu" class="col s3">
             <ul class="collection">
-              <li class="collection-item active blue">DiSpeak</li>
-              <li class="collection-item">Discord</li>
-              <li class="collection-item">DM</li>
-              <li class="collection-item">グループDM</li>
-              <li class="collection-item">サーバー</li>
-              <li class="collection-item">棒読みちゃん</li>
-              <li class="collection-item">ブラックリスト</li>
+              <li class="collection-item waves-effect waves-light active blue">DiSpeak</li>
+              <li class="collection-item waves-effect waves-light">Discord</li>
+              <li class="collection-item waves-effect waves-light">DM</li>
+              <li class="collection-item waves-effect waves-light">グループDM</li>
+              <li class="collection-item waves-effect waves-light">サーバー</li>
+              <li class="collection-item waves-effect waves-light">棒読みちゃん</li>
+              <li class="collection-item waves-effect waves-light">ブラックリスト</li>
             </ul>
           </div>
           <div id="setting_table" class="col s9">
             <!-- DiSpeak -->
             <div id="dispeak" class="collection col s12">
               <div class="row section valign-wrapper">
-                <div class="col s9"><strong>「閉じる」の設定</strong><br>Onでアプリを終了する。Offでウィンドウを閉じる。</div>
+                <div class="col s9"><strong class="valign-wrapper">閉じる（<i class="small material-icons">close</i>）の設定</strong>Onでアプリを終了する。Offでウィンドウを閉じる。</div>
                 <div class="col s3 switch right-align"><label><input name="close" type="checkbox" checked><span class="lever"></span></label></div>
               </div>
               <div class="divider"></div>
               <div class="row section valign-wrapper">
-                <div class="col s9"><strong>ウィンドウの位置を保存する？</strong></div>
+                <div class="col s9"><strong>ウィンドウのサイズ・位置を保存する？</strong></div>
                 <div class="col s3 switch right-align"><label><input name="window" type="checkbox" checked><span class="lever"></span></label></div>
               </div>
               <div class="divider"></div>
               <div class="row section valign-wrapper">
-                <div class="col s9"><strong>DiSpeakの起動と同時に読み上げを開始する？</strong><br>棒読みちゃんも自動的に起動します。</div>
+                <div class="col s9"><strong class="valign-wrapper">DiSpeakの起動と同時に読み上げを開始する？</strong>棒読みちゃんも自動的に起動します。</div>
                 <div class="col s3 switch right-align"><label><input name="bouyomi" type="checkbox"><span class="lever"></span></label></div>
               </div>
               <div class="divider"></div>
@@ -124,13 +105,8 @@
                 <div class="col s12">
                   <div class="card-panel grey lighten-5 z-depth-1">
                     <div id="discord-profile" class="row valign-wrapper">
-                      <div class="col s2 valign-wrapper">
-                        <img src="images/discord.png" alt="" class="circle responsive-img">
-                      </div>
-                      <div class="col s10">
-                        <p class="black-text">ユーザー名</p>
-                        <p class="black-text">user#0000</p>
-                      </div>
+                      <div class="col s2 valign-wrapper"><img src="images/discord.png" alt="" class="circle responsive-img"></div>
+                      <div class="col s10"><p class="black-text">ユーザー名</p><p class="black-text"></p></div>
                     </div>
                   </div>
                 </div>
@@ -140,7 +116,7 @@
             <div id="directmessage" class="collection col s12 display-none">
               <div class="row section">
                 <div class="input-field col s12"><strong>テンプレート - ログ</strong></div>
-                <div class="template" data-template="$time$ [DM] $name$<br>$text$">
+                <div class="template" data-template="$time$ [DM] $username$<br>$text$">
                   <div class="input-field col s8">
                     <input id="dm_template_log" name="template_log" type="text">
                     <label for="dm_template_log">チャット</label>
@@ -150,7 +126,7 @@
                   </div>
                 </div>
                 <div class="input-field col s12"><strong>テンプレート - 棒読みちゃん</strong></div>
-                <div class="template" data-template="DM $name$さん $text$">
+                <div class="template" data-template="DM $username$さん $text$">
                   <div class="input-field col s8">
                     <input id="dm_template_bym" name="template_bym" type="text">
                     <label for="dm_template_bym">チャット</label>
@@ -158,9 +134,9 @@
                   <div class="input-field col s4 center-align">
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
-                  <div class="col s12">
-                    <div id="directmessage-list" class="collection"></div>
-                  </div>
+                </div>
+                <div class="col s12">
+                  <div id="directmessage-list" class="collection"></div>
                 </div>
               </div>
             </div>
@@ -168,7 +144,7 @@
             <div id="group" class="collection col s12 display-none">
               <div class="row section">
                 <div class="input-field col s12"><strong>テンプレート - ログ</strong></div>
-                <div class="template" data-template="$time$ [GroupDM] $name$<br>$text$">
+                <div class="template" data-template="$time$ [GroupDM - $group$] $username$<br>$text$">
                   <div class="input-field col s8">
                     <input id="gr_template_log" name="template_log" type="text">
                     <label for="gr_template_log">チャット</label>
@@ -178,7 +154,7 @@
                   </div>
                 </div>
                 <div class="input-field col s12"><strong>テンプレート - 棒読みちゃん</strong></div>
-                <div class="template" data-template="グループDM $name$さん $text$">
+                <div class="template" data-template="グループDM $username$さん $text$">
                   <div class="input-field col s8">
                     <input id="gr_template_bym" name="template_bym" type="text">
                     <label for="gr_template_bym">チャット</label>
@@ -196,7 +172,7 @@
             <div id="server" class="collection col s12 display-none">
               <div class="row section">
                 <div class="input-field col s12"><strong>テンプレート - ログ</strong></div>
-                <div class="template" data-template="$time$ [$server$ $channel$] $name$<br>$text$">
+                <div class="template" data-template="$time$ [$server$ $channel$] $username$<br>$text$">
                   <div class="input-field col s8">
                     <input id="sv_template_log" name="template_log" type="text">
                     <label for="sv_template_log">チャット</label>
@@ -205,7 +181,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$time$ [$server$] <br>$name$が$channel$に参加しました">
+                <div class="template" data-template="$time$ [$server$] <br>$username$が$channel$に参加しました">
                   <div class="input-field col s8">
                     <input id="sv_template_log_vc_in" name="template_log_vc_in" type="text">
                     <label for="sv_template_log_vc_in">ボイスチャンネル 参加時</label>
@@ -214,7 +190,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$time$ [$server$] <br>$name$が$channel-prev$から$channel-next$に移動しました">
+                <div class="template" data-template="$time$ [$server$] <br>$username$が$channel-prev$から$channel-next$に移動しました">
                   <div class="input-field col s8">
                     <input id="sv_template_log_vc_change" name="template_log_vc_change" type="text">
                     <label for="sv_template_log_vc_change">ボイスチャンネル 移動時</label>
@@ -223,7 +199,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$time$ [$server$] <br>$name$が$channel$から退出しました">
+                <div class="template" data-template="$time$ [$server$] <br>$username$が$channel$から退出しました">
                   <div class="input-field col s8">
                     <input id="sv_template_log_vc_out" name="template_log_vc_out" type="text">
                     <label for="sv_template_log_vc_out">ボイスチャンネル 退出時</label>
@@ -233,7 +209,7 @@
                   </div>
                 </div>
                 <div class="input-field col s12"><strong>テンプレート - 棒読みちゃん</strong></div>
-                <div class="template" data-template="$server$ $channel$ $name$さん $text$">
+                <div class="template" data-template="$server$ $channel$ $username$さん $text$">
                   <div class="input-field col s8">
                     <input id="sv_template_bym" name="template_bym" type="text">
                     <label for="sv_template_bym">チャット</label>
@@ -242,7 +218,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$server$ $name$が$channel$に参加しました">
+                <div class="template" data-template="$server$ $username$が$channel$に参加しました">
                   <div class="input-field col s8">
                     <input id="sv_template_bym_vc_in" name="template_bym_vc_in" type="text">
                     <label for="sv_template_bym_vc_in">ボイスチャンネル 参加時</label>
@@ -251,7 +227,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$server$ $name$が$channel-prev$から$channel-next$に移動しました">
+                <div class="template" data-template="$server$ $username$が$channel-prev$から$channel-next$に移動しました">
                   <div class="input-field col s8">
                     <input id="sv_template_bym_vc_change" name="template_bym_vc_change" type="text">
                     <label for="sv_template_bym_vc_change">ボイスチャンネル 移動時</label>
@@ -260,7 +236,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$server$ $name$が$channel$から退出しました">
+                <div class="template" data-template="$server$ $username$が$channel$から退出しました">
                   <div class="input-field col s8">
                     <input id="sv_template_bym_vc_out" name="template_bym_vc_out" type="text">
                     <label for="sv_template_bym_vc_change">ボイスチャンネル 退出時</label>
@@ -310,6 +286,7 @@
         </div>
       </div>
     </div>
+    <!-- 読み上げボタン -->
     <div class="fixed-action-btn">
       <a id="start" class="btn-floating btn-large blue">
         <i class="large material-icons">mic</i>
@@ -318,7 +295,8 @@
         <i class="large material-icons">mic_off</i>
       </a>
     </div>
-    <div id="modal" class="modal">
+    <!-- モーダル -->
+    <div id="modal_discord" class="modal">
       <div class="modal-content">
         <div class="row">
           <div class="col s12 center-align row section">

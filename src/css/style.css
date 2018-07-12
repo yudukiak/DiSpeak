@@ -74,6 +74,9 @@ main .tabs .indicator {
   padding: 10px;
   cursor: pointer;
 }
+#setting_menu .waves-effect {
+  display: list-item;
+}
 #setting_table .row {
   margin-bottom: 0;
 }
@@ -159,18 +162,19 @@ textarea.materialize-textarea:focus:not([readonly])+label {
   right: auto;
   left: 5%;
   bottom: 7%;
-  width: 320px;
+  min-width: 320px;
+  max-width: 86%;
 }
-#modal.modal {
+main .modal {
   height: 100%;
   bottom: 10%;
 }
-#modal .modal-content {
+main .modal-content {
   height: 100%;
   display: table;
   width: 100%;
 }
-#modal .modal-content .row {
+main .modal-content .row {
   display: table-cell;
   vertical-align: middle;
 }
@@ -180,6 +184,9 @@ main .modal-overlay {
 .collection:empty {
   margin: 0;
   border: none;
+}
+#dispeak i.small {
+  font-size: 1.5rem;
 }
 /* ********************
   その他
@@ -209,4 +216,9 @@ b, strong {
 }
 .display-none {
   display: none;
+}
+.emoji {
+  height: 20px;
+  width: 20px;
+  margin: 0 1px;
 }
