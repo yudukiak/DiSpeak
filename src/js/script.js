@@ -1,10 +1,10 @@
-'use strict';
 const {ipcRenderer} = require('electron');
 const Discord = require('discord.js');
 const $ = require('jquery');
+const net = require('net');
 const srcDirectory = ipcRenderer.sendSync('directory-app-check').replace(/\\/g, '/');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
-const bouyomiConnect = require(`${srcDirectory}/js/bouyomiConnect.js`);
+//const bouyomiConnect = require(`${srcDirectory}/js/bouyomiConnect.js`);
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
 // 設定ファイルを読み込む
@@ -38,23 +38,17 @@ $(function() {
           classes: 'toast-chips'
         });
       } else if (lastImg == null) {
-        const userData = client.users.get(lastTag);
-        const userName = userData.username;
-        const userDiscriminator = userData.discriminator;
-        const useAvatarURL = (function() {
-          if (userData.avatarURL == null) return userData.defaultAvatarURL;
-          return userData.avatarURL.replace(/\?size=\d+/, '');
-        })();
-        instance.deleteChip(aryLen);
-        instance.addChip({
-          tag: `${userName}#${userDiscriminator} (${lastTag})`,
-          image: useAvatarURL
-        });
-        // 少し時間差を置いてファイルへ書き込みさせます。ダサい実装なので調整したい
-        setTimeout(function() {
+        const userData = client.users.get(tag);
+        if (userData == null) {
+          instance.deleteChip(len);
+          M.toast({
+            html: `${tag}は存在しないIDです`,
+            classes: 'toast-chips'
+          });
+        } else {
+          chipWrite(userData, lastTag, aryLen);
           writeFile();
-          debugLog('[Discord] onChipAdd', userData);
-        }, 100);
+        }
       }
     }
   });
@@ -212,6 +206,8 @@ client.on('ready', function() {
   M.Modal.getInstance($('#modal_discord')).close();
   $('#offline').css('display', 'none');
   $('#online').css('display', 'inline-block');
+  $('#blacklist > .row.section').eq(0).addClass('display-none'); // blacklistを非表示
+  $('#blacklist > .row.section').eq(1).removeClass('display-none'); // プログレスを表示
   M.toast({
     html: 'Discordのログインに成功しました',
     classes: 'toast-discord'
@@ -304,6 +300,16 @@ client.on('ready', function() {
     html += '</div></div>';
     $('#server-list').append(html);
   }
+  // チップの処理（時間を置かないとうまく取得できない）
+  setTimeout(function(){
+    $('#blacklist > .row.section').eq(0).removeClass('display-none'); // blacklistを表示
+    $('#blacklist > .row.section').eq(1).addClass('display-none'); // プログレスを非表示
+    $('#blacklist .chip').each(function(i) {
+      const id = $(this).text().replace(/[^0-9]/g, '');
+      const userData = client.users.get(id);
+      chipWrite(userData, id, i);
+    });
+  }, 1000*10);
   // 設定ファイルを反映
   readFile();
 });
@@ -400,8 +406,10 @@ client.on('message', function(data) {
     && setting.directmessage[authorId] != null // settingに無い場合はスルー（主に自分のチャット）
     || channelType == 'group' && setting.group[channelId] == null // settingに無い場合は処理させない
     || channelType == 'group' && !setting.group[channelId] // 特定のグループDMを読み上げない時
+    || channelType == 'server' && setting.server[guildId] == null // settingに無い場合は処理させない
     || channelType == 'server' && setting.server[guildId].chat == null // settingに無い場合は処理させない
     || channelType == 'server' && !setting.server[guildId].chat // 特定のサーバーを読み上げない時
+    || channelType == 'server' && setting.server[guildId] == null // settingに無い場合は処理させない
     || channelType == 'server' && setting.server[guildId][channelId] == null // settingに無い場合は処理させない
     || channelType == 'server' && !setting.server[guildId][channelId] // 特定のサーバーのチャンネルを読み上げない時
   ) return;
@@ -577,6 +585,18 @@ function loginDiscord(token) {
     });
   });
 }
+// チップ
+function chipWrite(userData, tag, len) {
+  debugLog('[Discord] onChipAdd', userData);
+  if (userData == null) return;
+  const userName = userData.username;
+  const userDiscriminator = userData.discriminator;
+  const useAvatarURL = (function() {
+    if (userData.avatarURL == null) return userData.defaultAvatarURL;
+    return userData.avatarURL.replace(/\?size=\d+/, '');
+  })();
+  $('#blacklist .chip').eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`)
+}
 // 棒読みちゃん起動
 function bouyomiExeStart() {
   debugLog('[bouyomiExeStart] check', bouyomiExeStartCheck);
@@ -591,10 +611,7 @@ function bouyomiExeStart() {
   // 棒読みちゃんに起動した旨を読ませる
   if (bouyomiExeStartCheck) {
     const data = '読み上げを開始しました';
-    // 少し時間差を置いて読ませる。ダサい実装なので調整したい
-    setTimeout(function() {
-      bouyomiSpeak(data);
-    }, 3000);
+    bouyomiSpeak(data);
   } else {
     bouyomiSpeakCheck = false; // 読み上げない状態に変更
     $('#stop').css('display', 'none');
@@ -605,14 +622,48 @@ function bouyomiExeStart() {
     });
   }
 };
+let bouyomiRetryNum = 0;
 // 棒読みちゃんにdataを渡す
 function bouyomiSpeak(data) {
-  debugLog('[bouyomiSpeak] data', data);
+  bouyomiRetryNum ++
+  debugLog(`[bouyomiSpeak] data (retry${bouyomiRetryNum})`, data);
   if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return;
   const bouyomiServer = {};
   bouyomiServer.host = setting.bouyomi.ip;
   bouyomiServer.port = setting.bouyomi.port;
-  bouyomiConnect.sendBouyomi(bouyomiServer, data);
+  const options = bouyomiServer;
+  const message = data;
+  const client = net.createConnection(options, () => {
+    let messageBuffer = new Buffer(message);
+    let buffer = new Buffer(15 + messageBuffer.length);
+    buffer.writeUInt16LE(0x0001, 0);
+    buffer.writeUInt16LE(0xFFFF, 2);
+    buffer.writeUInt16LE(0xFFFF, 4);
+    buffer.writeUInt16LE(0xFFFF, 6);
+    buffer.writeUInt16LE(0000, 8);
+    buffer.writeUInt8(00, 10);
+    buffer.writeUInt32LE(messageBuffer.length, 11);
+    messageBuffer.copy(buffer, 15, 0, messageBuffer.length);
+    client.write(buffer);
+  });
+  // エラー（接続できなかったときなど）
+  client.on('error', (e) => {
+    if (bouyomiRetryNum == 10) {
+      errorLog('[bouyomiSpeak] error', e);
+      client.end();
+    } else {
+      setTimeout(function() {
+        bouyomiSpeak(message);
+      }, 100);
+    }
+  });
+  client.on('data', (e) => {
+    client.end();
+  });
+  // 接続が完了したとき
+  client.on('end', () => {
+    bouyomiRetryNum = 0;
+  });
 };
 // ログを書き出す
 function logProcess(html, image) {
@@ -654,7 +705,7 @@ function escapeHtml(str) {
 }
 // エラーをログへ書き出す
 function errorLog(fnc, error) {
-  debugLog(fnc, error);
+  console.error(`[${fnc}]`, error);
   const errorStr = (function() {
     if (toString.call(error) == '[object Event]') return JSON.stringify(error);
     return String(error);

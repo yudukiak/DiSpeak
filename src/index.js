@@ -258,8 +258,9 @@ ipcMain.on('window-maximize', () => {
   }
 });
 ipcMain.on('window-close', () => {
-  const close = appSettingObj.dispeak.close;
-  if (close) {
+  if (appSettingObj == null || appSettingObj.dispeak == null){
+    mainWindow.hide();
+  } else if (appSettingObj.dispeak.close) {
     app.quit();
   } else {
     mainWindow.hide();
@@ -400,7 +401,8 @@ function taskTrayMenu() {
       label: '終了する',
       position: 'endof=cmd',
       click: function() {
-        mainWindow.close();
+        //mainWindow.close();
+        app.quit();
       }
     }
   ];

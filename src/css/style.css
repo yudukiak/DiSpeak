@@ -188,6 +188,12 @@ main .modal-overlay {
 #dispeak i.small {
   font-size: 1.5rem;
 }
+.chip > div {
+  width: 385px;
+  height: 32px;
+  display: inline-block;
+  overflow: hidden;
+}
 /* ********************
   その他
 ******************** */
