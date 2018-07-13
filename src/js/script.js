@@ -4,7 +4,6 @@ const $ = require('jquery');
 const net = require('net');
 const srcDirectory = ipcRenderer.sendSync('directory-app-check').replace(/\\/g, '/');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
-//const bouyomiConnect = require(`${srcDirectory}/js/bouyomiConnect.js`);
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
 // 設定ファイルを読み込む
@@ -17,12 +16,15 @@ let bouyomiExeStartCheck = false; // 棒読みちゃんは f:起動してない,
 $(function() {
   // materializeの処理
   M.AutoInit();
+  M.Modal.init($('.modal'), {
+    dismissible: false
+  });
   M.Chips.init($('.chips'), {
     placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
     secondaryPlaceholder: '+ ユーザーのIDを追加する',
     data: (function() {
       if (setting == null) return [];
-      return setting.blacklist; // メモ 正規表現は/\((\d+)\)$/
+      return setting.blacklist;
     })(),
     onChipAdd: function() {
       const instance = M.Chips.getInstance($('.chips'));
@@ -38,11 +40,11 @@ $(function() {
           classes: 'toast-chips'
         });
       } else if (lastImg == null) {
-        const userData = client.users.get(tag);
+        const userData = client.users.get(lastTag);
         if (userData == null) {
-          instance.deleteChip(len);
+          instance.deleteChip(aryLen);
           M.toast({
-            html: `${tag}は存在しないIDです`,
+            html: `${lastTag}は存在しないIDです`,
             classes: 'toast-chips'
           });
         } else {
@@ -52,6 +54,8 @@ $(function() {
       }
     }
   });
+  // バージョンを記入
+  $('#info p').eq(0).text(`v${nowVersion}`);
   // デフォルトのテンプレートを反映
   $('#directmessage .template, #group .template, #server .template').each(function() {
     const data = $(this).data('template');
@@ -193,6 +197,39 @@ $(function() {
       writeFile();
     }
   });
+  // バージョンチェック
+  $(document).on('click', '#info button', function() {
+    ipcRenderer.send('version-check');
+  });
+  // エラーをわざと出す（後で削除します）
+  $(document).on('click', '#log img', function() {
+    console.log(this_variable_is_error);
+  });
+  // エラーログを送信しますか？
+  $(document).on('click', '.toast-error button', function() {
+    const error = $(this).data('error');
+    const errorDom = $(this).parents('.toast-error');
+    const errorLog = errorDom.find('.display-none').text();
+    $('#textarea_error').val(errorLog);
+    M.Toast.getInstance(errorDom).dismiss();
+    // モーダルを表示
+    if (error) {
+      M.Modal.getInstance($('#modal_error')).open();
+      M.textareaAutoResize($('#textarea_error'));
+    }
+  });
+  // エラーログを送信します
+  $(document).on('click', '#modal_error a', function() {
+    const error = $(this).data('error');
+    const errorLog = $('#textarea_error').val();
+    if (error) {
+      // どこかにPOSTする予定
+      // リザルトはtoastで表示するだけ
+      console.log(errorLog);
+    }
+    $('#textarea_error').val();
+    $('#textarea_error').css('height','0');
+  });
 });
 
 // ------------------------------
@@ -202,7 +239,6 @@ $(function() {
 client.on('ready', function() {
   debugLog('[Discord] ready', client);
   loginDiscordCheck = true; // ログインしたのでtrueへ変更
-  M.Modal.init($('.modal'));
   M.Modal.getInstance($('#modal_discord')).close();
   $('#offline').css('display', 'none');
   $('#online').css('display', 'inline-block');
@@ -223,7 +259,7 @@ client.on('ready', function() {
   $('#discord-profile img').attr('src', avatarURL);
   $('#discord-profile p').eq(1).text(`${username}#${discriminator}`);
   const loginTime = whatTimeIsIt();
-  const loginHtml = `${loginTime} [info] <br>Discordのログインに成功しました`;
+  const loginHtml = `${loginTime} [info]<br>Discordのログインに成功しました`;
   logProcess(loginHtml, avatarURL);
   // 各チャンネル
   let serverObj = {}; // サーバーの処理を考える
@@ -301,7 +337,7 @@ client.on('ready', function() {
     $('#server-list').append(html);
   }
   // チップの処理（時間を置かないとうまく取得できない）
-  setTimeout(function(){
+  setTimeout(function() {
     $('#blacklist > .row.section').eq(0).removeClass('display-none'); // blacklistを表示
     $('#blacklist > .row.section').eq(1).addClass('display-none'); // プログレスを非表示
     $('#blacklist .chip').each(function(i) {
@@ -309,7 +345,7 @@ client.on('ready', function() {
       const userData = client.users.get(id);
       chipWrite(userData, id, i);
     });
-  }, 1000*10);
+  }, 1000 * 10);
   // 設定ファイルを反映
   readFile();
 });
@@ -324,11 +360,10 @@ client.on('reconnecting', function() {
 // ボイスチャンネルに参加（マイク、スピーカーのON/OFFも）
 client.on('voiceStateUpdate', function(data) {
   debugLog('[Discord] voiceStateUpdate', data);
-  //if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return; // 棒読みちゃんの読み上げが始まっていないときは処理しない
   if (client.user.id == data.id) return; // 自分自身のイベントは処理しない
   const guildId = data.guild.id; // サーバのID
-  const voice = setting.server[guildId].voice; // settingのtrueもしくはfalseを取得
-  if (!voice) return; // falseのとき読まない
+  if (setting.server[guildId] == null) return; // settingがない場合は読まない
+  if (setting.server[guildId].voice == false) return; // settingがfalseのとき読まない
   const guildChannel = data.guild.channels; // サーバのチャンネル一覧を取得
   // 切断チャンネル（参加時:undefined, 切断時:123456789012345678）
   const channelPrevID = data.voiceChannelID;
@@ -344,6 +379,12 @@ client.on('voiceStateUpdate', function(data) {
     if (channelNextData == null) return '';
     return channelNextData.name;
   })();
+  // ブラックリストの処理
+  const blacklist = setting.blacklist;
+  for (let i = 0, n = blacklist.length; i < n; i++) {
+    const blacklistTag = blacklist[i].tag;
+    if (blacklistTag == data.id) return;
+  }
   // テキストの生成
   const time = whatTimeIsIt(); // 現在の時刻
   const guildName = data.guild.name; // 対象サーバーの名前
@@ -383,7 +424,6 @@ client.on('voiceStateUpdate', function(data) {
 // チャットが送信された時
 client.on('message', function(data) {
   debugLog('[Discord] message', data);
-  //if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return; // 棒読みちゃんの読み上げが始まっていないときは処理しない
   const userId = client.user.id; // 自分のID
   const authorId = data.author.id; // チャットユーザーのID
   const settingMyChat = setting.dispeak.my_chat;
@@ -401,20 +441,24 @@ client.on('message', function(data) {
     if (channelType == 'server') return data.channel.guild.id;
     return '';
   })();
-  if (
-    channelType == 'directmessage' && !setting.directmessage[authorId] // 特定のDMを読み上げない時
-    && setting.directmessage[authorId] != null // settingに無い場合はスルー（主に自分のチャット）
-    || channelType == 'group' && setting.group[channelId] == null // settingに無い場合は処理させない
-    || channelType == 'group' && !setting.group[channelId] // 特定のグループDMを読み上げない時
-    || channelType == 'server' && setting.server[guildId] == null // settingに無い場合は処理させない
-    || channelType == 'server' && setting.server[guildId].chat == null // settingに無い場合は処理させない
-    || channelType == 'server' && !setting.server[guildId].chat // 特定のサーバーを読み上げない時
-    || channelType == 'server' && setting.server[guildId] == null // settingに無い場合は処理させない
-    || channelType == 'server' && setting.server[guildId][channelId] == null // settingに無い場合は処理させない
-    || channelType == 'server' && !setting.server[guildId][channelId] // 特定のサーバーのチャンネルを読み上げない時
-  ) return;
-  // ここにブラックリストの処理を書きます
-
+  if (channelType == 'directmessage' && userId != authorId) {
+    // settingにDMIDがない or 特定のDMを読み上げない
+    if (setting.directmessage[authorId] == null || !setting.directmessage[authorId]) return;
+  } else if (channelType == 'group') {
+    // settingにグループDMIDがない or 特定のグループDMを読み上げない
+    if (setting.group[channelId] == null || !setting.group[channelId]) return;
+  } else if (channelType == 'server') {
+    // settingにサーバーIDがない or 特定のサーバーを読み上げない
+    if (setting.server[guildId] == null || !setting.server[guildId].chat) return;
+    // settingにチャンネルIDがない or 特定のチャンネルを読み上げない
+    if (setting.server[guildId][channelId] == null || !setting.server[guildId][channelId]) return;
+  }
+  // ブラックリストの処理
+  const blacklist = setting.blacklist;
+  for (let i = 0, n = blacklist.length; i < n; i++) {
+    const blacklistTag = blacklist[i].tag;
+    if (blacklistTag == authorId) return;
+  }
   // テキストの生成
   const template_bym = setting[channelType].template_bym;
   const template_log = setting[channelType].template_log;
@@ -472,21 +516,26 @@ client.on('message', function(data) {
 });
 // WebSocketに接続エラーが起きたときの処理
 client.on('error', function(data) {
-  errorLog('[Discord] error', data);
+  console.log('Discord error =>', data);
 });
 // 警告があった際の処理
 client.on('warn', function(data) {
-  errorLog('[Discord] warn', data);
+  console.log('Discord warn =>', data);
+});
+
+// ------------------------------
+// Electronからのメッセージ
+// ------------------------------
+ipcRenderer.on('log-error', (event, jsn) => {
+  const obj = JSON.parse(jsn);
+  errorLog(obj);
 });
 
 // ------------------------------
 // 各種エラーをキャッチ
 // ------------------------------
-process.on('uncaughtException', function(message) {
-  errorLog('[Error] uncaughtException', message);
-});
-process.on('unhandledRejection', function(message) {
-  errorLog('[Error] unhandledRejection', message);
+process.on('uncaughtException', (e) => {
+  erroeObj(e);
 });
 
 // ------------------------------
@@ -571,13 +620,9 @@ function writeFile() {
 function loginDiscord(token) {
   if (token == null || token == '') return;
   debugLog('[loginDiscord] token', token);
-  M.Modal.init($('.modal'), {
-    dismissible: false
-  });
   M.Modal.getInstance($('#modal_discord')).open();
   // 成功したらclient.on('ready')の処理が走る
   client.login(token).catch(function(error) {
-    M.Modal.init($('.modal'));
     M.Modal.getInstance($('#modal_discord')).close();
     M.toast({
       html: `ログインに失敗しました<br>${error}`,
@@ -588,22 +633,35 @@ function loginDiscord(token) {
 // チップ
 function chipWrite(userData, tag, len) {
   debugLog('[Discord] onChipAdd', userData);
-  if (userData == null) return;
-  const userName = userData.username;
-  const userDiscriminator = userData.discriminator;
-  const useAvatarURL = (function() {
-    if (userData.avatarURL == null) return userData.defaultAvatarURL;
-    return userData.avatarURL.replace(/\?size=\d+/, '');
-  })();
-  $('#blacklist .chip').eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`)
+  if (userData == null) {
+    $('#blacklist .chip').eq(len).html(`<img src="images/discord.png"><div>no data (${tag})</div><i class="material-icons close">close</i>`);
+  } else {
+    const userName = userData.username;
+    const userDiscriminator = userData.discriminator;
+    const useAvatarURL = (function() {
+      if (userData.avatarURL == null) return userData.defaultAvatarURL;
+      return userData.avatarURL.replace(/\?size=\d+/, '');
+    })();
+    $('#blacklist .chip').eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`);
+  }
 }
 // 棒読みちゃん起動
 function bouyomiExeStart() {
   debugLog('[bouyomiExeStart] check', bouyomiExeStartCheck);
   const bouyomiDir = setting.bouyomi.dir;
-  // 起動していない（false）場合のみ処理する
+  // exeが異なる
+  if (!bouyomiExeStartCheck && !/BouyomiChan\.exe/.test(bouyomiDir)) {
+    bouyomiSpeakCheck = false; // 読み上げない状態に変更
+    $('#stop').css('display', 'none');
+    $('#start').css('display', 'block');
+    M.toast({
+      html: `棒読みちゃんを起動できませんでした<br>ディレクトリを間違えていないかご確認ください`,
+      classes: 'toast-bouyomiExe'
+    });
+    return;
+  }
+  // 起動していない
   if (!bouyomiExeStartCheck) {
-    if (bouyomiDir == '' || !/BouyomiChan\.exe/.test(bouyomiDir)) return;
     const res = ipcRenderer.sendSync('bouyomi-exe-start', bouyomiDir);
     debugLog('[bouyomiExeStart] ipcRenderer', res);
     bouyomiExeStartCheck = res; // true:起動成功, false:起動失敗
@@ -625,15 +683,15 @@ function bouyomiExeStart() {
 let bouyomiRetryNum = 0;
 // 棒読みちゃんにdataを渡す
 function bouyomiSpeak(data) {
-  bouyomiRetryNum ++
-  debugLog(`[bouyomiSpeak] data (retry${bouyomiRetryNum})`, data);
+  debugLog(`[bouyomiSpeak] data (retry${bouyomiRetryNum + 1})`, data);
   if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return;
+  bouyomiRetryNum++
   const bouyomiServer = {};
   bouyomiServer.host = setting.bouyomi.ip;
   bouyomiServer.port = setting.bouyomi.port;
   const options = bouyomiServer;
   const message = data;
-  const client = net.createConnection(options, () => {
+  const bouyomiClient = net.createConnection(options, () => {
     let messageBuffer = new Buffer(message);
     let buffer = new Buffer(15 + messageBuffer.length);
     buffer.writeUInt16LE(0x0001, 0);
@@ -644,24 +702,25 @@ function bouyomiSpeak(data) {
     buffer.writeUInt8(00, 10);
     buffer.writeUInt32LE(messageBuffer.length, 11);
     messageBuffer.copy(buffer, 15, 0, messageBuffer.length);
-    client.write(buffer);
+    bouyomiClient.write(buffer);
   });
   // エラー（接続できなかったときなど）
-  client.on('error', (e) => {
+  bouyomiClient.on('error', (e) => {
     if (bouyomiRetryNum == 10) {
-      errorLog('[bouyomiSpeak] error', e);
-      client.end();
+      bouyomiRetryNum = 0;
+      erroeObj(e);
+      bouyomiClient.end();
     } else {
       setTimeout(function() {
         bouyomiSpeak(message);
       }, 100);
     }
   });
-  client.on('data', (e) => {
-    client.end();
+  bouyomiClient.on('data', (e) => {
+    bouyomiClient.end();
   });
   // 接続が完了したとき
-  client.on('end', () => {
+  bouyomiClient.on('end', () => {
     bouyomiRetryNum = 0;
   });
 };
@@ -703,48 +762,70 @@ function escapeHtml(str) {
   const rep = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   return rep;
 }
+// エラーログのオブジェクトを生成
+function erroeObj(e) {
+  const obj = {};
+  obj.process = 'renderer';
+  obj.message = e.message;
+  obj.stack = e.stack;
+  errorLog(obj);
+}
 // エラーをログへ書き出す
-function errorLog(fnc, error) {
-  console.error(`[${fnc}]`, error);
-  const errorStr = (function() {
-    if (toString.call(error) == '[object Event]') return JSON.stringify(error);
-    return String(error);
+function errorLog(obj) {
+  const time = whatTimeIsIt();
+  const msg = obj.message;
+  console.groupCollapsed(`%c${time} [Error] ${msg}`, 'color:red');
+  console.log('obj:', obj);
+  console.groupEnd();
+  //if (/Error: Cannot find module '\.\.\/setting\.json'/.test(msg)) return;
+  const msgTxt = (function() {
+    //if (/{"isTrusted":true}/.test(msg)) return 'インターネットに接続できません。再接続をします。';
+    //if (/TypeError: Failed to fetch/.test(msg)) return 'インターネットに接続できません。';
+    //if (/Error: Something took too long to do/.test(msg)) return 'Discordに接続できません。';
+    if (/connect ECONNREFUSED \d+\.\d+\.\d+\.\d+:\d+/.test(msg)) return '棒読みちゃんが起動していない、もしくは接続できません。';
+    //if (/Error: getaddrinfo ENOTFOUND/.test(msg)) return 'IPが正しくありません。';
+    //if (/RangeError: "port" option should be/.test(msg)) return 'ポートが正しくありません。';
+    //if (/Error: Incorrect login details were provided/.test(msg)) return 'トークンが正しくありません。';
+    //if (/Error: Uncaught, unspecified "error" event/.test(msg)) return 'エラーが発生しました。';
+    //if (/Error: The token is not filled in/.test(msg)) return 'トークンが記入されていません。';
+    if (/([0-9a-zA-Z]+) is not defined/.test(msg)) return 'エラーが発生しました';
+    return `エラーが発生しました`;
   })();
-  if (errorStr.match(/Error: Cannot find module '\.\.\/setting\.json'/)) return;
-  const errorMess = (function() {
-    if (errorStr.match(/{"isTrusted":true}/)) return 'インターネットに接続できません。再接続をします。';
-    if (errorStr.match(/TypeError: Failed to fetch/)) return 'インターネットに接続できません。';
-    if (errorStr.match(/Error: Something took too long to do/)) return 'Discordに接続できません。';
-    if (errorStr.match(/Error: connect ECONNREFUSED/)) return '棒読みちゃんが起動していない、もしくは接続できません。';
-    if (errorStr.match(/Error: getaddrinfo ENOTFOUND/)) return 'IPが正しくありません。';
-    if (errorStr.match(/RangeError: "port" option should be/)) return 'ポートが正しくありません。';
-    if (errorStr.match(/Error: Incorrect login details were provided/)) return 'トークンが正しくありません。';
-    if (errorStr.match(/Error: Uncaught, unspecified "error" event/)) return 'エラーが発生しました。';
-    if (errorStr.match(/Error: The token is not filled in/)) return 'トークンが記入されていません。';
-    if (errorStr.match(/ReferenceError: ([\s\S]*?) is not defined/)) return `変数 ${errorStr.split(' ')[1]} が定義されていません。@micelle9までご連絡ください。`;
-    return `不明なエラーが発生しました。（${errorStr}）`;
-  })();
-  if ($('toast-error').length > 6) return;
-  M.toast({
-    //displayLength:'stay',
-    html: errorMess,
-    classes: 'toast-error'
-  });
+  const jsn = JSON.stringify(obj);
+  const process = obj.process;
+  if ($('.toast-error').length) return;
+  // mainプロセスのエラー or エラーが発生しました
+  if (process == 'main' || msgTxt == 'エラーが発生しました') {
+    const toastHTML =
+      `<i class="material-icons red-text text-accent-1">highlight_off</i><span>${msgTxt}<br>エラーログを送信しますか？</span><span class="display-none">${jsn}</span>` +
+      '<div><button class="btn-flat toast-action" data-error="true">はい</button>' +
+      '<button class="btn-flat toast-action" data-error="false">いいえ</button></div>';
+    M.toast({
+      displayLength: 'stay',
+      html: toastHTML,
+      classes: 'toast-error'
+    });
+  }
+  // rendererプロセスのエラー
+  else if (process == 'renderer') {
+    const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxt}</span>`;
+    M.toast({
+      html: toastHTML,
+      classes: 'toast-error'
+    });
+  }
 }
 // デバッグ
 function debugLog(fnc, data) {
   if (setting == null || setting.dispeak.debug == false) return;
-  const time = new Date();
-  const hour = zeroPadding(time.getHours());
-  const min = zeroPadding(time.getMinutes());
-  const sec = zeroPadding(time.getSeconds());
+  const time = whatTimeIsIt();
   const type = toString.call(data);
   const text = (function() {
     if (/\[Discord\]/.test(fnc)) return '';
     if (/object (Event|Object)/.test(type)) return JSON.stringify(data);
     return String(data);
   })();
-  console.groupCollapsed(`${hour}:${min}:${sec} %s`, fnc);
+  console.groupCollapsed(`${time} %s`, fnc);
   console.log('type:', type);
   console.log('text:', text);
   console.log('data:', data);

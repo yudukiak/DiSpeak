@@ -153,9 +153,22 @@ textarea.materialize-textarea:focus:not([readonly])+label {
 }
 .toast {
   background-color: rgba(50, 50, 50, 0.95);
+  /*background-color: #323232;*/
 }
 .toast.toast-error {
-  background-color: rgba(244, 67, 54, 0.95);
+  /*background-color: rgba(183, 28, 28, 0.95);*/
+  /*background-color: #b71c1c;*/
+  justify-content: flex-start;
+}
+.toast.toast-error > div {
+  margin-left: 3rem;
+}
+.toast.toast-error .material-icons {
+  padding-right: 25px;
+}
+.toast.toast-error .toast-action {
+  margin: 0;
+  color: #fff;
 }
 #toast-container {
   top: auto;
@@ -168,6 +181,13 @@ textarea.materialize-textarea:focus:not([readonly])+label {
 main .modal {
   height: 100%;
   bottom: 10%;
+}
+main #modal_error.modal .modal-content {
+  padding-bottom: 0;
+  min-height: 100px;
+}
+main #modal_error.modal .modal-content textarea {
+  word-break:break-all;
 }
 main .modal-content {
   height: 100%;

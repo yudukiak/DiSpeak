@@ -56,6 +56,7 @@
               <li class="collection-item waves-effect waves-light">サーバー</li>
               <li class="collection-item waves-effect waves-light">棒読みちゃん</li>
               <li class="collection-item waves-effect waves-light">ブラックリスト</li>
+              <li class="collection-item waves-effect waves-light">DiSpeakについて</li>
             </ul>
           </div>
           <div id="setting_table" class="col s9">
@@ -275,7 +276,7 @@
             <div id="blacklist" class="collection col s12 display-none">
               <div class="row section">
                 <div class="col s12">
-                  <span class="helper-text">DM、グループDM、サーバーにてチャットを読ませたくないユーザーを個別に設定できます。</span>
+                  <span class="helper-text">特定のユーザーをブラックリストに追加することで「全てのチャット」と「サーバーのボイスチャンネル」の通知を読ませない・ログを表示させないことができます。</span>
                 </div>
                 <div class="col s12">
                   <div class="chips chips-placeholder"></div>
@@ -308,6 +309,28 @@
                       <div class="circle-clipper right"><div class="circle"></div></div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+            <!-- info -->
+            <div id="info" class="collection col s12">
+              <div class="row section valign-wrapper">
+                <div class="col s12 center-align">
+                  <h4>DiSpeak - でぃすぴーく</h4>
+                  <p></p>
+                  <p><button class="btn waves-effect waves-light indigo lighten-1" type="button">バージョンの確認<i class="material-icons left">swap_vert</i></button></p>
+                  <div class="col s6 center-align">
+                    <p><a href="https://github.com/micelle/dc_DiSpeak" target="_blank">Github</a></p>
+                  </div>
+                  <div class="col s6 center-align">
+                    <p><a href="https://github.com/micelle/dc_DiSpeak" target="_blank">Twitter @micelle9</a></p>
+                  </div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="row section valign-wrapper">
+                <div class="col s12 center-align">
+                  <p>&copy; 2018 micelle</p>
                 </div>
               </div>
             </div>
@@ -358,6 +381,21 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div id="modal_error" class="modal">
+      <div class="modal-content">
+        <div class="row">
+          <div class="col s12 input-field center-align">
+            <h4>エラーログを送信します</h4>
+            <p>以下の内容を送信します。<br>個人情報がある場合は修正してください。</p>
+            <textarea id="textarea_error" class="materialize-textarea"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat" data-error="false">キャンセル</a>
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat" data-error="true">送信</a>
       </div>
     </div>
   </main>

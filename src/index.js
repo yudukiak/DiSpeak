@@ -239,7 +239,8 @@ ipcMain.on('now-version-check', (event) => {
 });
 // 設定ファイルを返す
 ipcMain.on('setting-file-read', (event) => {
-  event.returnValue = readFileSync(appSetting);
+  appSettingObj = readFileSync(appSetting);
+  event.returnValue = appSettingObj;
 });
 // 設定ファイルを保存する
 ipcMain.on('setting-file-write', (event, data) => {
@@ -259,9 +260,9 @@ ipcMain.on('window-maximize', () => {
 });
 ipcMain.on('window-close', () => {
   if (appSettingObj == null || appSettingObj.dispeak == null){
-    mainWindow.hide();
+    mainWindow.close();
   } else if (appSettingObj.dispeak.close) {
-    app.quit();
+    mainWindow.close();
   } else {
     mainWindow.hide();
   }
@@ -286,62 +287,34 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
   });
 });
 ipcMain.on('bouyomi-exe-start', (event, data) => {
-  let child = execFile(data, (error, stdout, stderr) => {
-    //console.error("error=>", error);
-    //console.error("stdout=>", stdout);
-    //console.error("stderr=>", stderr);
-  });
+  let child = execFile(data, (error, stdout, stderr) => {});
   let res = (function(){
     if (child.pid == null) return false;
     return true;
   })();
-  //console.error("child=>", child);
   event.returnValue = res;
+});
+ipcMain.on('version-check', () => {
+  apiCheck('check');
 });
 // ------------------------------
 // その他
 // ------------------------------
 // エラーの処理
-process.on('uncaughtException', (err) => {
-  console.log(err);
-  let errStr = String(err);
-  let errMess = (function() {
-    if (errStr.match(/'toggleDevTools' of null/)) return '「でぃすぴーくについて」が開かれていません';
-    return '不明なエラー';
-  })();
-  let mesOptions = {
-    type: 'error',
-    buttons: ['OK'],
-    title: 'エラーが発生しました',
-    message: `${errMess}`,
-    detail: `詳細：\n${errStr}`
-  };
-  dialog.showMessageBox(mesOptions);
+process.on('uncaughtException', (e) => {
+  const obj = {};
+  obj.process = 'main';
+  obj.message = e.message;
+  obj.stack = e.stack;
+  const jsn = JSON.stringify(obj);
+  mainWindow.webContents.send('log-error', jsn);
 });
 // ウィンドウメニューをカスタマイズ
 function mainWindowMenu() {
   let template = [{
       label: 'メニュー',
-      submenu: [{
-          label: 'リロード',
-          accelerator: 'CmdOrCtrl+R',
-          click: function() {
-            mainWindow.reload();
-          }
-        },
+      submenu: [
         {
-          label: '終了する',
-          accelerator: 'CmdOrCtrl+W',
-          position: 'endof=cmd',
-          click: function() {
-            app.quit();
-          }
-        }
-      ]
-    },
-    {
-      label: 'ヘルプ',
-      submenu: [{
           label: 'Wikiを開く',
           accelerator: 'F1',
           click: function() {
@@ -349,19 +322,51 @@ function mainWindowMenu() {
           }
         },
         {
-          label: 'デバッグ - main',
-          accelerator: 'CmdOrCtrl+Shift+I',
-          position: 'endof=debug',
+          label: 'リロード',
+          accelerator: 'CmdOrCtrl+R',
+          position: 'endof=cmdctrl',
           click: function() {
-            mainWindow.toggleDevTools();
+            mainWindow.reload();
           }
         },
         {
           label: '最新のバージョンを確認',
           accelerator: 'CmdOrCtrl+H',
-          position: 'endof=info',
+          position: 'endof=cmdctrl',
           click: function() {
             apiCheck('check');
+          }
+        },
+        {
+          label: 'ウィンドウを閉じる',
+          accelerator: 'CmdOrCtrl+W',
+          position: 'endof=cmdctrl',
+          click: function() {
+            mainWindow.hide();
+          }
+        },
+        {
+          label: '終了する',
+          accelerator: 'CmdOrCtrl+Shift+Q',
+          position: 'endof=cmdctrlshift',
+          click: function() {
+            mainWindow.close();
+          }
+        },
+        {
+          label: 'デバッグ - main',
+          accelerator: 'CmdOrCtrl+Shift+I',
+          position: 'endof=cmdctrlshift',
+          click: function() {
+            mainWindow.toggleDevTools();
+          }
+        },
+        {
+          label: 'エラー',
+          accelerator: 'CmdOrCtrl+Shift+E',
+          position: 'endof=cmdctrlshift',
+          click: function() {
+            console.log(this_variable_is_error);
           }
         }
       ]
@@ -401,8 +406,7 @@ function taskTrayMenu() {
       label: '終了する',
       position: 'endof=cmd',
       click: function() {
-        //mainWindow.close();
-        app.quit();
+        mainWindow.close();
       }
     }
   ];
