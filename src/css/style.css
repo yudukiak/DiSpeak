@@ -1,5 +1,5 @@
 /* ********************
-  ヘッダー
+  header
 ******************** */
 header {
   -webkit-app-region: drag;
@@ -36,7 +36,7 @@ header > div:last-child:hover {
   background: #e81123;
 }
 /* ********************
-  メイン
+  main
 ******************** */
 main {
   overflow-y: scroll;
@@ -44,7 +44,7 @@ main {
   padding-top: .5rem;
 }
 main > .container {
-  width:100%;
+  width: 100%;
 }
 /* ********************
   tabs
@@ -68,7 +68,7 @@ main .tabs .indicator {
   min-height: 50px;
 }
 /* ********************
-  setting
+  setting_menu
 ******************** */
 #setting_menu .collection .collection-item {
   padding: 10px;
@@ -77,9 +77,24 @@ main .tabs .indicator {
 #setting_menu .waves-effect {
   display: list-item;
 }
+#setting_menu li:last-child span {
+  letter-spacing: -0.17em;
+}
+/* ********************
+  setting_table
+******************** */
 #setting_table .row {
   margin-bottom: 0;
 }
+/* ********************
+  dispeak
+******************** */
+#dispeak i.small {
+  font-size: 1.5rem;
+}
+/* ********************
+  server
+******************** */
 #server .row.section.right-align {
   margin-bottom: 20px;
   padding-top: 0px;
@@ -91,6 +106,9 @@ main .tabs .indicator {
 #server .collection .collection-item:first-child {
   border-top: 0;
 }
+/* ********************
+  blacklist
+******************** */
 #blacklist .chip {
   display: block;
 }
@@ -105,16 +123,76 @@ main .tabs .indicator {
 #blacklist .chip:focus {
   background-color: #5c6bc0;
 }
-
+/* ********************
+  info
+******************** */
+#info h4 {
+  margin: 14px 0;
+}
+#info svg {
+  width: 56px;
+  height: 56px;
+  fill: #607d8b;
+}
+/* ********************
+  toast
+******************** */
+.toast {
+  background-color: rgba(50, 50, 50, 0.95);
+  /*background-color: #323232;*/
+}
+.toast.toast-error {
+  /*background-color: rgba(183, 28, 28, 0.95);*/
+  /*background-color: #b71c1c;*/
+  justify-content: flex-start;
+}
+.toast.toast-error > div {
+  margin-left: 3rem;
+}
+.toast.toast-error .material-icons {
+  padding-right: 25px;
+}
+.toast.toast-error .toast-action {
+  margin: 0;
+  color: #fff;
+}
+#toast-container {
+  top: auto;
+  right: auto;
+  left: 5%;
+  bottom: 7%;
+  min-width: 320px;
+  max-width: 86%;
+}
+/* ********************
+  modal
+******************** */
+main .modal {
+  height: 100%;
+  bottom: 10%;
+}
+main #modal_error.modal .modal-content {
+  padding-bottom: 0;
+  min-height: 100px;
+}
+main #modal_error.modal .modal-content textarea {
+  word-break:break-all;
+}
+main .modal-content {
+  height: 100%;
+  display: table;
+  width: 100%;
+}
+main .modal-content .row {
+  display: table-cell;
+  vertical-align: middle;
+}
+main .modal-overlay {
+  top: 25px;
+}
 /* ********************
   各種微調整
 ******************** */
-.switch label input[type=checkbox]:checked+.lever {
-  background-color: #9fa8da;
-}
-.switch label input[type=checkbox]:checked+.lever:after {
-  background-color: #5c6bc0;
-}
 input[type=checkbox]:checked:not(:disabled) ~ .lever:active::before,
 input[type=checkbox]:checked:not(:disabled).tabbed:focus ~ .lever::before {
   background-color: rgba(92,107,192,0.15);
@@ -149,64 +227,17 @@ input[type=tel]:not(.browser-default):focus:not([readonly])+label,
 input[type=number]:not(.browser-default):focus:not([readonly])+label,
 input[type=search]:not(.browser-default):focus:not([readonly])+label,
 textarea.materialize-textarea:focus:not([readonly])+label {
-    color: #3949ab;
+  color: #3949ab;
 }
-.toast {
-  background-color: rgba(50, 50, 50, 0.95);
-  /*background-color: #323232;*/
+.switch label input[type=checkbox]:checked+.lever {
+  background-color: #9fa8da;
 }
-.toast.toast-error {
-  /*background-color: rgba(183, 28, 28, 0.95);*/
-  /*background-color: #b71c1c;*/
-  justify-content: flex-start;
-}
-.toast.toast-error > div {
-  margin-left: 3rem;
-}
-.toast.toast-error .material-icons {
-  padding-right: 25px;
-}
-.toast.toast-error .toast-action {
-  margin: 0;
-  color: #fff;
-}
-#toast-container {
-  top: auto;
-  right: auto;
-  left: 5%;
-  bottom: 7%;
-  min-width: 320px;
-  max-width: 86%;
-}
-main .modal {
-  height: 100%;
-  bottom: 10%;
-}
-main #modal_error.modal .modal-content {
-  padding-bottom: 0;
-  min-height: 100px;
-}
-main #modal_error.modal .modal-content textarea {
-  word-break:break-all;
-}
-main .modal-content {
-  height: 100%;
-  display: table;
-  width: 100%;
-}
-main .modal-content .row {
-  display: table-cell;
-  vertical-align: middle;
-}
-main .modal-overlay {
-  top: 25px;
+.switch label input[type=checkbox]:checked+.lever:after {
+  background-color: #5c6bc0;
 }
 .collection:empty {
   margin: 0;
   border: none;
-}
-#dispeak i.small {
-  font-size: 1.5rem;
 }
 .chip > div {
   width: 385px;
@@ -214,9 +245,7 @@ main .modal-overlay {
   display: inline-block;
   overflow: hidden;
 }
-/* ********************
-  その他
-******************** */
+/* その他 */
 html {
   background: #fff;
 }

@@ -42,20 +42,18 @@ $(function() {
       } else if (lastImg == null) {
         const userData = client.users.get(lastTag);
         if (userData == null) {
-          instance.deleteChip(aryLen);
           M.toast({
-            html: `${lastTag}は存在しないIDです`,
+            html: `ID「${lastTag}」が見つかりませんでした`,
             classes: 'toast-chips'
           });
-        } else {
-          chipWrite(userData, lastTag, aryLen);
-          writeFile();
         }
+        chipWrite(userData, lastTag, aryLen);
+        writeFile();
       }
     }
   });
   // バージョンを記入
-  $('#info p').eq(0).text(`v${nowVersion}`);
+  $('#info button span').eq(0).text(nowVersion);
   // デフォルトのテンプレートを反映
   $('#directmessage .template, #group .template, #server .template').each(function() {
     const data = $(this).data('template');
@@ -198,13 +196,13 @@ $(function() {
     }
   });
   // バージョンチェック
-  $(document).on('click', '#info button', function() {
+  $(document).on('click', '#version_check', function() {
     ipcRenderer.send('version-check');
   });
   // エラーをわざと出す（後で削除します）
-  $(document).on('click', '#log img', function() {
-    console.log(this_variable_is_error);
-  });
+  //$(document).on('click', '#log img', function() {
+  //  console.log(this_variable_is_error);
+  //});
   // エラーログを送信しますか？
   $(document).on('click', '.toast-error button', function() {
     const error = $(this).data('error');
@@ -223,12 +221,25 @@ $(function() {
     const error = $(this).data('error');
     const errorLog = $('#textarea_error').val();
     if (error) {
-      // どこかにPOSTする予定
-      // リザルトはtoastで表示するだけ
-      console.log(errorLog);
+      const url = 'https://script.google.com/macros/s/AKfycbwcp4mBcZ7bhzrPRf_WAzN5TziFQvZsl3utG-VO0hSRXDC1YbA/exec';
+      $.post(url, errorLog)
+        //サーバーからの返信を受け取る
+        .done(function(data) {
+          M.toast({
+            html: 'エラーログの送信が完了しました',
+            classes: 'toast-errorPost'
+          });
+        })
+        //通信エラーの場合
+        .fail(function() {
+          M.toast({
+            html: 'エラーログの送信に失敗しました',
+            classes: 'toast-errorPost'
+          });
+        });
     }
     $('#textarea_error').val();
-    $('#textarea_error').css('height','0');
+    $('#textarea_error').css('height', '0');
   });
 });
 
@@ -317,6 +328,7 @@ client.on('ready', function() {
       });
     }
   });
+  debugLog('[client ready] serverObj', serverObj);
   for (let id in serverObj) {
     const name = serverObj[id].name;
     const iconURL = serverObj[id].iconURL;
@@ -568,6 +580,7 @@ function readFile() {
   if ($('.toast-readFile').length) return;
   M.updateTextFields();
   debugLog('[readFile] obj', setting);
+  if (setting.dispeak.bouyomi) bouyomiExeStart();
 }
 // ファイルへ書き込み
 function writeFile() {
@@ -738,14 +751,18 @@ function logProcess(html, image) {
   }
 }
 // 現在の時刻を取得
-function whatTimeIsIt() {
+function whatTimeIsIt(iso) {
   const time = new Date();
   const year = time.getFullYear();
   const month = zeroPadding(time.getMonth() + 1);
   const day = zeroPadding(time.getDate());
   const hours = zeroPadding(time.getHours());
   const minutes = zeroPadding(time.getMinutes());
-  const text = `${year}/${month}/${day} ${hours}:${minutes}`;
+  const seconds = zeroPadding(time.getSeconds());
+  const text = (function() {
+    if (iso == null) return `${year}/${month}/${day} ${hours}:${minutes}`;
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+0900`;
+  })();
   return text;
 }
 // ゼロパディング
@@ -765,6 +782,8 @@ function escapeHtml(str) {
 // エラーログのオブジェクトを生成
 function erroeObj(e) {
   const obj = {};
+  obj.time = whatTimeIsIt(true);
+  obj.version = nowVersion;
   obj.process = 'renderer';
   obj.message = e.message;
   obj.stack = e.stack;
