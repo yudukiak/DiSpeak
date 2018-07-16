@@ -389,14 +389,14 @@ function mainWindowMenu() {
           mainWindow.toggleDevTools();
         }
       },
-      //{
-      //  label: 'エラー',
-      //  accelerator: 'CmdOrCtrl+Shift+E',
-      //  position: 'endof=cmdctrlshift',
-      //  click: function() {
-      //    console.log(this_variable_is_error);
-      //  }
-      //}
+      {
+        label: 'エラー',
+        accelerator: 'CmdOrCtrl+Shift+E',
+        position: 'endof=cmdctrlshift',
+        click: function() {
+          if (appSettingObj.dispeak.debug) console.log(this_variable_is_error);
+        }
+      }
     ]
   }];
   return template;

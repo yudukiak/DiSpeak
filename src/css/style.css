@@ -14,12 +14,13 @@ header > div:first-child {
   margin-right: auto;
   padding-left: 5px;
 }
-header > div:first-child img {
+header > div:first-child svg {
   /*height: calc(100% - 10px);*/
   height: 100%;
   width: auto;
   padding: 5px;
   padding: 5px;
+  fill: #fff;
 }
 header > div:not(:first-child) {
   -webkit-app-region: no-drag;
@@ -45,6 +46,9 @@ main {
 }
 main > .container {
   width: 100%;
+}
+main > .container > .row {
+  margin: 0;
 }
 /* ********************
   tabs
@@ -109,6 +113,9 @@ main .tabs .indicator {
 /* ********************
   blacklist
 ******************** */
+#blacklist img {
+  cursor: pointer;
+}
 #blacklist .chip {
   display: block;
 }
@@ -127,7 +134,8 @@ main .tabs .indicator {
   info
 ******************** */
 #info h4 {
-  margin: 14px 0;
+  margin: 0;
+  margin-top: 14px;
 }
 #info svg {
   width: 56px;
@@ -175,8 +183,18 @@ main #modal_error.modal .modal-content {
   padding-bottom: 0;
   min-height: 100px;
 }
-main #modal_error.modal .modal-content textarea {
-  word-break:break-all;
+#modal_error {
+  overflow-y: scroll;
+}
+#modal_error > div {
+  margin: 0;
+}
+#modal_error .modal-content.row {
+  height: auto;
+}
+#modal_error textarea,
+.hiddendiv.common {
+  word-break: break-all;
 }
 main .modal-content {
   height: 100%;
