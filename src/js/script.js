@@ -65,14 +65,26 @@ $(function() {
   });
   // 設定ファイルが存在しないとき（初回起動時）
   if (setting == null) {
+    const loginTime = whatTimeIsIt();
+    const loginHtml = `${loginTime} [info]<br>「設定 > Discord」からログインしてください`;
+    logProcess(loginHtml, 'images/discord.png');
     writeFile();
   }
   // 古い設定ファイルを使用しているとき
   else if (setting.version == null) {
+    const loginTime = whatTimeIsIt();
+    const loginHtml = `${loginTime} [info]<br>「設定」から各種設定をしてください`;
+    logProcess(loginHtml, 'images/discord.png');
     M.toast({
       html: 'v2.0未満の設定ファイルです<br>設定の読み込みを中止しました',
       classes: 'toast-load'
     });
+  }
+  // Discordのトークンがないとき
+  else if (setting.discord.token == '') {
+    const loginTime = whatTimeIsIt();
+    const loginHtml = `${loginTime} [info]<br>「設定」から各種設定をしてください`;
+    logProcess(loginHtml, 'images/discord.png');
   }
   // 設定ファイルが存在するとき
   else {
@@ -272,6 +284,7 @@ $(function() {
 // ログイン時
 client.on('ready', function() {
   debugLog('[Discord] ready', client);
+  if (loginDiscordCheck) return; // 既にログイン済みの場合処理をしない（再接続時など）
   loginDiscordCheck = true; // ログインしたのでtrueへ変更
   M.Modal.getInstance($('#modal_discord')).close();
   $('#offline').addClass('display-none');
@@ -830,6 +843,21 @@ function logProcess(html, image) {
     }
   }
 }
+// 連想配列にアクセス
+function objectCheck(obj, path) {
+  if (! (obj instanceof Object)) return null
+  if (/\./.test(path)) {
+    path = path.split('.');
+  } else {
+    path = [path];
+  }
+  let cursor = obj;
+  for (let i = 0; i < path.length; i++) {
+    if (cursor[path[i]] == null) return null; // 見つからないときはnullを
+    cursor = cursor[path[i]]; // 見つかったときはその情報を返す
+  }
+  return cursor;
+};
 // 現在の時刻を取得
 function whatTimeIsIt(iso) {
   const time = new Date();
@@ -915,7 +943,7 @@ function errorLog(obj) {
 }
 // デバッグ
 function debugLog(fnc, data) {
-  if (setting.dispeak.debug) {
+  if (objectCheck(setting, 'dispeak.debug')) {
     const time = whatTimeIsIt();
     const type = toString.call(data);
     const text = (function() {

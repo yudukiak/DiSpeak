@@ -140,12 +140,13 @@ function createMainwindow() {
   //ウィンドウサイズを設定する
   mainWindow = new BrowserWindow({
     frame: false,
-    show: false,
+    //show: false,
     width: 940,
     height: 500,
     minWidth: 640,
     minHeight: 480,
     icon: `${__dirname}/images/icon.png`,
+    backgroundColor: '#4a5459'
     //webPreferences: {nodeIntegration: false}
   });
   // ウィンドウメニューをカスタマイズ
@@ -165,9 +166,9 @@ function createMainwindow() {
   if (winSettingObj.maximized) mainWindow.maximize();
   if (winSettingObj.minimized) mainWindow.minimize();
   // ウィンドウの準備ができたら表示
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show();
-  });
+  //mainWindow.on('ready-to-show', () => {
+  //  mainWindow.show();
+  //});
   // ウィンドウが閉じる時
   mainWindow.on('close', () => {
     let ary = {};
