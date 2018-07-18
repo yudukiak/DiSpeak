@@ -548,8 +548,8 @@ client.on('message', function(data) {
   const contentEsc = escapeHtml(content);
   // 絵文字の処理をする
   const contentEscRep = contentEsc
-    .replace(/&lt;(:[0-9a-zA-Z]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
-    .replace(/&lt;a(:[0-9a-zA-Z]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
+    .replace(/&lt;(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
+    .replace(/&lt;a(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
   // テンプレートにはめ込み
   // $time$ $server$ $channel$ $group$ $channel-prev$ $channel-next$ $username$ $nickname$ $memo$ $text$
   const template_bymRep = template_bym
@@ -723,6 +723,7 @@ function serverChannel(index, val) {
     $(`#server-list > div:eq(${index}) > div:eq(2)`).addClass('display-none');
   }
 }
+// 再生開始の処理
 function startSpeak(thisId, siblingsId) {
   if ($('.toast-bouyomi').length) return;
   // 既にログインしていた場合
@@ -796,7 +797,7 @@ function bouyomiSpeak(data) {
   bouyomiServer.host = setting.bouyomi.ip;
   bouyomiServer.port = setting.bouyomi.port;
   const options = bouyomiServer;
-  const message = data.replace(/<a?(:[0-9a-zA-Z]+:)([0-9]+)>/g, '（スタンプ）').replace(/\s+/g, ' ').trim();;
+  const message = data.replace(/<a?(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)>/g, '（スタンプ）').replace(/\s+/g, ' ').trim();;
   const bouyomiClient = net.createConnection(options, () => {
     let messageBuffer = new Buffer(message);
     let buffer = new Buffer(15 + messageBuffer.length);
@@ -845,7 +846,7 @@ function logProcess(html, image) {
 }
 // 連想配列にアクセス
 function objectCheck(obj, path) {
-  if (! (obj instanceof Object)) return null
+  if (!(obj instanceof Object)) return null
   if (/\./.test(path)) {
     path = path.split('.');
   } else {
@@ -907,12 +908,12 @@ function errorLog(obj) {
   // ネットワークエラーなど
   if (/undefined/.test(msg) || /{"isTrusted":true}/.test(msg) || /Failed to fetch/.test(msg)) return;
   const msgTxt = (function() {
-    if (/Incorrect login details were provided/.test(msg)) return 'トークンが正しくありません。';
+    if (/Incorrect login details were provided/.test(msg)) return 'トークンが正しくありません';
     if (/Something took too long to do/.test(msg)) return 'Discordに接続できません';
     if (/getaddrinfo ENOTFOUND/.test(msg)) return 'IPが正しくありません';
     if (/"port" option should be/.test(msg)) return 'ポートが正しくありません';
     if (/connect ECONNREFUSED \d+\.\d+\.\d+\.\d+:\d+/.test(msg)) return '棒読みちゃんが起動していない、もしくは接続できません';
-    if (/$ is not a function/.test(msg)) return 'エラーが発生しました<br>Ctrl+Rで画面を更新してください';
+    if (/\$ is not a function/.test(msg)) return 'エラーが発生しました<br>Ctrl+Rで画面を更新してください';
     if (/([0-9a-zA-Z]+) is not defined/.test(msg)) return 'エラーが発生しました';
     //if (/Uncaught, unspecified "error" event/.test(msg)) return 'エラーが発生しました。';
     return `エラーが発生しました`;
@@ -932,8 +933,8 @@ function errorLog(obj) {
       classes: 'toast-error'
     });
   }
-  // rendererプロセスのエラー
-  else if (process == 'renderer') {
+  // rendererプロセスのエラーなど
+  else {
     const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxt}</span>`;
     M.toast({
       html: toastHTML,
