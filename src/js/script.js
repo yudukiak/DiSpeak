@@ -2,7 +2,6 @@ const {ipcRenderer} = require('electron');
 const Discord = require('discord.js');
 const $ = require('jquery');
 const net = require('net');
-const srcDirectory = ipcRenderer.sendSync('directory-app-check').replace(/\\/g, '/');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
@@ -85,6 +84,8 @@ $(function() {
     const loginTime = whatTimeIsIt();
     const loginHtml = `${loginTime} [info]<br>「設定」から各種設定をしてください`;
     logProcess(loginHtml, 'images/discord.png');
+    // 設定ファイルを反映
+    readFile();
   }
   // 設定ファイルが存在するとき
   else {
@@ -196,6 +197,7 @@ $(function() {
       writeFile();
     }
   });
+  // ブラックリストの情報を再取得
   $(document).on('click', '#blacklist img', function() {
     if ($(this).attr('src') != 'images/discord.png') return;
     const index = $('#blacklist img').index(this);
@@ -210,10 +212,6 @@ $(function() {
     } else {
       chipWrite(userData, id, index);
     }
-  });
-  // バージョンチェック
-  $(document).on('click', '#version_check', function() {
-    ipcRenderer.send('version-check');
   });
   // デバッグ
   $(document).on('click', '#info button:eq(0)', function() {

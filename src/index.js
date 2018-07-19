@@ -1,27 +1,62 @@
 'use strict';
+// デスクトップにショートカットアイコン追加
+if (require('electron-squirrel-startup')) return;
 // モジュールの読み込み
-const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain} = require('electron');
+const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain, autoUpdater} = require('electron');
 const {execFile} = require('child_process');
 const request = require('request');
 const fs = require('fs');
 const packageJson = require('./package.json');
-const appPath = app.getAppPath(); // "\dc_DiSpeak.git\src" "\DiSpeak\resources\app.asar"
-const repPath = appPath.replace(/\\src/, '').replace(/\\resources\\app\.asar/, ''); // '\dc_DiSpeak.git' '\DiSpeak'
-const exePath = app.getPath('exe'); // '\dc_DiSpeak.git\node_modules\electron\dist\electron.exe' '\DiSpeak\DiSpeak.exe'
 const userData = app.getPath('userData'); // \AppData\Roaming\DiSpeak
 // DiSpeakの設定ファイル
-const appSetting = `${repPath}\\setting.json`;
+const appSetting = `${userData}\\setting.json`;
 let appSettingObj = {};
 // windowの設定ファイル
-const winSetting = `${userData}\\setting.json`;
-let winSettingObj = readFileSync(winSetting);
+const winSetting = `${userData}\\window.json`;
+let winSettingObj = (function(){
+  const res = readFileSync(winSetting);
+  if (res == null) return {};
+  return res;
+})();
 // 変数の指定
 const nowVersion = packageJson['version'];
 const appName = app.getName();
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let tray = null;
 // 起動時にバージョンのチェックを行う
-apiCheck('start');
+autoUpdater.setFeedURL('https://prfac.com/dispeak/update');
+autoUpdater.checkForUpdates();
+autoUpdater.on("update-downloaded", () => {
+  const mesOptions = {
+    type: 'warning',
+    buttons: ['する', 'あとで'],
+    title: '再起動するっす？',
+    message: '新しいバージョンをダウンロードしたっす！',
+    detail: '再起動してインストールするっす？\nあとでを選んだときは終了時にインストールするっすよ。'
+  };
+  dialog.showMessageBox(mesOptions, function(res) {
+    if (res == 0) autoUpdater.quitAndInstall();
+  });
+});
+autoUpdater.on("update-not-available", () => {
+  const mesOptions = {
+    type: 'info',
+    buttons: ['OK'],
+    title: 'アップデートないっす！',
+    message: 'おぉ…！！',
+    detail: '最新のバージョンを使ってるっす。ありがとおぉおおぉっ！！'
+  };
+});
+autoUpdater.on("error", () => {
+  const mesOptions = {
+    type: 'error',
+    buttons: ['OK'],
+    title: 'エラーが発生したっす…',
+    message: '最新のバージョン取得に失敗しました。',
+    detail: '時間を置いてからご確認ください。お願いします。'
+  };
+  dialog.showMessageBox(mesOptions);
+});
 // Electronの初期化完了後に実行
 app.on('ready', () => {
   createMainwindow(); // mainWindowの生成
@@ -35,104 +70,6 @@ app.on('window-all-closed', () => {
 // ------------------------------
 // 処理用の関数
 // ------------------------------
-// APIチェック
-function apiCheck(status) {
-  const apiOptions = {
-    url: 'https://api.github.com/repos/micelle/dc_DiSpeak/releases/latest',
-    headers: {
-      'User-Agent': 'Awesome-Octocat-App'
-    },
-    json: true
-  };
-  request.get(apiOptions, function(err, res, data) {
-    if (!err && res.statusCode == 200) resCheck(data, status);
-  });
-}
-
-function resCheck(data, status) {
-  // APIの上限を超えたとき
-  if (data.message !== void 0 && status == 'check') {
-    const mesOptions = {
-      type: 'error',
-      buttons: ['OK'],
-      title: 'エラー',
-      message: '最新のバージョン取得に失敗しました。',
-      detail: '時間を置いてからご確認ください。お願いします。'
-    };
-    dialog.showMessageBox(mesOptions);
-    return;
-  }
-  // APIを取得できたとき
-  const relVer = data.tag_name;
-  //let relVer = (function(){if(status == 'check') return data.tag_name;return 'v11.45.14';})(); // テスト用
-  const relVer_v = relVer.replace(/v/g, '');
-  const relName = data.name;
-  // バージョンチェック
-  const nowVer = arraySplit(nowVersion);
-  const newVer = arraySplit(relVer_v);
-  const result = updateCheck(nowVer, newVer);
-  if (result) {
-    const mesOptions = {
-      type: 'warning',
-      buttons: ['Yes', 'No'],
-      title: relName,
-      message: 'おぉっと？',
-      detail: `お使いのバージョンは古いっす。ダウンロードページ開く？？\n\n` +
-        `現在のバージョン：${nowVersion}\n最新のバージョン：${relVer_v}`
-    };
-    dialog.showMessageBox(mesOptions, function(res) {
-      if (res == 0) {
-        shell.openExternal(data.html_url);
-      }
-    });
-  } else if (status == 'check') {
-    const mesOptions = {
-      type: 'info',
-      buttons: ['OK'],
-      title: relName,
-      message: 'おぉ…！！',
-      detail: `最新のバージョンを使ってるっす。ありがとおぉおおぉっ！！\n\n` +
-        `現在のバージョン：${nowVersion}\n最新のバージョン：${relVer_v}`
-    };
-    dialog.showMessageBox(mesOptions);
-  }
-}
-// バージョンを配列化
-function arraySplit(txt) {
-  const ary = txt.split('.');
-  const obj = [];
-  for (let v of ary) {
-    const num = Number(v);
-    obj.push(num);
-  }
-  return obj;
-}
-// バージョンの確認
-function updateCheck(nowVer, newVer) {
-  const nowMajor = nowVer[0],
-    nowMinor = nowVer[1],
-    nowBuild = nowVer[2],
-    newMajor = newVer[0],
-    newMinor = newVer[1],
-    newBuild = newVer[2];
-  if (newMajor > nowMajor) {
-    return true;
-  } else if (newMajor < nowMajor) {
-    return false;
-  } else
-  if (newMinor > nowMinor) {
-    return true;
-  } else if (newMinor < nowMinor) {
-    return false;
-  } else
-  if (newBuild > nowBuild) {
-    return true;
-  } else if (newBuild < nowBuild) {
-    return false;
-  } else {
-    return false;
-  }
-}
 // メインウィンドウの処理
 function createMainwindow() {
   // タスクトレイを表示
@@ -161,10 +98,12 @@ function createMainwindow() {
     shell.openExternal(url);
   });
   // winSettingObjに設定があれば処理する
-  const bounds = winSettingObj.bounds;
-  if (bounds) mainWindow.setBounds(bounds);
-  if (winSettingObj.maximized) mainWindow.maximize();
-  if (winSettingObj.minimized) mainWindow.minimize();
+  if (winSettingObj.bounds != null) {
+    const bounds = winSettingObj.bounds;
+    if (bounds) mainWindow.setBounds(bounds);
+    if (winSettingObj.maximized) mainWindow.maximize();
+    if (winSettingObj.minimized) mainWindow.minimize();
+  }
   // ウィンドウの準備ができたら表示
   //mainWindow.on('ready-to-show', () => {
   //  mainWindow.show();
@@ -250,16 +189,6 @@ function zeroPadding(num) {
 // ------------------------------
 // レンダラープロセスとのやりとり
 // ------------------------------
-// DiSpeakのディレクトリを返す
-ipcMain.on('directory-app-check', (event) => {
-  event.returnValue = appPath;
-});
-//ipcMain.on('directory-rep-check', (event) => {
-//  event.returnValue = repPath;
-//});
-//ipcMain.on('directory-exe-check', (event) => {
-//  event.returnValue = exePath;
-//});
 // 現在のバージョンを返す
 ipcMain.on('now-version-check', (event) => {
   event.returnValue = nowVersion;
@@ -320,9 +249,6 @@ ipcMain.on('bouyomi-exe-start', (event, data) => {
     return true;
   })();
   event.returnValue = res;
-});
-ipcMain.on('version-check', () => {
-  apiCheck('check');
 });
 // ------------------------------
 // その他

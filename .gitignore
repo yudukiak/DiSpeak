@@ -2,7 +2,8 @@
 /build/
 /dest/
 /dist/
-/test/
 /node_modules/
+/release/
 /src/node_modules/
+/test/
 /setting.json
