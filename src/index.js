@@ -13,7 +13,7 @@ const appSetting = `${userData}\\setting.json`;
 let appSettingObj = {};
 // windowの設定ファイル
 const winSetting = `${userData}\\window.json`;
-let winSettingObj = (function(){
+let winSettingObj = (() => {
   const res = readFileSync(winSetting);
   if (res == null) return {};
   return res;
@@ -25,7 +25,7 @@ let mainWindow = null; // メインウィンドウはGCされないようにグ�
 let tray = null;
 // 起動時にバージョンのチェックを行う
 autoUpdater.setFeedURL('https://prfac.com/dispeak/update');
-autoUpdater.checkForUpdates();
+try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
 autoUpdater.on("update-downloaded", () => {
   const mesOptions = {
     type: 'warning',
@@ -77,14 +77,17 @@ function createMainwindow() {
   //ウィンドウサイズを設定する
   mainWindow = new BrowserWindow({
     frame: false,
-    //show: false,
-    width: 940,
-    height: 500,
+    show: false,
+    width: 960,
+    height: 540,
     minWidth: 640,
-    minHeight: 480,
+    minHeight: 360,
     icon: `${__dirname}/images/icon.png`,
     backgroundColor: '#4a5459'
-    //webPreferences: {nodeIntegration: false}
+  });
+  // ウィンドウの準備ができたら表示
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
   });
   // ウィンドウメニューをカスタマイズ
   const template = mainWindowMenu();
@@ -104,10 +107,6 @@ function createMainwindow() {
     if (winSettingObj.maximized) mainWindow.maximize();
     if (winSettingObj.minimized) mainWindow.minimize();
   }
-  // ウィンドウの準備ができたら表示
-  //mainWindow.on('ready-to-show', () => {
-  //  mainWindow.show();
-  //});
   // ウィンドウが閉じる時
   mainWindow.on('close', () => {
     let ary = {};
@@ -136,7 +135,7 @@ function createTray() {
   const menu = Menu.buildFromTemplate(template)
   tray.setContextMenu(menu);
   tray.setToolTip(`${appName} v${nowVersion}`);
-  tray.on('click', function() {
+  tray.on('click', () => {
     mainWindow.show();
   });
 }
@@ -171,7 +170,7 @@ function whatTimeIsIt(iso) {
   const hours = zeroPadding(time.getHours());
   const minutes = zeroPadding(time.getMinutes());
   const seconds = zeroPadding(time.getSeconds());
-  const text = (function() {
+  const text = (() => {
     if (iso == null) return `${year}/${month}/${day} ${hours}:${minutes}`;
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+0900`;
   })();
@@ -180,7 +179,7 @@ function whatTimeIsIt(iso) {
 // ゼロパディング
 function zeroPadding(num) {
   const str = String(num);
-  const txt = (function() {
+  const txt = (() => {
     if (str.length == 1) return `0${str}`;
     return str;
   })();
@@ -235,7 +234,7 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
     properties: ['openFile'],
   };
   dialog.showOpenDialog(options, (filePaths) => {
-    const filePath = (function() {
+    const filePath = (() => {
       if (filePaths == void 0) return '';
       return filePaths[0];
     })();
@@ -244,7 +243,7 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
 });
 ipcMain.on('bouyomi-exe-start', (event, data) => {
   const child = execFile(data, (error, stdout, stderr) => {});
-  const res = (function() {
+  const res = (() => {
     if (child.pid == null) return false;
     return true;
   })();
@@ -272,57 +271,43 @@ function mainWindowMenu() {
       {
         label: 'Wikiを開く',
         accelerator: 'F1',
-        click: function() {
-          shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki');
-        }
+        click: () => {shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')}
       },
       {
         label: 'リロード',
         accelerator: 'CmdOrCtrl+R',
         position: 'endof=cmdctrl',
-        click: function() {
-          mainWindow.reload();
-        }
+        click: () => {mainWindow.reload()}
       },
       {
         label: '最新のバージョンを確認',
         accelerator: 'CmdOrCtrl+H',
         position: 'endof=cmdctrl',
-        click: function() {
-          apiCheck('check');
-        }
+        click:  () => {apiCheck('check')}
       },
       {
         label: 'ウィンドウを閉じる',
         accelerator: 'CmdOrCtrl+W',
         position: 'endof=cmdctrl',
-        click: function() {
-          mainWindow.hide();
-        }
+        click:  () => {mainWindow.hide()}
       },
       {
         label: '終了する',
         accelerator: 'CmdOrCtrl+Shift+Q',
         position: 'endof=cmdctrlshift',
-        click: function() {
-          mainWindow.close();
-        }
+        click:  () => {mainWindow.close()}
       },
       {
         label: 'デバッグ - main',
         accelerator: 'CmdOrCtrl+Shift+I',
         position: 'endof=cmdctrlshift',
-        click: function() {
-          mainWindow.toggleDevTools();
-        }
+        click:  () => {mainWindow.toggleDevTools()}
       },
       {
         label: 'エラー',
         accelerator: 'CmdOrCtrl+Shift+E',
         position: 'endof=cmdctrlshift',
-        click: function() {
-          if (appSettingObj.dispeak.debug) console.log(this_variable_is_error);
-        }
+        click:  () => {if (appSettingObj.dispeak.debug) console.log(this_variable_is_error)}
       }
     ]
   }];
@@ -333,36 +318,25 @@ function taskTrayMenu() {
   const template = [
     {
       label: '表示する',
-      click: function() {
-        mainWindow.show();
-      }
+      click: () => {mainWindow.show()}
     },
     {
       label: 'サイズを元に戻す',
-      click: function() {
-        mainWindow.setSize(940, 500);
-        mainWindow.center();
-      }
+      click: () => {mainWindow.setSize(960, 540), mainWindow.center()}
     },
     {
       label: 'バージョンの確認',
-      click: function() {
-        apiCheck('check');
-      }
+      click: () => {apiCheck('check')}
     },
     {
       label: 'Wikiを開く',
       position: 'endof=info',
-      click: function() {
-        shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki');
-      }
+      click: () => {shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')}
     },
     {
       label: '終了する',
       position: 'endof=cmd',
-      click: function() {
-        mainWindow.close();
-      }
+      click: () => {mainWindow.close()}
     }
   ];
   return template;

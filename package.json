@@ -7,13 +7,14 @@
     "discord.js": "^11.3.2",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.3.1",
-    "request": "^2.87.0"
+    "universal-analytics": "^0.4.17"
   },
   "devDependencies": {
     "archiver": "^2.1.1",
     "electron": "^1.8.4",
     "electron-packager": "^10.1.1",
-    "electron-winstaller": "^2.6.4"
+    "electron-winstaller": "^2.6.4",
+    "ftp-deploy": "^2.1.2"
   },
   "scripts": {},
   "repository": {

@@ -2,9 +2,11 @@ const {ipcRenderer} = require('electron');
 const Discord = require('discord.js');
 const $ = require('jquery');
 const net = require('net');
+const ua = require('universal-analytics');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
+const postUrl = 'https://script.google.com/macros/s/AKfycbwcp4mBcZ7bhzrPRf_WAzN5TziFQvZsl3utG-VO0hSRXDC1YbA/exec'
 // 設定ファイルを読み込む
 let setting = ipcRenderer.sendSync('setting-file-read');
 // 多重動作を防ぐ為の変数
@@ -14,8 +16,14 @@ let bouyomiExeStartCheck = false; // 棒読みちゃんは f:起動してない,
 // 回数を保持
 let debugNum = 0;
 let bouyomiRetryNum = 0;
+// analytics
+let clientID = (function() {
+  if (setting == null || setting.clientID == null) return '';
+  return setting.clientID;
+})();
 
 $(function() {
+  analytics();
   // materializeの処理
   M.AutoInit();
   M.Modal.init($('.modal'), {
@@ -25,7 +33,7 @@ $(function() {
     placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
     secondaryPlaceholder: '+ ユーザーのIDを追加する',
     data: (function() {
-      if (setting == null) return [];
+      if (setting == null || setting.blacklist == null) return [];
       return setting.blacklist;
     })(),
     onChipAdd: function() {
@@ -254,7 +262,7 @@ $(function() {
     const error = $(this).data('error');
     const errorLog = $('#textarea_error').val();
     if (error) {
-      const url = 'https://script.google.com/macros/s/AKfycbwcp4mBcZ7bhzrPRf_WAzN5TziFQvZsl3utG-VO0hSRXDC1YbA/exec';
+      const url = `${postUrl}?t=e`;
       $.post(url, errorLog)
         // サーバーからの返信を受け取る
         .done(function(data) {
@@ -665,6 +673,7 @@ function writeFile() {
   });
   setting_AutoSave.blacklist = M.Chips.getInstance($('.chips')).chipsData;
   setting_AutoSave.version = nowVersion;
+  setting_AutoSave.clientID = clientID;
   if (!setting_AutoSave.dispeak.debug) delete setting_AutoSave.dispeak.debug;
   if (JSON.stringify(setting) == JSON.stringify(setting_AutoSave)) return;
   setting = $.extend(true, {}, setting_AutoSave);
@@ -841,6 +850,18 @@ function logProcess(html, image) {
       logDom[i].remove();
     }
   }
+}
+// analytics
+function analytics() {
+  let visitor = ua('UA-56839189-2', clientID, {http: true});
+  clientID = visitor.cid;
+  visitor.pageview('/', 'http://example.com', `DiSpeak (${nowVersion})`).event('DiSpeak', nowVersion).send();
+  const url = `${postUrl}?t=a`;
+  let obj = {};
+  obj.time = whatTimeIsIt(true);
+  obj.version = nowVersion;
+  obj.clientID = clientID;
+  $.post(url, JSON.stringify(obj)).done(function(data) {}).fail(function() {});
 }
 // 連想配列にアクセス
 function objectCheck(obj, path) {
