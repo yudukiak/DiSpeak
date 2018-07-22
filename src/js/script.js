@@ -3,10 +3,12 @@ const Discord = require('discord.js');
 const $ = require('jquery');
 const net = require('net');
 const ua = require('universal-analytics');
+const markdown = require('markdown');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
 const postUrl = 'https://script.google.com/macros/s/AKfycbwcp4mBcZ7bhzrPRf_WAzN5TziFQvZsl3utG-VO0hSRXDC1YbA/exec'
+const releaseUrl = 'https://api.github.com/repos/micelle/dc_DiSpeak/releases';
 // 設定ファイルを読み込む
 let setting = ipcRenderer.sendSync('setting-file-read');
 // 多重動作を防ぐ為の変数
@@ -18,12 +20,13 @@ let debugNum = 0;
 let bouyomiRetryNum = 0;
 // analytics
 let clientID = (function() {
-  if (setting == null || setting.clientID == null) return '';
+  if (objectCheck(setting, 'clientID') == null) return '';
   return setting.clientID;
 })();
 
 $(function() {
   analytics();
+  $.get(releaseUrl, null, release, "json");
   // materializeの処理
   M.AutoInit();
   M.Modal.init($('.modal'), {
@@ -33,7 +36,7 @@ $(function() {
     placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
     secondaryPlaceholder: '+ ユーザーのIDを追加する',
     data: (function() {
-      if (setting == null || setting.blacklist == null) return [];
+      if (objectCheck(setting, 'blacklist') == null) return [];
       return setting.blacklist;
     })(),
     onChipAdd: function() {
@@ -136,15 +139,19 @@ $(function() {
   // タブ切り替え時に再生ボタンを表示・非表示
   $(document).on('click', '.tabs li', function() {
     const index = $('.tabs li').index(this);
-    if (index == 0) $('.fixed-action-btn').removeClass('display-none');
-    if (index == 1) $('.fixed-action-btn').addClass('display-none');
+    if (index == 0) {
+      $('.fixed-action-btn').removeClass('display-none');
+    } else {
+      $('.fixed-action-btn').addClass('display-none');
+    }
   });
   // 設定リストの切り替え
-  $(document).on('click', '#setting_menu li', function() {
-    const index = $('#setting_menu li').index(this);
-    $('#setting_table > div').addClass('display-none');
-    $('#setting_table > div').eq(index).removeClass('display-none');
-    $('#setting_menu li').removeClass('active blue');
+  $(document).on('click', '#setting_menu li, #help_menu li', function() {
+    const id = $(this).parents('div.col.s12').attr('id');
+    const index = $(`#${id}_menu li`).index(this);
+    $(`#${id}_table > div`).addClass('display-none');
+    $(`#${id}_table > div`).eq(index).removeClass('display-none');
+    $(`#${id}_menu li`).removeClass('active blue');
     $(this).addClass('active blue');
   });
   // 再生・停止
@@ -220,6 +227,10 @@ $(function() {
     } else {
       chipWrite(userData, id, index);
     }
+  });
+  // バージョンチェック
+  $(document).on('click', '#version_check', function() {
+    ipcRenderer.send('version-check');
   });
   // デバッグ
   $(document).on('click', '#info button:eq(0)', function() {
@@ -820,7 +831,7 @@ function bouyomiSpeak(data) {
   });
   // エラー（接続できなかったときなど）
   bouyomiClient.on('error', (e) => {
-    if (bouyomiRetryNum == 10) {
+    if (bouyomiRetryNum >= 10) {
       bouyomiRetryNum = 0;
       erroeObj(e);
       bouyomiClient.end();
@@ -841,7 +852,9 @@ function bouyomiSpeak(data) {
 // ログを書き出す
 function logProcess(html, image) {
   debugLog('[logProcess] html', html);
-  $('#log .collection').prepend(`<li class="collection-item avatar valign-wrapper"><img src="${image}" class="circle"><p>${html}</p></li>`);
+  const htmlAdd = `<li class="collection-item avatar valign-wrapper"><img src="${image}" class="circle"><p>${html}</p></li>`;
+  const emoji = twemoji.parse(htmlAdd);
+  $('#log .collection').prepend(emoji);
   // ログの削除
   const logDom = $('#log .collection li');
   const maxLine = 50; // 表示される最大行数
@@ -863,6 +876,29 @@ function analytics() {
   obj.clientID = clientID;
   $.post(url, JSON.stringify(obj)).done(function(data) {}).fail(function() {});
 }
+// 更新履歴を反映
+function release(data) {
+  let html = '';
+  let num = 1;
+  for (let i = 0, n = data.length; i < n; i++) {
+    const url = data[i].html_url;
+    const tag = data[i].tag_name;
+    const name = data[i].name;
+    const time = whatTimeIsIt(data[i].published_at);
+    const text = markdown.markdown.toHTML(data[i].body, 'Gruber').replace(/~~([^~]+)~~/g, '<del>$1</del>');
+    if (`v${nowVersion}` == tag) num = i + 1;
+    html +=
+      `<li><div class="collapsible-header"><i class="material-icons">library_books</i>${tag} (${time})</div>` +
+      `<div class="collapsible-body"><p><a href="${url}" target="_blank">${name}</a></p><p>${text}</p></div></li>`;
+  }
+  const emoji = twemoji.parse(html);
+  $('#release ul').append(emoji);
+  for (let i = 0; i < num; i++) $('#release > ul > li').eq(i).addClass('active');
+  $('#release > ul > li:eq(0) > .collapsible-header').append('<span class="new badge" data-badge-caption="Latest release"></span>');
+  M.Collapsible.init($('.collapsible.expandable'), {
+    accordion: false
+  });
+}
 // 連想配列にアクセス
 function objectCheck(obj, path) {
   if (!(obj instanceof Object)) return null
@@ -879,8 +915,11 @@ function objectCheck(obj, path) {
   return cursor;
 };
 // 現在の時刻を取得
-function whatTimeIsIt(iso) {
-  const time = new Date();
+function whatTimeIsIt(data) {
+  const time = (function() {
+    if (data == null || data == true) return new Date();
+    return new Date(data);
+  })();
   const year = time.getFullYear();
   const month = zeroPadding(time.getMonth() + 1);
   const day = zeroPadding(time.getDate());
@@ -888,7 +927,7 @@ function whatTimeIsIt(iso) {
   const minutes = zeroPadding(time.getMinutes());
   const seconds = zeroPadding(time.getSeconds());
   const text = (function() {
-    if (iso == null) return `${year}/${month}/${day} ${hours}:${minutes}`;
+    if (data == null || data != true) return `${year}/${month}/${day} ${hours}:${minutes}`;
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+0900`;
   })();
   return text;

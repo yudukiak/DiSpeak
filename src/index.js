@@ -4,7 +4,6 @@ if (require('electron-squirrel-startup')) return;
 // モジュールの読み込み
 const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain, autoUpdater} = require('electron');
 const {execFile} = require('child_process');
-const request = require('request');
 const fs = require('fs');
 const packageJson = require('./package.json');
 const userData = app.getPath('userData'); // \AppData\Roaming\DiSpeak
@@ -24,6 +23,8 @@ const appName = app.getName();
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let tray = null;
 // 起動時にバージョンのチェックを行う
+let updateCheckNum = 0; // 初回時の処理のため
+let updateDownloaded = false; // ダウンロード済みの場合true
 autoUpdater.setFeedURL('https://prfac.com/dispeak/update');
 try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
 autoUpdater.on("update-downloaded", () => {
@@ -34,18 +35,45 @@ autoUpdater.on("update-downloaded", () => {
     message: '新しいバージョンをダウンロードしたっす！',
     detail: '再起動してインストールするっす？\nあとでを選んだときは終了時にインストールするっすよ。'
   };
-  dialog.showMessageBox(mesOptions, function(res) {
-    if (res == 0) autoUpdater.quitAndInstall();
+  dialog.showMessageBox(mesOptions, (res) => {
+    if (res == 0) {
+      autoUpdater.quitAndInstall();
+    } else {
+      updateDownloaded = true;
+    }
   });
+  updateCheckNum = 1;
 });
 autoUpdater.on("update-not-available", () => {
-  const mesOptions = {
-    type: 'info',
-    buttons: ['OK'],
-    title: 'アップデートないっす！',
-    message: 'おぉ…！！',
-    detail: '最新のバージョンを使ってるっす。ありがとおぉおおぉっ！！'
-  };
+  // 二回目以降のときのみ処理する
+  if (updateCheckNum > 0) {
+    // ダウンロードが合った場合（＝ダウンロード済み）
+    if (updateDownloaded) {
+      const mesOptions = {
+        type: 'warning',
+        buttons: ['する', 'あとで'],
+        title: '再起動するっす？',
+        message: '新しいバージョンをダウンロードしたっす！',
+        detail: '再起動してインストールするっす？\nあとでを選んだときは終了時にインストールするっすよ。'
+      };
+      dialog.showMessageBox(mesOptions, (res) => {
+        if (res == 0) autoUpdater.quitAndInstall();
+      });
+    }
+    // ダウンロードが無かった場合
+    else {
+      const mesOptions = {
+        type: 'info',
+        buttons: ['OK'],
+        title: 'アップデートないっす！',
+        message: 'おぉ…！！',
+        detail: '最新のバージョンを使ってるっす。ありがとおぉおおぉっ！！'
+      };
+      dialog.showMessageBox(mesOptions);
+    }
+  } else {
+    updateCheckNum = 1;
+  }
 });
 autoUpdater.on("error", () => {
   const mesOptions = {
@@ -56,6 +84,7 @@ autoUpdater.on("error", () => {
     detail: '時間を置いてからご確認ください。お願いします。'
   };
   dialog.showMessageBox(mesOptions);
+  updateCheckNum = 1;
 });
 // Electronの初期化完了後に実行
 app.on('ready', () => {
@@ -80,8 +109,8 @@ function createMainwindow() {
     show: false,
     width: 960,
     height: 540,
-    minWidth: 640,
-    minHeight: 360,
+    minWidth: 768,
+    minHeight: 432,
     icon: `${__dirname}/images/icon.png`,
     backgroundColor: '#4a5459'
   });
@@ -249,6 +278,10 @@ ipcMain.on('bouyomi-exe-start', (event, data) => {
   })();
   event.returnValue = res;
 });
+// バージョンチェック
+ipcMain.on('version-check', () => {
+  try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
+});
 // ------------------------------
 // その他
 // ------------------------------
@@ -283,7 +316,7 @@ function mainWindowMenu() {
         label: '最新のバージョンを確認',
         accelerator: 'CmdOrCtrl+H',
         position: 'endof=cmdctrl',
-        click:  () => {apiCheck('check')}
+        click:  () => {try { autoUpdater.checkForUpdates(); } catch(e) {}} // batから起動したときの対策
       },
       {
         label: 'ウィンドウを閉じる',
@@ -298,7 +331,7 @@ function mainWindowMenu() {
         click:  () => {mainWindow.close()}
       },
       {
-        label: 'デバッグ - main',
+        label: 'デバッグ',
         accelerator: 'CmdOrCtrl+Shift+I',
         position: 'endof=cmdctrlshift',
         click:  () => {mainWindow.toggleDevTools()}
@@ -324,10 +357,10 @@ function taskTrayMenu() {
       label: 'サイズを元に戻す',
       click: () => {mainWindow.setSize(960, 540), mainWindow.center()}
     },
-    {
-      label: 'バージョンの確認',
-      click: () => {apiCheck('check')}
-    },
+    //{
+    //  label: 'バージョンの確認',
+    //  click: () => {apiCheck('check')}
+    //},
     {
       label: 'Wikiを開く',
       position: 'endof=info',
