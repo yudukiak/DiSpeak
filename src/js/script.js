@@ -868,7 +868,7 @@ function logProcess(html, image) {
 function analytics() {
   let visitor = ua('UA-56839189-2', clientID, {http: true});
   clientID = visitor.cid;
-  visitor.pageview('/', 'http://example.com', `DiSpeak (${nowVersion})`).event('DiSpeak', nowVersion).send();
+  visitor.pageview(`/DiSpeak/${nowVersion}`, 'http://example.com', `DiSpeak(${nowVersion})`).send();
   const url = `${postUrl}?t=a`;
   let obj = {};
   obj.time = whatTimeIsIt(true);
