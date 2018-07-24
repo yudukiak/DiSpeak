@@ -179,11 +179,23 @@ $(function() {
         loginDiscord(token);
       }
     } else {
+      const toastHTML =
+        '<i class="material-icons light-blue-text text-accent-1">phonelink_off</i><span>ログアウトしますか？<br>設定は初期化されます</span>' +
+        '<div><button class="btn-flat toast-action" data-logout="true">はい</button>' +
+        '<button class="btn-flat toast-action" data-logout="false">いいえ</button></div>';
       M.toast({
-        html: 'ログイン済みです<br>ログアウトする場合は設定ファイルを削除してください',
-        classes: 'toast-discord'
+        displayLength: 'stay',
+        html: toastHTML,
+        classes: 'toast-logout'
       });
     }
+  });
+  // ログアウト処理
+  $(document).on('click', '.toast-logout button', function() {
+    const logout = $(this).data('logout');
+    const logoutDom = $(this).parents('.toast-logout');
+    M.Toast.getInstance(logoutDom).dismiss();
+    if (logout) ipcRenderer.send('logout-process');
   });
   // テンプレートのリセット
   $(document).on('click', '#directmessage .template button, #group .template button, #server .template button', function() {

@@ -200,17 +200,20 @@ main .tabs .indicator {
   background-color: rgba(50, 50, 50, 0.95);
   /*background-color: #323232;*/
 }
+.toast.toast-logout,
 .toast.toast-error {
   /*background-color: rgba(183, 28, 28, 0.95);*/
   /*background-color: #b71c1c;*/
   justify-content: flex-start;
 }
+.toast.toast-logout > div
 .toast.toast-error > div {
   margin-left: 3rem;
 }
-.toast.toast-error .material-icons {
+.toast .material-icons {
   padding-right: 25px;
 }
+.toast.toast-logout .toast-action
 .toast.toast-error .toast-action {
   margin: 0;
   color: #fff;

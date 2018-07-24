@@ -282,6 +282,23 @@ ipcMain.on('bouyomi-exe-start', (event, data) => {
 ipcMain.on('version-check', () => {
   try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
 });
+// ログアウト処理
+ipcMain.on('logout-process', () => {
+  fs.unlink(appSetting, function (e) {
+    if (e) {
+      const obj = {};
+      obj.time = whatTimeIsIt(true);
+      obj.version = nowVersion;
+      obj.process = 'main';
+      obj.message = e.message;
+      obj.stack = e.stack;
+      const jsn = JSON.stringify(obj);
+      mainWindow.webContents.send('log-error', jsn);
+    } else {
+      mainWindow.reload();
+    }
+  });
+});
 // ------------------------------
 // その他
 // ------------------------------
