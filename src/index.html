@@ -56,6 +56,7 @@
               <li class="collection-item waves-effect waves-light">DM</li>
               <li class="collection-item waves-effect waves-light">グループDM</li>
               <li class="collection-item waves-effect waves-light">サーバー</li>
+              <li class="collection-item waves-effect waves-light">絵文字</li>
               <li class="collection-item waves-effect waves-light">棒読みちゃん</li>
               <li class="collection-item waves-effect waves-light">ブラックリスト</li>
             </ul>
@@ -254,6 +255,10 @@
                 </div>
               </div>
             </div>
+            <!-- 絵文字 -->
+            <div id="emojis" class="display-none">
+              <ul class="collapsible expandable"></ul>
+            </div>
             <!-- 棒読みちゃん -->
             <div id="bouyomi" class="collection col s12 display-none">
               <div class="row section">
@@ -322,6 +327,7 @@
           <div id="help_menu" class="col s3">
             <ul class="collection">
               <li class="collection-item waves-effect waves-light active blue">ショートカットキー</li>
+              <li class="collection-item waves-effect waves-light">テンプレート</li>
               <li class="collection-item waves-effect waves-light">更新履歴</li>
               <li class="collection-item waves-effect waves-light">DiSpeakについて</li>
             </ul>
@@ -346,6 +352,60 @@
                   <tr>
                     <td class="right-align"><strong>終了する</strong></td>
                     <td><span class="keyboard">Ctrl</span>+<span class="keyboard">Shift</span>+<span class="keyboard">Q</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- テンプレート -->
+            <div id="template" class="collection col s12 display-none">
+              <p>テンプレートのキーは「ログ・棒読みちゃん」どちらでも使えます。<br>「ログ」ではHTMLタグも利用できます。</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>キー</th>
+                    <th>説明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="text" value="$time$" readonly></td>
+                    <td><span>チャットの送信された日時（<span id="template_time"></span>）が挿入されます。</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$server$" readonly></td>
+                    <td><span>サーバー名が挿入されます。<br>※「サーバー」でのみ使用可能</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$channel$" readonly></td>
+                    <td><span>サーバーのチャンネル名が挿入されます。<br>※「サーバー」の「ボイスチャンネル 移動時」以外でのみ使用可能</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$channel-prev$" readonly></td>
+                    <td><span>ボイスチャンネルの移動時、切断したチャンネル名が挿入されます。<br>※「サーバー」の「ボイスチャンネル 移動時」でのみ使用可能</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$channel-next$" readonly></td>
+                    <td><span>ボイスチャンネルの移動時、接続したチャンネル名が挿入されます。<br>※「サーバー」の「ボイスチャンネル 移動時」でのみ使用可能</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$group$" readonly></td>
+                    <td><span>グループDM名が挿入されます。<br>※「グループDM」でのみ使用可能</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$username$" readonly></td>
+                    <td><span>ユーザー名が挿入されます。</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$nickname$" readonly></td>
+                    <td><span>ユーザーのニックネームが挿入されます。もしニックネームが無い場合は$username$が挿入されます<br>※「サーバー」でのみ使用可能</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$memo$" readonly></td>
+                    <td><span>ユーザーのメモが挿入されます。</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$text$" readonly></td>
+                    <td><span>チャットの本文が挿入されます。</span></td>
                   </tr>
                 </tbody>
               </table>

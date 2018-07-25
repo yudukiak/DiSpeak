@@ -67,6 +67,8 @@ $(function() {
   });
   // バージョンを記入
   $('#info button span').eq(0).text(nowVersion);
+  // 時刻を記入
+  $('#template_time').text(whatTimeIsIt());
   // デフォルトのテンプレートを反映
   $('#directmessage .template, #group .template, #server .template').each(function() {
     const data = $(this).data('template');
@@ -111,6 +113,10 @@ $(function() {
     // ログインの処理
     loginDiscord(setting.discord.token);
   }
+  // テンプレート フォーカス時選択する
+  $(document).on('focus', '#template input', function() {
+    $(this).select();
+  });
   // Discordのトークン 入力制限（半角英数字記号以外を削除）
   $(document).on('blur', '#discord input', function() {
     const val = $(this).val();
@@ -198,7 +204,7 @@ $(function() {
     if (logout) ipcRenderer.send('logout-process');
   });
   // テンプレートのリセット
-  $(document).on('click', '#directmessage .template button, #group .template button, #server .template button', function() {
+  $(document).on('click', '#directmessage .template button, #group .template button, #server .template button, #emojis .template button', function() {
     const data = $(this).parents('.template').data('template');
     $(this).parents('.template').find('input').val(data);
     M.updateTextFields();
@@ -339,7 +345,6 @@ client.on('ready', function() {
   const loginHtml = `${loginTime} [info]<br>Discordのログインに成功しました`;
   logProcess(loginHtml, avatarURL);
   // 各チャンネル
-  let serverObj = {}; // サーバーの処理を考える
   client.channels.map(function(val, key) {
     // ダイレクトメッセージ
     if (val.type == 'dm') {
@@ -383,37 +388,40 @@ client.on('ready', function() {
         if (val.guild.iconURL == null) return 'images/group.svg';
         return val.guild.iconURL.replace(/\?size=\d+/, '');
       })();
-      if (serverObj[s_id] == null) serverObj[s_id] = {
-        'name': s_name,
-        'iconURL': s_iconURL,
-        'channels': []
-      };
-      serverObj[s_id].channels.push({
-        'name': c_name,
-        'id': c_id
-      });
+      if (document.getElementById(s_id) == null) {
+        $('#server-list').append(
+          `<div id="${s_id}" class="collection-item row">` +
+          `<div class="collection-item avatar valign-wrapper"><img src="${s_iconURL}" alt="" class="circle"><span class="title">${s_name}</span></div>` +
+          '<div class="col s12 row section right-align">' +
+          '<div class="col s6 valign-wrapper"><div class="col s9"><strong>チャットの読み上げ</strong></div><div class="col s3 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
+          '<div class="col s6 valign-wrapper"><div class="col s9"><strong>ボイスチャンネルの通知</strong></div><div class="col s3 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
+          '</div><div class="col s12 row section right-align display-none"></div></div>'
+        );
+      }
+      $(`#${s_id} .display-none`).append(`<div class="col s6 valign-wrapper"><div class="col s9">${c_name}</div><div class="col s3 switch right-align"><label><input name="${c_id}" type="checkbox" checked><span class="lever"></span></label></div></div>`);
     }
   });
-  debugLog('[client ready] serverObj', serverObj);
-  for (let id in serverObj) {
-    const name = serverObj[id].name;
-    const iconURL = serverObj[id].iconURL;
-    const channels = serverObj[id].channels;
-    let html =
-      `<div id="${id}" class="collection-item row">` +
-      `<div class="collection-item avatar valign-wrapper"><img src="${iconURL}" alt="" class="circle"><span class="title">${name}</span></div>` +
-      '<div class="col s12 row section right-align">' +
-      '<div class="col s6 valign-wrapper"><div class="col s9"><strong>チャットの読み上げ</strong></div><div class="col s3 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
-      '<div class="col s6 valign-wrapper"><div class="col s9"><strong>ボイスチャンネルの通知</strong></div><div class="col s3 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
-      '</div><div class="col s12 row section right-align display-none">';
-    for (let i = 0, l = channels.length; i < l; i++) {
-      const channelId = channels[i].id;
-      const channelName = channels[i].name;
-      html += `<div class="col s6 valign-wrapper"><div class="col s9">${channelName}</div><div class="col s3 switch right-align"><label><input name="${channelId}" type="checkbox" checked><span class="lever"></span></label></div></div>`;
-    }
-    html += '</div></div>';
-    $('#server-list').append(html);
-  }
+  // 絵文字
+  client.guilds.map(function(v, k) {
+    const server_name = v.name;
+    const server_iconURL = (function() {
+      if (v.iconURL == null) return 'images/group.svg';
+      return v.iconURL.replace(/\?size=\d+/, '');
+    })();
+    //let html = `<li><div class="collapsible-header"><i class="material-icons">list</i>${server_name}</div><div class="collapsible-body">`;
+    let html = `<li><div class="collapsible-header valign-wrapper"><img src="${server_iconURL}" alt="" class="circle">${server_name}</div><div class="collapsible-body">`;
+    v.emojis.map(function(val, key) {
+      const emoji_name = val.name;
+      const emoji_id = key;
+      const emoji_url = val.url;
+      html +=
+        `<div class="row valign-wrapper template" data-template="（絵文字）"><div class="col s2 center-align"><img src="${emoji_url}" alt="${emoji_name}"></div>` +
+        `<div class="input-field col s6"><input id="${emoji_id}" name="${emoji_id}" type="text" value="（絵文字）"><label for="${emoji_id}">${emoji_name}</label></div>` +
+        '<div class="col s4 center-align"><button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button></div></div>';
+    });
+    html += '</div></li>';
+    $('#emojis ul').append(html);
+  });
   // チップの処理（時間を置かないとうまく取得できない）
   setTimeout(function() {
     $('#blacklist > .row.section').eq(0).removeClass('display-none'); // blacklistを表示
@@ -670,7 +678,7 @@ function readFile() {
 // ファイルへ書き込み
 function writeFile() {
   let setting_AutoSave = {};
-  $('#dispeak, #discord, #directmessage, #group, #bouyomi, #server .template, #server-list > div').each(function() {
+  $('#dispeak, #discord, #directmessage, #group, #bouyomi, #server .template, #server-list > div, #emojis').each(function() {
     const divId = $(this).attr('id');
     const id = (function() {
       if (divId == null) return 'server';
@@ -827,7 +835,22 @@ function bouyomiSpeak(data) {
   bouyomiServer.host = setting.bouyomi.ip;
   bouyomiServer.port = setting.bouyomi.port;
   const options = bouyomiServer;
-  const message = data.replace(/<a?(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)>/g, '（スタンプ）').replace(/\s+/g, ' ').trim();;
+  // 絵文字の処理
+  const dataMatch = data.match(/<a?(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)>/g); // 絵文字を抽出
+  const dataLen = (function(){
+    if (dataMatch) return dataMatch.length;
+    return 0;
+  })();
+  for (let i = 0; i < dataLen; i++) {
+    const emojiId = dataMatch[i].replace(/<a?:[a-zA-Z0-9!-/:-@¥[-`{-~]+:([0-9]+)>/, '$1'); // 絵文字IDのみを抜き出し
+    const emojiTxt = (function(){
+      if (objectCheck(setting, `emojis.${emojiId}`) == null) return '（絵文字）'; // 絵文字の文字を調べる
+      return setting.emojis[emojiId];
+    })();
+    const emojiReg = new RegExp('<a?:[a-zA-Z0-9!-/:-@¥[-`{-~]+:(' + emojiId + ')>'); // 絵文字を文字に置換
+    data = data.replace(emojiReg, emojiTxt);
+  }
+  const message = data.replace(/\s+/g, ' ').trim();
   const bouyomiClient = net.createConnection(options, () => {
     let messageBuffer = new Buffer(message);
     let buffer = new Buffer(15 + messageBuffer.length);
@@ -891,20 +914,23 @@ function analytics() {
 // 更新履歴を反映
 function release(data) {
   let html = '';
-  let num = 1;
+  let num = 0;
   for (let i = 0, n = data.length; i < n; i++) {
     const url = data[i].html_url;
     const tag = data[i].tag_name;
     const name = data[i].name;
     const time = whatTimeIsIt(data[i].published_at);
     const text = markdown.markdown.toHTML(data[i].body, 'Gruber').replace(/~~([^~]+)~~/g, '<del>$1</del>');
-    if (`v${nowVersion}` == tag) num = i + 1;
+    const nowVer = nowVersion.replace(/^(\d+\.\d+)\.\d+.*/, '$1');
+    const nowVerReg = new RegExp(`^v${nowVer}`);
+    if (nowVerReg.test(tag)) num = i + 1;
     html +=
       `<li><div class="collapsible-header"><i class="material-icons">library_books</i>${tag} (${time})</div>` +
       `<div class="collapsible-body"><p><a href="${url}" target="_blank">${name}</a></p><p>${text}</p></div></li>`;
   }
   const emoji = twemoji.parse(html);
   $('#release ul').append(emoji);
+  if (num == 0) num++;
   for (let i = 0; i < num; i++) $('#release > ul > li').eq(i).addClass('active');
   $('#release > ul > li:eq(0) > .collapsible-header').append('<span class="new badge" data-badge-caption="Latest release"></span>');
   M.Collapsible.init($('.collapsible.expandable'), {

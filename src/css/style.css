@@ -111,6 +111,25 @@ main .tabs .indicator {
   border-top: 0;
 }
 /* ********************
+  emojis
+******************** */
+#emojis > .collapsible {
+  box-shadow: none;
+}
+#emojis .collapsible-header img {
+  width: auto;
+  height: auto;
+  max-width: 30px;
+  max-height: 30px;
+  margin-right: 16px;
+}
+#emojis .collapsible-body img {
+  width: auto;
+  height: auto;
+  max-width: 60px;
+  max-height: 60px;
+}
+/* ********************
   blacklist
 ******************** */
 #blacklist img {
@@ -129,6 +148,13 @@ main .tabs .indicator {
 }
 #blacklist .chip:focus {
   background-color: #5c6bc0;
+}
+/* ********************
+  template
+******************** */
+#template td > input {
+  margin: 0;
+  border: none;
 }
 /* ********************
   info
