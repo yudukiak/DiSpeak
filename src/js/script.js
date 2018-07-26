@@ -23,6 +23,11 @@ let clientID = (function() {
   if (objectCheck(setting, 'clientID') == null) return '';
   return setting.clientID;
 })();
+// ドラッグ&ドロップの動作を阻止する
+document.ondragover = document.ondrop = function(e) {
+  e.preventDefault();
+  return false;
+};
 
 $(function() {
   analytics();
@@ -65,10 +70,6 @@ $(function() {
       }
     }
   });
-  // バージョンを記入
-  $('#info button span').eq(0).text(nowVersion);
-  // 時刻を記入
-  $('#template_time').text(whatTimeIsIt());
   // デフォルトのテンプレートを反映
   $('#directmessage .template, #group .template, #server .template').each(function() {
     const data = $(this).data('template');
@@ -113,6 +114,12 @@ $(function() {
     // ログインの処理
     loginDiscord(setting.discord.token);
   }
+  // バージョンを記入
+  $('#info button span').eq(0).text(nowVersion);
+  // 時刻を記入
+  $('#template_time').text(whatTimeIsIt());
+  // ドラッグ禁止
+  $('a').attr('draggable', 'false');
   // テンプレート フォーカス時選択する
   $(document).on('focus', '#template input', function() {
     $(this).select();
@@ -933,6 +940,7 @@ function release(data) {
   if (num == 0) num++;
   for (let i = 0; i < num; i++) $('#release > ul > li').eq(i).addClass('active');
   $('#release > ul > li:eq(0) > .collapsible-header').append('<span class="new badge" data-badge-caption="Latest release"></span>');
+  $('#release a[href^=http]').attr('target', '_blank').attr('draggable', 'false');
   M.Collapsible.init($('.collapsible.expandable'), {
     accordion: false
   });

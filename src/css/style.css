@@ -115,6 +115,10 @@ main .tabs .indicator {
 ******************** */
 #emojis > .collapsible {
   box-shadow: none;
+  border-radius: 3px;
+  border-top: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  border-left: 1px solid #e0e0e0;
 }
 #emojis .collapsible-header img {
   width: auto;
@@ -148,6 +152,12 @@ main .tabs .indicator {
 }
 #blacklist .chip:focus {
   background-color: #5c6bc0;
+}
+/* ********************
+  help
+******************** */
+#help tr:last-child {
+  border-bottom: none;
 }
 /* ********************
   template

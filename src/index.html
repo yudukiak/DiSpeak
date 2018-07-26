@@ -149,7 +149,7 @@
             <div id="group" class="collection col s12 display-none">
               <div class="row section">
                 <div class="input-field col s12"><strong>テンプレート - ログ</strong></div>
-                <div class="template" data-template="$time$ [GroupDM - $group$] $username$<br>$text$">
+                <div class="template" data-template="$time$ [グループDM - $group$] $username$<br>$text$">
                   <div class="input-field col s8">
                     <input id="gr_template_log" name="template_log" type="text">
                     <label for="gr_template_log">チャット</label>
@@ -186,7 +186,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$time$ [$server$] <br>$username$ ($nickname$) が$channel$に参加しました">
+                <div class="template" data-template="$time$ [$server$]<br>$username$ ($nickname$) が$channel$に参加しました">
                   <div class="input-field col s8">
                     <input id="sv_template_log_vc_in" name="template_log_vc_in" type="text">
                     <label for="sv_template_log_vc_in">ボイスチャンネル 参加時</label>
@@ -195,7 +195,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$time$ [$server$] <br>$username$ ($nickname$) が$channel-prev$から$channel-next$に移動しました">
+                <div class="template" data-template="$time$ [$server$]<br>$username$ ($nickname$) が$channel-prev$から$channel-next$に移動しました">
                   <div class="input-field col s8">
                     <input id="sv_template_log_vc_change" name="template_log_vc_change" type="text">
                     <label for="sv_template_log_vc_change">ボイスチャンネル 移動時</label>
@@ -204,7 +204,7 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
-                <div class="template" data-template="$time$ [$server$] <br>$username$ ($nickname$) が$channel$から退出しました">
+                <div class="template" data-template="$time$ [$server$]<br>$username$ ($nickname$) が$channel$から退出しました">
                   <div class="input-field col s8">
                     <input id="sv_template_log_vc_out" name="template_log_vc_out" type="text">
                     <label for="sv_template_log_vc_out">ボイスチャンネル 退出時</label>
@@ -397,7 +397,7 @@
                   </tr>
                   <tr>
                     <td><input type="text" value="$nickname$" readonly></td>
-                    <td><span>ユーザーのニックネームが挿入されます。もしニックネームが無い場合は$username$が挿入されます<br>※「サーバー」でのみ使用可能</span></td>
+                    <td><span>ユーザーのニックネームが挿入されます。もしニックネームが無い場合は$username$が挿入されます。<br>※「サーバー」でのみ使用可能</span></td>
                   </tr>
                   <tr>
                     <td><input type="text" value="$memo$" readonly></td>
