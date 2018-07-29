@@ -803,7 +803,7 @@ function bouyomiExeStart() {
   debugLog('[bouyomiExeStart] check', bouyomiExeStartCheck);
   const bouyomiDir = setting.bouyomi.dir;
   // exeが異なる
-  if (!bouyomiExeStartCheck && !/BouyomiChan\.exe/.test(bouyomiDir)) {
+  if (!bouyomiExeStartCheck && bouyomiDir != '' && !/BouyomiChan\.exe/.test(bouyomiDir)) {
     bouyomiSpeakCheck = false; // 読み上げない状態に変更
     $('#stop').addClass('display-none');
     $('#start').removeClass('display-none');
@@ -814,10 +814,12 @@ function bouyomiExeStart() {
     return;
   }
   // 起動していない
-  if (!bouyomiExeStartCheck) {
+  if (!bouyomiExeStartCheck && /BouyomiChan\.exe/.test(bouyomiDir)) {
     const res = ipcRenderer.sendSync('bouyomi-exe-start', bouyomiDir);
     debugLog('[bouyomiExeStart] ipcRenderer', res);
     bouyomiExeStartCheck = res; // true:起動成功, false:起動失敗
+  } else if (!bouyomiExeStartCheck && bouyomiDir == '') {
+    bouyomiExeStartCheck = true;
   }
   // 棒読みちゃんに起動した旨を読ませる
   if (bouyomiExeStartCheck) {
