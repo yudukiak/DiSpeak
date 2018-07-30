@@ -14,23 +14,24 @@ Discordを起動していなくても読み上げてくれます。
 ## 日本語
 
 ### ダウンロード、インストール
-1. ファイルのダウンロードは[ここから](https://github.com/micelle/dc_DiSpeak/releases)行えます。
-    * 32bit版 **DiSpeak-win32-ia32.zip**
-    * 64bit版 **DiSpeak-win32-x64.zip**
-1. ダウンロード後、適当なフォルダーへ解凍します。
-1. 解凍後**DiSpeak.exe**をクリックすることで、起動できます。
+詳細については[ダウンロードについて](https://github.com/micelle/dc_DiSpeak/wiki/Download)、
+エラーや警告が出たときは[Defender SmartScreenについて](https://github.com/micelle/dc_DiSpeak/wiki/Defender)をご確認ください。
+
+1. インストーラーのダウンロードは[releases](https://github.com/micelle/dc_DiSpeak/releases)から行えます。
+1. 「 **DiSpeakSetup-xxx.exe** 」をクリックし、インストーラーのダウンロードを行います。
+1. ダウンロード後、インストーラーを実行することでDiSpeakのインストールが開始されます。
+1. インストールが完了すると自動的にDiSpeakが起動します。
 
 ### アンインストール
-ダウンロードしたフォルダーを削除することで、アンインストールできます。
+コントロールパネル「プログラムと機能」よりアンインストールしてください。
 
 ### 設定
-「設定を編集」をクリックすることで、各種設定画面が表示されます。
-
-詳細については[Wiki](https://github.com/micelle/dc_DiSpeak/wiki)にてご確認ください。
+「設定」をクリックすることで、各種設定画面が表示されます。
 
 ### 使い方
-1. 棒読みちゃんを起動。
-1. 「読み上げ開始」をクリック。
+1. DiSpeakを起動。
+1. DiSpeakの設定を済ませる。
+1. 読み上げボタン（マイクボタン）をクリック。
 
 ### 動作確認
 Windows10 64bitで動作確認済み。
