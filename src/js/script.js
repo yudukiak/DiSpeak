@@ -426,7 +426,6 @@ client.on('ready', function() {
       if (v.iconURL == null) return 'images/group.svg';
       return v.iconURL.replace(/\?size=\d+/, '');
     })();
-    //let html = `<li><div class="collapsible-header"><i class="material-icons">list</i>${server_name}</div><div class="collapsible-body">`;
     let html = `<li><div class="collapsible-header valign-wrapper"><img src="${server_iconURL}" alt="" class="circle">${server_name}</div><div class="collapsible-body">`;
     v.emojis.map(function(val, key) {
       const emoji_name = val.name;
@@ -858,13 +857,13 @@ function bouyomiSpeak(data) {
   const options = bouyomiServer;
   // 絵文字の処理
   const dataMatch = data.match(/<a?(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)>/g); // 絵文字を抽出
-  const dataLen = (function(){
+  const dataLen = (function() {
     if (dataMatch) return dataMatch.length;
     return 0;
   })();
   for (let i = 0; i < dataLen; i++) {
     const emojiId = dataMatch[i].replace(/<a?:[a-zA-Z0-9!-/:-@¥[-`{-~]+:([0-9]+)>/, '$1'); // 絵文字IDのみを抜き出し
-    const emojiTxt = (function(){
+    const emojiTxt = (function() {
       if (objectCheck(setting, `emojis.${emojiId}`) == null) return '（絵文字）'; // 絵文字の文字を調べる
       return setting.emojis[emojiId];
     })();
@@ -922,7 +921,9 @@ function logProcess(html, image) {
 }
 // analytics
 function analytics() {
-  let visitor = ua('UA-56839189-2', clientID, {http: true});
+  let visitor = ua('UA-56839189-2', clientID, {
+    http: true
+  });
   clientID = visitor.cid;
   visitor.pageview(`/DiSpeak/${nowVersion}`, 'http://example.com', `DiSpeak(${nowVersion})`).send();
   const url = `${postUrl}?t=a`;
@@ -946,7 +947,7 @@ function release(data) {
     const nowVerReg = new RegExp(`^v${nowVer}`);
     if (nowVerReg.test(tag)) num = i + 1;
     html +=
-      `<li><div class="collapsible-header"><i class="material-icons">library_books</i>${tag} (${time})</div>` +
+      `<li><div class="collapsible-header valign-wrapper"><i class="material-icons">library_books</i>${tag} (${time})</div>` +
       `<div class="collapsible-body"><p><a href="${url}" target="_blank">${name}</a></p><p>${text}</p></div></li>`;
   }
   const emoji = twemoji.parse(html);
