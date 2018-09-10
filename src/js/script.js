@@ -356,10 +356,7 @@ client.on('ready', function() {
   });
   // アカウント
   const user = client.user;
-  const avatarURL = (function() {
-    if (user.avatarURL != null) return user.avatarURL.replace(/\?size=\d+/, '');
-    return user.defaultAvatarURL;
-  })();
+  const avatarURL = user.displayAvatarURL.replace(/\?size=\d+/, '');
   const username = user.username;
   const discriminator = user.discriminator;
   $('#discord_token').prop('disabled', true);
@@ -372,10 +369,7 @@ client.on('ready', function() {
   client.channels.map(function(val, key) {
     // ダイレクトメッセージ
     if (val.type == 'dm') {
-      const avatarURL = (function() {
-        if (val.recipient.avatarURL == null) return val.recipient.defaultAvatarURL;
-        return val.recipient.avatarURL.replace(/\?size=\d+/, '');
-      })();
+      const avatarURL = val.recipient.displayAvatarURL.replace(/\?size=\d+/, '');
       const name = val.recipient.username;
       const id = val.recipient.id;
       const discriminator = val.recipient.discriminator;
@@ -526,10 +520,7 @@ client.on('voiceStateUpdate', function(data) {
     if (data.user.note == null) return '';
     return data.user.note;
   })();
-  const avatarURL = (function() {
-    if (data.user.avatarURL == null) return data.user.defaultAvatarURL;
-    return data.user.avatarURL.replace(/\?size=\d+/, '');
-  })();
+  const avatarURL = data.user.displayAvatarURL.replace(/\?size=\d+/, '');
   const template_bymRep = template_bym
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
@@ -607,10 +598,7 @@ client.on('message', function(data) {
     if (data.author.note == null) return '';
     return data.author.note;
   })();
-  const avatarURL = (function() {
-    if (data.author.avatarURL == null) return data.author.defaultAvatarURL;
-    return data.author.avatarURL.replace(/\?size=\d+/, '');
-  })();
+  const avatarURL = data.author.displayAvatarURL.replace(/\?size=\d+/, '');
   // チャットの内容 (リプライ/チャンネルタグを読ませない)
   const content = data.content.replace(/<@!?[0-9]+>/g, '').replace(/<#[0-9]+>/g, '');
   // 画像オンリー、スペースのみを読ませない
@@ -780,10 +768,7 @@ function chipWrite(userData, tag, len) {
   } else {
     const userName = userData.username;
     const userDiscriminator = userData.discriminator;
-    const useAvatarURL = (function() {
-      if (userData.avatarURL == null) return userData.defaultAvatarURL;
-      return userData.avatarURL.replace(/\?size=\d+/, '');
-    })();
+    const useAvatarURL = userData.displayAvatarURL.replace(/\?size=\d+/, '');
     $('#blacklist .chip').eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`);
   }
 }
