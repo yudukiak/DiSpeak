@@ -60,13 +60,23 @@ $(function() {
       } else if (lastImg == null) {
         const userData = client.users.get(lastTag);
         if (userData == null) {
-          M.toast({
-            html: `ID「${lastTag}」が見つかりませんでした`,
-            classes: 'toast-chips'
-          });
+          client.fetchUser(lastTag)
+            .then(function(val) {
+              chipWrite(val, lastTag, aryLen);
+              writeFile();
+            })
+            .catch(function(res) {
+              M.toast({
+                html: `ID「${lastTag}」が見つかりませんでした`,
+                classes: 'toast-chips'
+              });
+              chipWrite(null, lastTag, aryLen);
+              writeFile();
+            });
+        } else {
+          chipWrite(userData, lastTag, aryLen);
+          writeFile();
         }
-        chipWrite(userData, lastTag, aryLen);
-        writeFile();
       }
     }
   });
@@ -244,11 +254,18 @@ $(function() {
     const id = $(this).next('div').text().match(/\((\d+)\)$/)[1];
     const userData = client.users.get(id);
     if (userData == null) {
-      M.toast({
-        displayLength: 1000,
-        html: `ID「${id}」が見つかりませんでした`,
-        classes: 'toast-chips'
-      });
+      client.fetchUser(id)
+        .then(function(val) {
+          chipWrite(val, id, index);
+        })
+        .catch(function(res) {
+          M.toast({
+            displayLength: 1000,
+            html: `ID「${id}」が見つかりませんでした`,
+            classes: 'toast-chips'
+          });
+          chipWrite(null, id, index);
+        });
     } else {
       chipWrite(userData, id, index);
     }
@@ -436,7 +453,17 @@ client.on('ready', function() {
     $('#blacklist .chip').each(function(i) {
       const id = $(this).text().replace(/[^0-9]/g, '');
       const userData = client.users.get(id);
-      chipWrite(userData, id, i);
+      if (userData == null) {
+        client.fetchUser(id)
+          .then(function(val) {
+            chipWrite(val, id, i);
+          })
+          .catch(function(res) {
+            chipWrite(null, id, i);
+          });
+      } else {
+        chipWrite(userData, id, i);
+      }
     });
   }, 1000 * 10);
   // 設定ファイルを反映
