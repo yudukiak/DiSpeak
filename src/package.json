@@ -4,7 +4,7 @@
   "description": "Bouyomi speaks the notice of Discord.",
   "main": "index.js",
   "dependencies": {
-    "discord.js": "^11.3.2",
+    "discord.js": "^11.4.2",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.3.1",
     "markdown": "^0.5.0",
