@@ -4,6 +4,7 @@ const $ = require('jquery');
 const net = require('net');
 const ua = require('universal-analytics');
 const markdown = require('markdown');
+const PowerShell = require('node-powershell');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
@@ -18,6 +19,9 @@ let bouyomiExeStartCheck = false; // 棒読みちゃんは f:起動してない,
 // 回数を保持
 let debugNum = 0;
 let bouyomiRetryNum = 0;
+// 状態を保持
+let lastStatus = '';
+let processData = '';
 // analytics
 let clientID = (function() {
   if (objectCheck(setting, 'clientID') == null) return '';
@@ -28,7 +32,10 @@ document.ondragover = document.ondrop = function(e) {
   e.preventDefault();
   return false;
 };
-
+// logを表示させない
+window.console.log = function(e) {
+  return;
+};
 $(function() {
   analytics();
   $.get(releaseUrl, null, release, "json");
@@ -470,6 +477,19 @@ client.on('reconnecting', function() {
     classes: 'toast-reconnecting'
   });
 });
+// ステータスが変わったとき
+client.on('clientUserSettingsUpdate', function(ClientUserSettings) {
+  const status = ClientUserSettings.status;
+  if (lastStatus === status) return;
+  lastStatus = status;
+  client.user.setStatus(status)
+    .then(function(res) {
+      debugLog('[Discord] status update', res);
+    })
+    .catch(function(res) {
+      debugLog('[Discord] status update', res);
+    });
+});
 // ボイスチャンネルに参加（マイク、スピーカーのON/OFFも）
 client.on('voiceStateUpdate', function(data) {
   debugLog('[Discord] voiceStateUpdate', data);
@@ -680,7 +700,7 @@ function readFile() {
       }
       // それ以外
       else {
-        $(`#${id} input[name=${name}]`).val(val);
+        $(`#${id} input[name=${name}]`).val([val]);
       }
     }
   }
@@ -712,6 +732,7 @@ function writeFile() {
       const name = input.attr('name');
       const val = (function() {
         if (input.attr('type') == 'checkbox') return input.prop('checked');
+        if (input.attr('type') == 'radio') return $(`input:radio[name="${name}"]:checked`).val();
         return input.val();
       })();
       inputObj[name] = val;
@@ -750,14 +771,36 @@ function loginDiscord(token) {
   if (token == null || token == '') return;
   debugLog('[loginDiscord] token', token);
   M.Modal.getInstance($('#modal_discord')).open();
-  // 成功したらclient.on('ready')の処理が走る
-  client.login(token).catch(function(error) {
-    M.Modal.getInstance($('#modal_discord')).close();
-    M.toast({
-      html: `ログインに失敗しました<br>${error}`,
-      classes: 'toast-discord'
-    });
+  // Discordが起動しているかチェック
+  let ps = new PowerShell({
+    executionPolicy: 'Bypass',
+    noProfile: true
   });
+  ps.addCommand('Get-Process | Select-Object name');
+  ps.invoke()
+    .then(function(output) {
+      processData = output;
+      return client.login(token);
+    }).then(function(res) {
+      ps.dispose();
+      const status = (function() {
+        if (objectCheck(setting, 'dispeak.status') && !/Discord/.test(processData)) return 'invisible';
+        return null;
+      })();
+      client.user.setStatus(status);
+    }).catch(function(err) {
+      const txt = (function() {
+        const e = String(err);
+        if (/Incorrect login details were provided/.test(e)) return 'ログインに失敗しました';
+        return 'エラーが発生しました';
+      })();
+      ps.dispose();
+      M.Modal.getInstance($('#modal_discord')).close();
+      M.toast({
+        html: txt,
+        classes: 'toast-discord'
+      });
+    });
 }
 // チップ
 function chipWrite(userData, tag, len) {
@@ -1022,7 +1065,7 @@ function errorLog(obj) {
   const time = whatTimeIsIt();
   const msg = obj.message;
   console.groupCollapsed(`%c${time} [Error] ${msg}`, 'color:red');
-  console.log('obj:', obj);
+  console.info('obj:', obj);
   console.groupEnd();
   // ネットワークエラーなど
   if (/undefined/.test(msg) || /{"isTrusted":true}/.test(msg) || /Failed to fetch/.test(msg)) return;
@@ -1072,9 +1115,9 @@ function debugLog(fnc, data) {
       return String(data);
     })();
     console.groupCollapsed(`${time} %s`, fnc);
-    console.log('type:', type);
-    console.log('text:', text);
-    console.log('data:', data);
+    console.info('type:', type);
+    console.info('text:', text);
+    console.info('data:', data);
     console.groupEnd();
   }
 }

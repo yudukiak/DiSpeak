@@ -8,6 +8,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.3.1",
     "markdown": "^0.5.0",
+    "node-powershell": "^3.3.1",
     "universal-analytics": "^0.4.17"
   },
   "devDependencies": {},
