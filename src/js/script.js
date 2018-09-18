@@ -4,7 +4,6 @@ const $ = require('jquery');
 const net = require('net');
 const ua = require('universal-analytics');
 const markdown = require('markdown');
-const PowerShell = require('node-powershell');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
@@ -21,7 +20,6 @@ let debugNum = 0;
 let bouyomiRetryNum = 0;
 // 状態を保持
 let lastStatus = '';
-let processData = '';
 // analytics
 let clientID = (function() {
   if (objectCheck(setting, 'clientID') == null) return '';
@@ -771,35 +769,21 @@ function loginDiscord(token) {
   if (token == null || token == '') return;
   debugLog('[loginDiscord] token', token);
   M.Modal.getInstance($('#modal_discord')).open();
-  // Discordが起動しているかチェック
-  let ps = new PowerShell({
-    executionPolicy: 'Bypass',
-    noProfile: true
-  });
-  ps.addCommand('Get-Process | Select-Object name');
-  ps.invoke()
-    .then(function(output) {
-      processData = output;
-      return client.login(token);
-    }).then(function(res) {
-      ps.dispose();
-      const status = (function() {
-        if (objectCheck(setting, 'dispeak.status') && !/Discord/.test(processData)) return 'invisible';
-        return null;
-      })();
-      client.user.setStatus(status);
+  client.login(token)
+    .then(function(res) {
+      client.user.setStatus(client.user.settings.status);
+      //client.user.settings.update('status', client.user.settings.status);
     }).catch(function(err) {
-      const txt = (function() {
-        const e = String(err);
-        if (/Incorrect login details were provided/.test(e)) return 'ログインに失敗しました';
-        return 'エラーが発生しました';
-      })();
-      ps.dispose();
       M.Modal.getInstance($('#modal_discord')).close();
-      M.toast({
-        html: txt,
-        classes: 'toast-discord'
-      });
+      const txt = String(err);
+      if (/Incorrect login details were provided/.test(txt)) {
+        M.toast({
+          html: 'ログインに失敗しました',
+          classes: 'toast-discord'
+        });
+      } else {
+        erroeObj(err);
+      }
     });
 }
 // チップ
