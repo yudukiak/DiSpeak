@@ -489,22 +489,23 @@ client.on('clientUserSettingsUpdate', function(ClientUserSettings) {
     });
 });
 // ボイスチャンネルに参加（マイク、スピーカーのON/OFFも）
-client.on('voiceStateUpdate', function(data) {
-  debugLog('[Discord] voiceStateUpdate', data);
-  if (client.user.id == data.id) return; // 自分自身のイベントは処理しない
-  const guildId = data.guild.id; // サーバのID
+client.on('voiceStateUpdate', function(oldMember, newMember) {
+  debugLog('[Discord] voiceStateUpdate oldMember', oldMember);
+  debugLog('[Discord] voiceStateUpdate newMember', newMember);
+  if (client.user.id == oldMember.id) return; // 自分自身のイベントは処理しない
+  const guildId = oldMember.guild.id; // サーバのID
   if (setting.server[guildId] == null) return; // settingがない場合は読まない
   if (setting.server[guildId].voice == false) return; // settingがfalseのとき読まない
-  const guildChannel = data.guild.channels; // サーバのチャンネル一覧を取得
-  // 切断チャンネル（参加時:undefined, 切断時:123456789012345678）
-  const channelPrevID = data.voiceChannelID;
+  const guildChannel = oldMember.guild.channels; // サーバのチャンネル一覧を取得
+  // 切断チャンネル（old:123456789012345678, new:null）
+  const channelPrevID = oldMember.voiceChannelID;
   const channelPrevName = (function() {
     const channelPrevData = guildChannel.get(channelPrevID);
     if (channelPrevData == null) return '';
     return channelPrevData.name;
   })();
-  // 参加チャンネル（参加時:123456789012345678, 切断時:null）
-  const channelNextID = data.__proto__.voiceChannelID;
+  // 参加チャンネル（old:null, new:123456789012345678）
+  const channelNextID = newMember.voiceChannelID;
   const channelNextName = (function() {
     const channelNextData = guildChannel.get(channelNextID);
     if (channelNextData == null) return '';
@@ -514,15 +515,15 @@ client.on('voiceStateUpdate', function(data) {
   const blacklist = setting.blacklist;
   for (let i = 0, n = blacklist.length; i < n; i++) {
     const blacklistTag = blacklist[i].tag;
-    if (blacklistTag == data.id) return;
+    if (blacklistTag == oldMember.id) return;
   }
   // テキストの生成
   const time = whatTimeIsIt(); // 現在の時刻
-  const guildName = data.guild.name; // 対象サーバーの名前
-  const username = data.user.username; // 対象者の名前
+  const guildName = oldMember.guild.name; // 対象サーバーの名前
+  const username = oldMember.user.username; // 対象者の名前
   const nickname = (function() { // 対象者のニックネーム。未設定はnull
-    if (data.nickname == null) return username;
-    return data.nickname;
+    if (oldMember.nickname == null) return username;
+    return oldMember.nickname;
   })();
   const vcSettingAry = (function() {
     if (channelPrevID == null) return [channelNextName, setting.server.template_bym_vc_in, setting.server.template_log_vc_in]; // チャンネルへ参加
@@ -534,10 +535,10 @@ client.on('voiceStateUpdate', function(data) {
   const template_bym = vcSettingAry[1];
   const template_log = vcSettingAry[2];
   const note = (function() {
-    if (data.user.note == null) return '';
-    return data.user.note;
+    if (oldMember.user.note == null) return '';
+    return oldMember.user.note;
   })();
-  const avatarURL = data.user.displayAvatarURL.replace(/\?size=\d+/, '');
+  const avatarURL = oldMember.user.displayAvatarURL.replace(/\?size=\d+/, '');
   const template_bymRep = template_bym
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
