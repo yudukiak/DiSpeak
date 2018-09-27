@@ -4,6 +4,7 @@
   "description": "For DiSpeak build.",
   "main": "index.js",
   "dependencies": {
+    "cryptiles": "^4.1.2",
     "discord.js": "^11.4.2",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.3.1",
@@ -13,7 +14,7 @@
   "devDependencies": {
     "electron": "^1.8.8",
     "electron-packager": "^10.1.1",
-    "electron-winstaller": "^2.6.4",
+    "electron-winstaller": "^2.7.0",
     "fs-extra": "^7.0.0",
     "ftp-deploy": "^2.1.3"
   },
