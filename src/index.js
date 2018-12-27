@@ -384,6 +384,16 @@ function taskTrayMenu() {
       click: () => {shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')}
     },
     {
+      label: 'Roamingを開く',
+      position: 'endof=appdata',
+      click: () => {shell.openExternal(process.env.APPDATA + '\\DiSpeak')}
+    },
+    {
+      label: 'Localを開く',
+      position: 'endof=appdata',
+      click: () => {shell.openExternal(process.env.LOCALAPPDATA + '\\DiSpeak')}
+    },
+    {
       label: '終了する',
       position: 'endof=cmd',
       click: () => {mainWindow.close()}
