@@ -364,12 +364,14 @@ client.on('ready', function() {
   });
   // アカウント
   const user = client.user;
+  const userId = user.id;
   const avatarURL = user.displayAvatarURL.replace(/\?size=\d+/, '');
   const username = user.username;
   const discriminator = user.discriminator;
   $('#discord_token').prop('disabled', true);
   $('#discord-profile img').attr('src', avatarURL);
   $('#discord-profile p').eq(1).text(`${username}#${discriminator}`);
+  localStorage.setItem('DiscordLoginId', userId); // 最後にログインしたIDを保存しておく
   const loginTime = whatTimeIsIt();
   const loginHtml = `${loginTime} [info]<br>Discordのログインに成功しました`;
   logProcess(loginHtml, avatarURL);
@@ -467,8 +469,26 @@ client.on('ready', function() {
       }
     });
   }, 1000 * 10);
-  // 設定ファイルを反映
-  readFile();
+  // tokenが変わったとき設定がリセットされるのを防ぐために処理を行なう
+  const sStorage = sessionStorage.getItem('DiscordLoginError');
+  debugLog('[Discord] sessionStorage', sStorage);
+  if (sStorage == null) {
+    readFile();  // 設定ファイルを反映
+  } else {
+    const sStorageObj = JSON.parse(sStorage);
+    const lStorageId = localStorage.getItem('DiscordLoginId');
+    const userId = client.user.id;
+    debugLog('[Discord] id', `localStorage:${lStorageId}, login:${userId}`);
+    if (lStorageId == userId) {
+      sStorageObj.discord.token = $('#discord_token').val(); // 最新のtokenを引き継がせる
+      debugLog('[Discord] setting1', setting);
+      setting = sStorageObj; // settingを書き換える
+      debugLog('[Discord] setting2', setting);
+      readFile();
+      writeFile();
+    }
+    sessionStorage.removeItem('DiscordLoginError'); // 不要になるので削除
+  }
 });
 // 再接続時
 client.on('reconnecting', function() {
@@ -781,6 +801,8 @@ function loginDiscord(token) {
       M.Modal.getInstance($('#modal_discord')).close();
       const txt = String(err);
       if (/Incorrect login details were provided/.test(txt)) {
+        debugLog('[Discord] DiscordLoginError', setting);
+        sessionStorage.setItem('DiscordLoginError', JSON.stringify(setting)); // tokenが変わったとき設定がリセットされるのを防ぐために一時保存
         const loginTime = whatTimeIsIt();
         const loginHtml = `${loginTime} [info]<br>
         ログインに失敗しました。<br>
