@@ -91,8 +91,13 @@ $(function() {
     $(this).find('input').val(data);
     M.updateTextFields();
   });
+  // 設定ファイルが存在しないが、localStorageには存在するとき
+  const storage = localStorage.getItem('DiscordSetting');
+  if (setting == null && storage != null) {
+    M.Modal.getInstance($('#modal_localStorage_setting')).open();
+  }
   // 設定ファイルが存在しないとき（初回起動時）
-  if (setting == null) {
+  else if (setting == null) {
     const loginTime = whatTimeIsIt();
     const loginHtml = `${loginTime} [info]<br>
     「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
@@ -342,6 +347,32 @@ $(function() {
     }
     $('#textarea_error').val();
     $('#textarea_error').css('height', '0');
+  });
+  // 以前使用していた設定を元に復元しますか？
+  $(document).on('click', '#modal_localStorage_setting a', function() {
+    const localstoragesetting = $(this).data('localstoragesetting');
+    if (localstoragesetting) {
+      // val（localStorage）からsettingを復元
+      //const storage = localStorage.getItem('DiscordSetting');
+      const storageObj = JSON.parse(storage);
+      setting = storageObj;
+      // デバッグの処理
+      if (setting.dispeak.debug) {
+        debugNum = 10;
+        $('#dispeak > div:last-child').removeClass('display-none');
+      }
+      // デバッグログ
+      debugLog('[info] DiSpeak', `v${nowVersion}`);
+      debugLog('[info] jQuery', `v${jQueryVersion}`);
+      // ログインの処理
+      loginDiscord(setting.discord.token);
+    } else {
+      const loginTime = whatTimeIsIt();
+      const loginHtml = `${loginTime} [info]<br>
+      「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
+      logProcess(loginHtml, 'images/discord.png');
+      //writeFile();
+    }
   });
 });
 
@@ -772,6 +803,7 @@ function writeFile() {
   if (!setting_AutoSave.dispeak.debug) delete setting_AutoSave.dispeak.debug;
   if (JSON.stringify(setting) == JSON.stringify(setting_AutoSave)) return;
   setting = $.extend(true, {}, setting_AutoSave);
+  localStorage.setItem('DiscordSetting', JSON.stringify(setting_AutoSave));
   const res = ipcRenderer.sendSync('setting-file-write', setting_AutoSave);
   // 保存に成功
   if (res === true) {}
@@ -797,6 +829,7 @@ function loginDiscord(token) {
     .then(function(res) {
       client.user.setStatus(client.user.settings.status);
       //client.user.settings.update('status', client.user.settings.status);
+      writeFile();
     }).catch(function(err) {
       M.Modal.getInstance($('#modal_discord')).close();
       const txt = String(err);
