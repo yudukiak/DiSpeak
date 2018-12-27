@@ -781,6 +781,12 @@ function loginDiscord(token) {
       M.Modal.getInstance($('#modal_discord')).close();
       const txt = String(err);
       if (/Incorrect login details were provided/.test(txt)) {
+        const loginTime = whatTimeIsIt();
+        const loginHtml = `${loginTime} [info]<br>
+        ログインに失敗しました。<br>
+        入力されたトークンが間違えている、もしくはトークンの値が変わった可能性があります。
+        トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
+        logProcess(loginHtml, 'images/discord.png');
         M.toast({
           html: 'ログインに失敗しました',
           classes: 'toast-discord'
