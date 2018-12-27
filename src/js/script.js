@@ -94,14 +94,16 @@ $(function() {
   // 設定ファイルが存在しないとき（初回起動時）
   if (setting == null) {
     const loginTime = whatTimeIsIt();
-    const loginHtml = `${loginTime} [info]<br>「設定 > Discord」からログインしてください`;
+    const loginHtml = `${loginTime} [info]<br>
+    「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
     logProcess(loginHtml, 'images/discord.png');
     writeFile();
   }
   // 古い設定ファイルを使用しているとき
   else if (setting.version == null) {
     const loginTime = whatTimeIsIt();
-    const loginHtml = `${loginTime} [info]<br>「設定」から各種設定をしてください`;
+    const loginHtml = `${loginTime} [info]<br>
+    「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
     logProcess(loginHtml, 'images/discord.png');
     M.toast({
       html: 'v2.0未満の設定ファイルです<br>設定の読み込みを中止しました',
@@ -111,7 +113,8 @@ $(function() {
   // Discordのトークンがないとき
   else if (setting.discord.token == '') {
     const loginTime = whatTimeIsIt();
-    const loginHtml = `${loginTime} [info]<br>「設定」から各種設定をしてください`;
+    const loginHtml = `${loginTime} [info]<br>
+    「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
     logProcess(loginHtml, 'images/discord.png');
     // 設定ファイルを反映
     readFile();
