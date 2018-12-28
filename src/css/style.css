@@ -299,6 +299,7 @@ main .modal-content .row {
   display: table-cell;
   vertical-align: middle;
 }
+.swal2-container,
 main .modal-overlay {
   top: 25px;
 }
