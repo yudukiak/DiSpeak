@@ -1,10 +1,7 @@
 *.bat
 /build/
-/dest/
-/dist/
 /lib/setting.json
 /node_modules/
 /release/
 /src/node_modules/
-/test/
 /setting.json
