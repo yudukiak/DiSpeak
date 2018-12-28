@@ -363,6 +363,7 @@ $(function() {
           $('#request input, #request textarea').removeClass('valid');
           M.textareaAutoResize($('#request_textarea'));
           M.updateTextFields();
+          $('#request_textarea').css('height', '43px'); // うまく戻らないので…
         })
         .fail(function() {
           M.toast({
