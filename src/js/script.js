@@ -283,6 +283,65 @@ $(function() {
       chipWrite(userData, id, index);
     }
   });
+  // フォームの送信
+  $(document).on('click', '#request button', function() {
+    let obj = {};
+    const url = `${postUrl}?t=r`;
+    const name =  escapeHtml($('#request_name').val());
+    const twitter = escapeHtml($('#request_twitter').val());
+    const comment = escapeHtml($('#request_textarea').val());
+    const commentLength = comment.replace(/\s/g, '').length;
+    const html =
+      '<table>' +
+      `<tr><th>名前</th><td>${name}</td></tr>` +
+      `<tr><th>Twitter</th><td>${twitter}</td></tr>` +
+      `<tr><th>内容</th><td>${comment}</td></tr>` +
+      '</table>';
+    if (commentLength < 1) {
+      Swal(
+        'おっと？',
+        '「コメント」は必須です',
+        'warning'
+      );
+      return;
+    }
+    Swal({
+      title: '以下の内容で送信します',
+      html: html,
+      type: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3949ab',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '送信する',
+      cancelButtonText: 'キャンセル'
+    }).then((result) => {
+      debugLog('[SweetAlert2] result', result);
+      if (result.value !== true) return;
+      obj.time = whatTimeIsIt(true);
+      obj.version = nowVersion;
+      obj.name = name;
+      obj.twitter = twitter;
+      obj.comment = comment;
+      $.post(url, JSON.stringify(obj))
+        .done(function(data) {
+          M.toast({
+            html: '送信が完了しました',
+            classes: 'toast-requestPost'
+          });
+          // 入力をリセットする
+          $('#request input, #request textarea').val('');
+          $('#request input, #request textarea').removeClass('valid');
+          M.textareaAutoResize($('#request_textarea'));
+          M.updateTextFields();
+        })
+        .fail(function() {
+          M.toast({
+            html: '送信に失敗しました',
+            classes: 'toast-requestPost'
+          });
+        });
+    })
+  });
   // バージョンチェック
   $(document).on('click', '#version_check', function() {
     ipcRenderer.send('version-check');

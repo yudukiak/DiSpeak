@@ -331,6 +331,7 @@
               <li class="collection-item waves-effect waves-light active blue">ショートカットキー</li>
               <li class="collection-item waves-effect waves-light">テンプレート</li>
               <li class="collection-item waves-effect waves-light">更新履歴</li>
+              <li class="collection-item waves-effect waves-light">要望フォーム</li>
               <li class="collection-item waves-effect waves-light">DiSpeakについて</li>
             </ul>
           </div>
@@ -415,6 +416,39 @@
             <!-- 更新履歴 -->
             <div id="release" class="display-none">
               <ul class="collapsible expandable"></ul>
+            </div>
+            <!-- 要望フォーム -->
+            <div id="request" class="collection col s12 display-none">
+              <div class="row section">
+                <div class="col s12">
+                  <p>
+                    DiSpeakに関する意見・感想・要望・不具合などありましたら、以下のフォームより投稿してみてください。
+                    実装する要望・改修する不具合については<a href="https://github.com/micelle/dc_DiSpeak/issues" target="_blank">こちら</a>にて確認できます。
+                  </p>
+                  <p>
+                    匿名で送信してもOKです。<br>
+                    が、TwitterのIDがあればフォローするかもしれません（気まぐれ）。
+                  </p>
+                </div>
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">account_circle</i>
+                  <input id="request_name" type="text" class="validate">
+                  <label for="request_name">名前</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="request_twitter" type="text" class="validate">
+                  <label for="request_twitter">Twitter</label>
+                </div>
+                <div class="col s12 input-field">
+                  <i class="material-icons prefix">mode_edit</i>
+                  <textarea id="request_textarea" class="materialize-textarea validate" required></textarea>
+                  <label for="request_textarea">コメント（意見・感想・要望・不具合など）</label>
+                  <span class="helper-text" data-error="※入力必須です"></span>
+                </div>
+                <div class="col s12 right-align">
+                 <button class="btn waves-effect waves-light indigo lighten-1" type="button">送信<i class="material-icons left">send</i></button>
+                </div>
+              </div>
             </div>
             <!-- DiSpeakについて -->
             <div id="info" class="collection col s12 display-none">

@@ -348,6 +348,9 @@ textarea.materialize-textarea:focus:not([readonly])+label {
 .switch label input[type=checkbox]:checked+.lever:after {
   background-color: #5c6bc0;
 }
+.input-field .prefix.active {
+  color: #3949ab;
+}
 .collection:empty {
   margin: 0;
   border: none;
@@ -405,4 +408,9 @@ b, strong {
     text-align: center;
     line-height: 41px;
     display: inline-block;
+}
+#swal2-content td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
