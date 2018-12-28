@@ -94,7 +94,37 @@ $(function() {
   // 設定ファイルが存在しないが、localStorageには存在するとき
   const storage = localStorage.getItem('DiscordSetting');
   if (setting == null && storage != null) {
-    M.Modal.getInstance($('#modal_localStorage_setting')).open();
+    Swal({
+      title: '設定ファイルが存在しません',
+      text: '以前使用していた設定を元に復元しますか？',
+      type: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3949ab',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '復元する',
+      cancelButtonText: '復元しない'
+    }).then((result) => {
+      debugLog('[SweetAlert2] result', result);
+      if (result.value) {
+        const storageObj = JSON.parse(storage);
+        setting = storageObj;
+        // デバッグの処理
+        if (setting.dispeak.debug) {
+          debugNum = 10;
+          $('#dispeak > div:last-child').removeClass('display-none');
+        }
+        // デバッグログ
+        debugLog('[info] DiSpeak', `v${nowVersion}`);
+        debugLog('[info] jQuery', `v${jQueryVersion}`);
+        // ログインの処理
+        loginDiscord(setting.discord.token);
+      } else {
+        const loginTime = whatTimeIsIt();
+        const loginHtml = `${loginTime} [info]<br>
+        「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
+        logProcess(loginHtml, 'images/discord.png');
+      }
+    });
   }
   // 設定ファイルが存在しないとき（初回起動時）
   else if (setting == null) {
@@ -406,32 +436,6 @@ $(function() {
     }
     $('#textarea_error').val();
     $('#textarea_error').css('height', '0');
-  });
-  // 以前使用していた設定を元に復元しますか？
-  $(document).on('click', '#modal_localStorage_setting a', function() {
-    const localstoragesetting = $(this).data('localstoragesetting');
-    if (localstoragesetting) {
-      // val（localStorage）からsettingを復元
-      //const storage = localStorage.getItem('DiscordSetting');
-      const storageObj = JSON.parse(storage);
-      setting = storageObj;
-      // デバッグの処理
-      if (setting.dispeak.debug) {
-        debugNum = 10;
-        $('#dispeak > div:last-child').removeClass('display-none');
-      }
-      // デバッグログ
-      debugLog('[info] DiSpeak', `v${nowVersion}`);
-      debugLog('[info] jQuery', `v${jQueryVersion}`);
-      // ログインの処理
-      loginDiscord(setting.discord.token);
-    } else {
-      const loginTime = whatTimeIsIt();
-      const loginHtml = `${loginTime} [info]<br>
-      「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
-      logProcess(loginHtml, 'images/discord.png');
-      //writeFile();
-    }
   });
 });
 
