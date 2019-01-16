@@ -1190,12 +1190,13 @@ function errorLog(obj) {
     if (/connect ECONNREFUSED \d+\.\d+\.\d+\.\d+:\d+/.test(msg)) return '棒読みちゃんが起動していない、もしくは接続できません';
     if (/\$ is not a function/.test(msg)) return 'エラーが発生しました<br>Ctrl+Rで画面を更新してください';
     if (/([0-9a-zA-Z]+) is not defined/.test(msg)) return 'エラーが発生しました';
+    if (/read ECONNRESET/.test(msg)) return ''; // Discord.jsの問題？
     //if (/Uncaught, unspecified "error" event/.test(msg)) return 'エラーが発生しました。';
     return `エラーが発生しました`;
   })();
   const jsn = JSON.stringify(obj);
   const process = obj.process;
-  if ($('.toast-error').length) return;
+  if ($('.toast-error').length || msgTxt === '') return;
   // mainプロセスのエラー or エラーが発生しました
   if (process == 'main' || msgTxt == 'エラーが発生しました') {
     const toastHTML =
