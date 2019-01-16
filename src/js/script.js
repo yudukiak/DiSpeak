@@ -264,14 +264,14 @@ $(function() {
     if (logout) ipcRenderer.send('logout-process');
   });
   // テンプレートのリセット
-  $(document).on('click', '#directmessage .template button, #group .template button, #server .template button, #emojis .template button', function() {
+  $(document).on('click', '#directmessage .template button, #group .template button, #server .template button, #emojis .template button, #bouyomi .template button', function() {
     const data = $(this).parents('.template').data('template');
     $(this).parents('.template').find('input').val(data);
     M.updateTextFields();
     writeFile();
   });
   // 棒読み
-  $(document).on('click', '#bouyomi button', function() {
+  $(document).on('click', '#bouyomi_dir_btn', function() {
     if ($('.toast-exe').length) return;
     const bouyomiDir = ipcRenderer.sendSync('bouyomi-dir-dialog');
     if (bouyomiDir == '') {

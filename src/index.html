@@ -270,15 +270,25 @@
                   <span class="helper-text">棒読みちゃんの実行ファイルを選択してください。</span>
                 </div>
                 <div class="input-field col s3 center-align">
-                  <button class="btn waves-effect waves-light indigo lighten-1" type="button">選択<i class="material-icons left">folder_open</i></button>
+                  <button id="bouyomi_dir_btn" class="btn waves-effect waves-light indigo lighten-1" type="button">選択<i class="material-icons left">folder_open</i></button>
                 </div>
-                <div class="input-field col s9">
-                  <input id="bouyomi_ip" name="ip" type="text" value="127.0.0.1">
-                  <label for="bouyomi_ip">IP</label>
+                <div class="template" data-template="127.0.0.1">
+                  <div class="input-field col s8">
+                    <input id="bouyomi_ip" name="ip" type="text" value="127.0.0.1">
+                    <label for="bouyomi_ip">IP</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
-                <div class="input-field col s9">
-                  <input id="bouyomi_port" name="port" type="text" value="50001">
-                  <label for="bouyomi_port">ポート</label>
+                <div class="template" data-template="50001">
+                  <div class="input-field col s8">
+                    <input id="bouyomi_port" name="port" type="text" value="50001">
+                    <label for="bouyomi_port">ポート</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
                 </div>
               </div>
             </div>
