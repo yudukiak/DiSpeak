@@ -1,3 +1,4 @@
+'use strict';
 const {ipcRenderer} = require('electron');
 const Discord = require('discord.js');
 const $ = require('jquery');
