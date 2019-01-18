@@ -182,8 +182,8 @@ $(function() {
     const val = $(this).val();
     $(this).val(val.replace(/[^a-zA-Z0-9!-/:-@¥[-`{-~]/g, '').replace(/"/g, ''));
   });
-  // NGユーザー 入力制限（数字以外を削除）
-  $(document).on('blur input keyup', '#blacklist input', function() {
+  // NGユーザー・ログの数 入力制限（数字以外を削除）
+  $(document).on('blur input keyup', '#blacklist input, #log_num', function() {
     const val = $(this).val();
     $(this).val(val.replace(/[^0-9]/g, ''));
   });
@@ -264,7 +264,7 @@ $(function() {
     if (logout) ipcRenderer.send('logout-process');
   });
   // テンプレートのリセット
-  $(document).on('click', '#directmessage .template button, #group .template button, #server .template button, #emojis .template button, #bouyomi .template button', function() {
+  $(document).on('click', '#dispeak .template button, #directmessage .template button, #group .template button, #server .template button, #emojis .template button, #bouyomi .template button', function() {
     const data = $(this).parents('.template').data('template');
     $(this).parents('.template').find('input').val(data);
     M.updateTextFields();
@@ -1068,7 +1068,11 @@ function logProcess(html, image) {
   $('#log .collection').prepend(emoji);
   // ログの削除
   const logDom = $('#log .collection li');
-  const maxLine = 50; // 表示される最大行数
+  const maxLine = (function() { // 表示される最大行数
+    if (setting.dispeak.log_num == null) return 50;
+    return Number(setting.dispeak.log_num);
+  })();
+  debugLog(`[logProcess] maxLine`, maxLine);
   if (logDom.length > maxLine) { // 行数を超えたら古いログを削除
     for (let i = maxLine, n = logDom.length; i < n; i++) {
       logDom[i].remove();
