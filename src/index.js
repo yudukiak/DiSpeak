@@ -105,6 +105,9 @@ function createMainwindow() {
   createTray();
   //ウィンドウサイズを設定する
   mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true
+    },
     frame: false,
     show: false,
     width: 960,
