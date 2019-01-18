@@ -1028,8 +1028,8 @@ function bouyomiSpeak(data) {
   }
   const message = data.replace(/\s+/g, ' ').trim();
   const bouyomiClient = net.createConnection(options, () => {
-    let messageBuffer = new Buffer(message);
-    let buffer = new Buffer(15 + messageBuffer.length);
+    const messageBuffer = Buffer.from(message);
+    const buffer = Buffer.alloc(15 + messageBuffer.length);
     buffer.writeUInt16LE(0x0001, 0);
     buffer.writeUInt16LE(0xFFFF, 2);
     buffer.writeUInt16LE(0xFFFF, 4);
