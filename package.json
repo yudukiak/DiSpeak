@@ -12,8 +12,8 @@
     "universal-analytics": "^0.4.20"
   },
   "devDependencies": {
-    "electron": "^1.8.8",
-    "electron-packager": "^10.1.1",
+    "electron": "^4.0.1",
+    "electron-packager": "^13.0.1",
     "electron-winstaller": "^2.7.0",
     "fs-extra": "^7.0.1",
     "ftp-deploy": "^2.3.0"
