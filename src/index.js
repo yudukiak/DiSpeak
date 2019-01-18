@@ -329,37 +329,31 @@ function mainWindowMenu() {
       {
         label: 'リロード',
         accelerator: 'CmdOrCtrl+R',
-        position: 'endof=cmdctrl',
         click: () => {mainWindow.reload()}
       },
       {
         label: '最新のバージョンを確認',
         accelerator: 'CmdOrCtrl+H',
-        position: 'endof=cmdctrl',
         click:  () => {try { autoUpdater.checkForUpdates(); } catch(e) {}} // batから起動したときの対策
       },
       {
         label: 'ウィンドウを閉じる',
         accelerator: 'CmdOrCtrl+W',
-        position: 'endof=cmdctrl',
         click:  () => {mainWindow.hide()}
       },
       {
         label: '終了する',
         accelerator: 'CmdOrCtrl+Shift+Q',
-        position: 'endof=cmdctrlshift',
         click:  () => {mainWindow.close()}
       },
       {
         label: 'デバッグ',
         accelerator: 'CmdOrCtrl+Shift+I',
-        position: 'endof=cmdctrlshift',
         click:  () => {mainWindow.toggleDevTools()}
       },
       {
         label: 'エラー',
         accelerator: 'CmdOrCtrl+Shift+E',
-        position: 'endof=cmdctrlshift',
         click:  () => {if (appSettingObj.dispeak.debug) console.log(this_variable_is_error)}
       }
     ]
@@ -377,28 +371,29 @@ function taskTrayMenu() {
       label: 'サイズを元に戻す',
       click: () => {mainWindow.setSize(960, 540), mainWindow.center()}
     },
-    //{
-    //  label: 'バージョンの確認',
-    //  click: () => {apiCheck('check')}
-    //},
+    {
+      type: "separator"
+    },
     {
       label: 'Wikiを開く',
-      position: 'endof=info',
       click: () => {shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')}
     },
     {
+      type: "separator"
+    },
+    {
       label: 'Roamingを開く',
-      position: 'endof=appdata',
       click: () => {shell.openExternal(process.env.APPDATA + '\\DiSpeak')}
     },
     {
       label: 'Localを開く',
-      position: 'endof=appdata',
       click: () => {shell.openExternal(process.env.LOCALAPPDATA + '\\DiSpeak')}
     },
     {
+      type: "separator"
+    },
+    {
       label: '終了する',
-      position: 'endof=cmd',
       click: () => {mainWindow.close()}
     }
   ];
