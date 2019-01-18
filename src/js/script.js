@@ -9,7 +9,7 @@ const nowVersion = ipcRenderer.sendSync('now-version-check');
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
 const homepath = process.env.HOMEPATH;
-const postUrl = 'https://script.google.com/macros/s/AKfycbwcp4mBcZ7bhzrPRf_WAzN5TziFQvZsl3utG-VO0hSRXDC1YbA/exec'
+const postUrl = 'https://script.google.com/macros/s/AKfycbwcp4mBcZ7bhzrPRf_WAzN5TziFQvZsl3utG-VO0hSRXDC1YbA/exec';
 const releaseUrl = 'https://api.github.com/repos/micelle/dc_DiSpeak/releases';
 // 設定ファイルを読み込む
 let setting = ipcRenderer.sendSync('setting-file-read');
@@ -319,7 +319,7 @@ $(function() {
   $(document).on('click', '#request button', function() {
     let obj = {};
     const url = `${postUrl}?t=r`;
-    const name =  escapeHtml($('#request_name').val());
+    const name = escapeHtml($('#request_name').val());
     const twitter = escapeHtml($('#request_twitter').val());
     const comment = escapeHtml($('#request_textarea').val());
     const commentLength = comment.replace(/\s/g, '').length;
@@ -373,7 +373,7 @@ $(function() {
             classes: 'toast-requestPost'
           });
         });
-    })
+    });
   });
   // バージョンチェック
   $(document).on('click', '#version_check', function() {
@@ -494,7 +494,7 @@ client.on('ready', function() {
         return val.iconURL.replace(/\?size=\d+/, '');
       })();
       const name = val.recipients.map(function(v) {
-        return v.username
+        return v.username;
       }).join(', ');
       $('#group-list').append(
         '<div class="collection-item avatar valign-wrapper">' +
@@ -570,7 +570,7 @@ client.on('ready', function() {
   const sStorage = sessionStorage.getItem('DiscordLoginError');
   debugLog('[Discord] sessionStorage', sStorage);
   if (sStorage == null) {
-    readFile();  // 設定ファイルを反映
+    readFile(); // 設定ファイルを反映
   } else {
     const sStorageObj = JSON.parse(sStorage);
     const lStorageId = localStorage.getItem('DiscordLoginId');
@@ -1208,12 +1208,12 @@ function errorLog(obj) {
   const jsoRep = jsn.replace(usernameReg, '***');
   const process = obj.process;
   const anonymousObj = {};
-  Object.assign(anonymousObj , obj);
-  anonymousObj.stack = 'Anonymous
+  Object.assign(anonymousObj, obj);
+  anonymousObj.stack = 'Anonymous';
   debugLog(`[errorLog] homepathAry`, homepathAry);
   debugLog(`[errorLog] username`, username);
   debugLog(`[errorLog] jsoRep`, jsoRep);
-  if ($('.toast-error').length || msgTxt === '') return;';
+  if ($('.toast-error').length || msgTxt === '') return;
   $.post(`${postUrl}?t=e`, JSON.stringify(anonymousObj));
   // mainプロセスのエラー or エラーが発生しました
   if (process == 'main' || msgTxt == 'エラーが発生しました') {
