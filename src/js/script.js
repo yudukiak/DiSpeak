@@ -942,7 +942,7 @@ function startSpeak(thisId, siblingsId) {
   if ($('.toast-bouyomi').length) return;
   // 既にログインしていた場合
   if (loginDiscordCheck) {
-    $(`#${thisId}`).addClass('display-none')
+    $(`#${thisId}`).addClass('display-none');
     $(`#${siblingsId}`).removeClass('display-none');
     if (thisId == 'start') {
       bouyomiSpeakCheck = true; // 読み上げる状態に変更
@@ -1124,7 +1124,7 @@ function release(data) {
 }
 // 連想配列にアクセス
 function objectCheck(obj, path) {
-  if (!(obj instanceof Object)) return null
+  if (!(obj instanceof Object)) return null;
   if (/\./.test(path)) {
     path = path.split('.');
   } else {
