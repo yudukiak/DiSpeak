@@ -8,6 +8,7 @@ const markdown = require('markdown');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
+const homepath = process.env.HOMEPATH;
 const postUrl = 'https://script.google.com/macros/s/AKfycbwcp4mBcZ7bhzrPRf_WAzN5TziFQvZsl3utG-VO0hSRXDC1YbA/exec'
 const releaseUrl = 'https://api.github.com/repos/micelle/dc_DiSpeak/releases';
 // 設定ファイルを読み込む
@@ -1199,13 +1200,20 @@ function errorLog(obj) {
     //if (/Uncaught, unspecified "error" event/.test(msg)) return 'エラーが発生しました。';
     return `エラーが発生しました`;
   })();
+  const homepathAry = homepath.split('\\');
+  const username = homepathAry[2];
+  const usernameReg = new RegExp(username, 'ig');
   const jsn = JSON.stringify(obj);
+  const jsoRep = jsn.replace(usernameReg, '***');
   const process = obj.process;
+  debugLog(`[errorLog] homepathAry`, homepathAry);
+  debugLog(`[errorLog] username`, username);
+  debugLog(`[errorLog] jsoRep`, jsoRep);
   if ($('.toast-error').length || msgTxt === '') return;
   // mainプロセスのエラー or エラーが発生しました
   if (process == 'main' || msgTxt == 'エラーが発生しました') {
     const toastHTML =
-      `<i class="material-icons red-text text-accent-1">highlight_off</i><span>${msgTxt}<br>エラーログを送信しますか？</span><span class="display-none">${jsn}</span>` +
+      `<i class="material-icons red-text text-accent-1">highlight_off</i><span>${msgTxt}<br>エラーログを送信しますか？</span><span class="display-none">${jsoRep}</span>` +
       '<div><button class="btn-flat toast-action" data-error="true">はい</button>' +
       '<button class="btn-flat toast-action" data-error="false">いいえ</button></div>';
     M.toast({
