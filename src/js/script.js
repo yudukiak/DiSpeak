@@ -1196,7 +1196,8 @@ function errorLog(obj) {
     if (/connect ECONNREFUSED \d+\.\d+\.\d+\.\d+:\d+/.test(msg)) return '棒読みちゃんが起動していない、もしくは接続できません';
     if (/\$ is not a function/.test(msg)) return 'エラーが発生しました<br>Ctrl+Rで画面を更新してください';
     if (/([0-9a-zA-Z]+) is not defined/.test(msg)) return 'エラーが発生しました';
-    if (/read ECONNRESET/.test(msg)) return ''; // Discord.jsの問題？
+    if (/read ECONNRESET/.test(msg)) return 'エラーが発生しました'; // Discord.jsの問題？
+    if (/connect ETIMEDOUT/.test(msg)) return 'エラーが発生しました'; // 他のソフトと競合？
     //if (/Uncaught, unspecified "error" event/.test(msg)) return 'エラーが発生しました。';
     return `エラーが発生しました`;
   })();
@@ -1206,10 +1207,14 @@ function errorLog(obj) {
   const jsn = JSON.stringify(obj);
   const jsoRep = jsn.replace(usernameReg, '***');
   const process = obj.process;
+  const anonymousObj = {};
+  Object.assign(anonymousObj , obj);
+  anonymousObj.stack = 'Anonymous
   debugLog(`[errorLog] homepathAry`, homepathAry);
   debugLog(`[errorLog] username`, username);
   debugLog(`[errorLog] jsoRep`, jsoRep);
-  if ($('.toast-error').length || msgTxt === '') return;
+  if ($('.toast-error').length || msgTxt === '') return;';
+  $.post(`${postUrl}?t=e`, JSON.stringify(anonymousObj));
   // mainプロセスのエラー or エラーが発生しました
   if (process == 'main' || msgTxt == 'エラーが発生しました') {
     const toastHTML =
