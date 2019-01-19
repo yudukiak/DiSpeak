@@ -111,7 +111,7 @@ $(function() {
         const storageObj = JSON.parse(storage);
         setting = storageObj;
         // デバッグの処理
-        if (setting.dispeak.debug) {
+        if (objectCheck(setting, 'dispeak.debug')) {
           debugNum = 10;
           $('#dispeak > div:last-child').removeClass('display-none');
         }
@@ -159,7 +159,7 @@ $(function() {
   // 設定ファイルが存在するとき
   else {
     // デバッグの処理
-    if (setting.dispeak.debug) {
+    if (objectCheck(setting, 'dispeak.debug')) {
       debugNum = 10;
       $('#dispeak > div:last-child').removeClass('display-none');
     }
@@ -400,7 +400,7 @@ $(function() {
   });
   // エラーをわざと出す
   $(document).on('click', '#log img', function(event) {
-    if (setting.dispeak.debug && event.ctrlKey && event.shiftKey) console.log(this_variable_is_error);
+    if (objectCheck(setting, 'dispeak.debug') && event.ctrlKey && event.shiftKey) console.log(this_variable_is_error);
   });
   // エラーログを送信しますか？
   $(document).on('click', '.toast-error button', function() {
@@ -1071,7 +1071,7 @@ function logProcess(html, image) {
   // ログの削除
   const logDom = $('#log .collection li');
   const maxLine = (function() { // 表示される最大行数
-    if (setting.dispeak.log_num == null) return 50;
+    if (objectCheck(setting, 'dispeak.log_num') == null) return 50;
     return Number(setting.dispeak.log_num);
   })();
   debugLog(`[logProcess] maxLine`, maxLine);

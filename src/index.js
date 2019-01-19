@@ -152,7 +152,7 @@ function createMainwindow() {
     } else {
       ary.bounds = bounds;
     }
-    const close = appSettingObj.dispeak.window;
+    const close = objectCheck(appSettingObj, 'dispeak.window');
     if (close) writeFileSync(winSetting, ary);
   });
   // ウィンドウが閉じられたらアプリも終了
@@ -192,6 +192,21 @@ function writeFileSync(target, data) {
     return err.code;
   }
   return true;
+}
+// 連想配列にアクセス
+function objectCheck(obj, path) {
+  if (!(obj instanceof Object)) return null;
+  if (/\./.test(path)) {
+    path = path.split('.');
+  } else {
+    path = [path];
+  }
+  let cursor = obj;
+  for (let i = 0; i < path.length; i++) {
+    if (cursor[path[i]] == null) return null; // 見つからないときはnullを
+    cursor = cursor[path[i]]; // 見つかったときはその情報を返す
+  }
+  return cursor;
 }
 // 現在の時刻を取得
 function whatTimeIsIt(iso) {
@@ -354,7 +369,7 @@ function mainWindowMenu() {
       {
         label: 'エラー',
         accelerator: 'CmdOrCtrl+Shift+E',
-        click:  () => {if (appSettingObj.dispeak.debug) console.log(this_variable_is_error)}
+        click:  () => {if (objectCheck(appSettingObj, 'dispeak.debug')) console.log(this_variable_is_error)}
       }
     ]
   }];
