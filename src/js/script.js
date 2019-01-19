@@ -1003,7 +1003,7 @@ function bouyomiExeStart() {
       classes: 'toast-bouyomiExe'
     });
   }
-};
+}
 // 棒読みちゃんにdataを渡す
 function bouyomiSpeak(data) {
   debugLog(`[bouyomiSpeak] data (retry${bouyomiRetryNum + 1})`, data);
@@ -1061,7 +1061,7 @@ function bouyomiSpeak(data) {
   bouyomiClient.on('end', () => {
     bouyomiRetryNum = 0;
   });
-};
+}
 // ログを書き出す
 function logProcess(html, image) {
   debugLog('[logProcess] html', html);
@@ -1136,7 +1136,7 @@ function objectCheck(obj, path) {
     cursor = cursor[path[i]]; // 見つかったときはその情報を返す
   }
   return cursor;
-};
+}
 // 現在の時刻を取得
 function whatTimeIsIt(data) {
   const time = (function() {
