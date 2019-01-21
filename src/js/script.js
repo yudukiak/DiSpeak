@@ -119,7 +119,7 @@ $(function() {
         debugLog('[info] DiSpeak', `v${nowVersion}`);
         debugLog('[info] jQuery', `v${jQueryVersion}`);
         // ログインの処理
-        loginDiscord(setting.discord.token);
+        loginDiscord(objectCheck(setting, 'dispeak.token'));
       } else {
         const loginTime = whatTimeIsIt();
         const loginHtml = `${loginTime} [info]<br>
@@ -148,7 +148,7 @@ $(function() {
     });
   }
   // Discordのトークンがないとき
-  else if (setting.discord.token == '') {
+  else if (objectCheck(setting, 'dispeak.token') == null || objectCheck(setting, 'dispeak.token') == '') {
     const loginTime = whatTimeIsIt();
     const loginHtml = `${loginTime} [info]<br>
     「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
@@ -167,7 +167,7 @@ $(function() {
     debugLog('[info] DiSpeak', `v${nowVersion}`);
     debugLog('[info] jQuery', `v${jQueryVersion}`);
     // ログインの処理
-    loginDiscord(setting.discord.token);
+    loginDiscord(objectCheck(setting, 'dispeak.token'));
   }
   // バージョンを記入
   $('#info button span').eq(0).text(nowVersion);
@@ -232,7 +232,7 @@ $(function() {
   $(document).on('click', '#offline, #online', function() {
     if ($('.toast-discord').length) return;
     const id = $(this).attr('id');
-    const token = setting.discord.token;
+    const token = objectCheck(setting, 'dispeak.token');
     // ログイン時
     if (id == 'offline') {
       // トークンがないとき
@@ -831,7 +831,7 @@ function readFile() {
     const val = $(this).prop('checked');
     serverChannel(index, val);
   });
-  if (setting.dispeak.bouyomi) {
+  if (objectCheck(setting, 'dispeak.bouyomi')) {
     startSpeak('start', 'stop');
   }
 }
@@ -1071,8 +1071,9 @@ function logProcess(html, image) {
   // ログの削除
   const logDom = $('#log .collection li');
   const maxLine = (function() { // 表示される最大行数
-    if (objectCheck(setting, 'dispeak.log_num') == null) return 50;
-    return Number(setting.dispeak.log_num);
+    const num = objectCheck(setting, 'dispeak.log_num');
+    if (num == null) return 50;
+    return Number(num);
   })();
   debugLog(`[logProcess] maxLine`, maxLine);
   if (logDom.length > maxLine) { // 行数を超えたら古いログを削除
