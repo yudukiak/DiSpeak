@@ -788,8 +788,8 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   set.volume = setting.server[guildId].volume;
   set.speed = setting.server[guildId].speed;
   set.tone = setting.server[guildId].tone;
-  const templateTop = setting.server[guildId].top;
-  const template_bymRepAdd = `${templateTop}${template_bymRep}`;
+  const templateCommand = setting.server[guildId].command;
+  const template_bymRepAdd = `${templateCommand}${template_bymRep}`;
   bouyomiSpeak(template_bymRepAdd, set);
   logProcess(template_logRep, avatarURL, oldMember.id);
 });
@@ -885,15 +885,15 @@ client.on('message', function(data) {
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
     //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
-  let template_bymRepAdd = String(template_bymRep);
+  let template_bymRepAdd = template_bymRep;
   let set = {};
   if (guildId != '') {
     set.voice = setting.server[guildId].voice;
     set.volume = setting.server[guildId].volume;
     set.speed = setting.server[guildId].speed;
     set.tone = setting.server[guildId].tone;
-    const templateTop = setting.server[guildId].top;
-    template_bymRepAdd += String(templateTop);
+    const templateCommand = setting.server[guildId].command;
+    template_bymRepAdd = `${templateCommand}${template_bymRep}`;
   }
   bouyomiSpeak(template_bymRepAdd, set);
   logProcess(template_logRep, avatarURL, authorId);
