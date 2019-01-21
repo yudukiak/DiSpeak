@@ -7,15 +7,16 @@ header {
   background: #4a5459;
   color: #fff;
   display: flex;
+  justify-content: flex-end;
   font-size: 15px;
   height: 25px;
 }
 header > div:first-child {
-  margin-right: auto;
+  -webkit-app-region: no-drag;
+  width: 100%;
   padding-left: 5px;
 }
 header > div:first-child svg {
-  /*height: calc(100% - 10px);*/
   height: 100%;
   width: auto;
   padding: 5px;
