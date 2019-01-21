@@ -343,7 +343,6 @@ $(function() {
       if (thisId === 'blacklist') $('#blacklist img').index(this);
       if (thisId === 'whitelist') $('#whitelist img').index(this);
     })();
-    console.info('index', index); // 削除
     const id = $(this).next('div').text().match(/\((\d+)\)$/)[1];
     const userData = client.users.get(id);
     if (userData == null) {
