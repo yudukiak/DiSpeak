@@ -232,7 +232,7 @@ $(function() {
     const val = $(this).val();
     $(this).val(val.replace(/[^0-9]/g, ''));
   });
-  $(document).on('blur input keyup', '#server-list input', function() {
+  $(document).on('blur input keyup', '#server-list input[type=number]', function() {
     const val = $(this).val();
     const valRep = val.replace(/[^0-9]/g, '');
     if (valRep === '') {
@@ -606,11 +606,13 @@ client.on('ready', function() {
             '</div>' +
             '<div class="col s12 row section right-align display-none"></div>' +
             '<div class="col s12 row section right-align">' +
-              `<div class="col s3 row input-field"><input id="${s_id}_voice" name="voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
-              `<div class="col s3 row input-field"><input id="${s_id}_volume" name="volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
-              `<div class="col s3 row input-field"><input id="${s_id}_speed" name="speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
-              `<div class="col s3 row input-field"><input id="${s_id}_tone" name="tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
-              '<span>声質・音量・速度・音程の設定については<a href="https://github.com/micelle/dc_DiSpeak/wiki/Bouyomi" target="_blank">こちら</a>をご確認ください。</span>' +
+              `<div class="col s2 row input-field"><input id="${s_id}_voice" name="voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
+              `<div class="col s2 row input-field"><input id="${s_id}_volume" name="volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
+              `<div class="col s2 row input-field"><input id="${s_id}_speed" name="speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
+              `<div class="col s2 row input-field"><input id="${s_id}_tone" name="tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
+              `<div class="col s2 row input-field"></div>` +
+              `<div class="col s2 row input-field"><input id="${s_id}_top" name="top" type="text" value=""><label for="${s_id}_top">先頭</label></div>` +
+              `<span>各種設定については<a href="${__dirname}\\alpha.md" target="_blank">こちら (alpha.md)</a>をご確認ください。` +
             '</div>' +
           '</div>'
         );
@@ -786,7 +788,9 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   set.volume = setting.server[guildId].volume;
   set.speed = setting.server[guildId].speed;
   set.tone = setting.server[guildId].tone;
-  bouyomiSpeak(template_bymRep, set);
+  const templateTop = setting.server[guildId].top;
+  const template_bymRepAdd = `${templateTop}${template_bymRep}`;
+  bouyomiSpeak(template_bymRepAdd, set);
   logProcess(template_logRep, avatarURL, oldMember.id);
 });
 // チャットが送信された時
@@ -881,14 +885,17 @@ client.on('message', function(data) {
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
     //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
+  let template_bymRepAdd = String(template_bymRep);
   let set = {};
   if (guildId != '') {
     set.voice = setting.server[guildId].voice;
     set.volume = setting.server[guildId].volume;
     set.speed = setting.server[guildId].speed;
     set.tone = setting.server[guildId].tone;
+    const templateTop = setting.server[guildId].top;
+    template_bymRepAdd += String(templateTop);
   }
-  bouyomiSpeak(template_bymRep, set);
+  bouyomiSpeak(template_bymRepAdd, set);
   logProcess(template_logRep, avatarURL, authorId);
 });
 // WebSocketに接続エラーが起きたときの処理
