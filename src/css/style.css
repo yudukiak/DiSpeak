@@ -318,6 +318,11 @@ main .modal-overlay {
 /* ********************
   各種微調整
 ******************** */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 input[type=checkbox]:checked:not(:disabled) ~ .lever:active::before,
 input[type=checkbox]:checked:not(:disabled).tabbed:focus ~ .lever::before {
   background-color: rgba(92,107,192,0.15);
