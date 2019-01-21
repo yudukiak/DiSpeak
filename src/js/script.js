@@ -232,6 +232,29 @@ $(function() {
     const val = $(this).val();
     $(this).val(val.replace(/[^0-9]/g, ''));
   });
+  $(document).on('blur input keyup', '#server-list input', function() {
+    const val = $(this).val();
+    const valRep = val.replace(/[^0-9]/g, '');
+    if (valRep === '') {
+      $(this).val(valRep);
+    } else if (Number(valRep) > 65535) {
+      $(this).val('65535');
+      if ($('.toast-serverinput').length) return;
+      M.toast({
+        html: '65535より大きい値は登録できません',
+        classes: 'toast-serverinput'
+      });
+    } else if (Number(valRep) < 0) {
+      $(this).val('0');
+      if ($('.toast-serverinput').length) return;
+      M.toast({
+        html: '0より小さい値は登録できません',
+        classes: 'toast-serverinput'
+      });
+    } else {
+      $(this).val(valRep);
+    }
+  });
   // オートセーブ
   $(document).on('blur click change focusout input keyup mouseup', 'textarea, input', function() {
     writeFile();
@@ -576,11 +599,20 @@ client.on('ready', function() {
       if (document.getElementById(s_id) == null) {
         $('#server-list').append(
           `<div id="${s_id}" class="collection-item row">` +
-          `<div class="collection-item avatar valign-wrapper"><img src="${s_iconURL}" alt="" class="circle"><span class="title">${s_name}</span></div>` +
-          '<div class="col s12 row section right-align">' +
-          '<div class="col s6 valign-wrapper"><div class="col s9"><strong>チャットの読み上げ</strong></div><div class="col s3 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
-          '<div class="col s6 valign-wrapper"><div class="col s9"><strong>ボイスチャンネルの通知</strong></div><div class="col s3 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
-          '</div><div class="col s12 row section right-align display-none"></div></div>'
+            `<div class="collection-item avatar valign-wrapper"><img src="${s_iconURL}" alt="" class="circle"><span class="title">${s_name}</span></div>` +
+            '<div class="col s12 row section right-align">' +
+              '<div class="col s6 valign-wrapper"><div class="col s9"><strong>チャットの読み上げ</strong></div><div class="col s3 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
+              '<div class="col s6 valign-wrapper"><div class="col s9"><strong>ボイスチャンネルの通知</strong></div><div class="col s3 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
+            '</div>' +
+            '<div class="col s12 row section right-align display-none"></div>' +
+            '<div class="col s12 row section right-align">' +
+              `<div class="col s3 row input-field"><input id="${s_id}_voice" name="voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
+              `<div class="col s3 row input-field"><input id="${s_id}_volume" name="volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
+              `<div class="col s3 row input-field"><input id="${s_id}_speed" name="speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
+              `<div class="col s3 row input-field"><input id="${s_id}_tone" name="tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
+              '<span>声質・音量・速度・音程の設定については<a href="https://github.com/micelle/dc_DiSpeak/wiki/Bouyomi" target="_blank">こちら</a>をご確認ください。</span>' +
+            '</div>' +
+          '</div>'
         );
       }
       $(`#${s_id} .display-none`).append(`<div class="col s6 valign-wrapper"><div class="col s9">${c_name}</div><div class="col s3 switch right-align"><label><input name="${c_id}" type="checkbox" checked><span class="lever"></span></label></div></div>`);
@@ -749,7 +781,12 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
-  bouyomiSpeak(template_bymRep);
+  let set = {};
+  set.voice = setting.server[guildId].voice;
+  set.volume = setting.server[guildId].volume;
+  set.speed = setting.server[guildId].speed;
+  set.tone = setting.server[guildId].tone;
+  bouyomiSpeak(template_bymRep, set);
   logProcess(template_logRep, avatarURL, oldMember.id);
 });
 // チャットが送信された時
@@ -844,7 +881,14 @@ client.on('message', function(data) {
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
     //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
-  bouyomiSpeak(template_bymRep);
+  let set = {};
+  if (guildId != '') {
+    set.voice = setting.server[guildId].voice;
+    set.volume = setting.server[guildId].volume;
+    set.speed = setting.server[guildId].speed;
+    set.tone = setting.server[guildId].tone;
+  }
+  bouyomiSpeak(template_bymRep, set);
   logProcess(template_logRep, avatarURL, authorId);
 });
 // WebSocketに接続エラーが起きたときの処理
@@ -890,6 +934,7 @@ process.on('uncaughtException', (e) => {
 function readFile() {
   for (let id in setting) {
     const data = setting[id];
+    debugLog(`[readFile] data(${id})`, data);
     for (let name in data) {
       const val = data[name];
       const type = toString.call(val);
@@ -897,7 +942,12 @@ function readFile() {
       if (/object Object/.test(type) && /server/.test(id)) {
         for (let serverName in val) {
           const serverVal = val[serverName];
-          $(`#${name} input[name=${serverName}]`).prop('checked', serverVal);
+          const serverValType = toString.call(serverVal);
+          if (/object Boolean/.test(serverValType)) {
+            $(`#${name} input[name=${serverName}]`).prop('checked', serverVal);
+          } else {
+            $(`#${name} input[name=${serverName}][type=number]`).val(serverVal);
+          }
         }
       }
       // チェックボックス
@@ -1093,8 +1143,9 @@ function bouyomiExeStart() {
   }
 }
 // 棒読みちゃんにdataを渡す
-function bouyomiSpeak(data) {
+function bouyomiSpeak(data, set) {
   debugLog(`[bouyomiSpeak] data (retry${bouyomiRetryNum + 1})`, data);
+  debugLog(`[bouyomiSpeak] set (retry${bouyomiRetryNum + 1})`, set);
   if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return;
   bouyomiRetryNum++;
   const bouyomiServer = {};
@@ -1117,14 +1168,42 @@ function bouyomiSpeak(data) {
     data = data.replace(emojiReg, emojiTxt);
   }
   const message = data.replace(/\s+/g, ' ').trim();
+  const setSpeed = (function() {
+    const s = objectCheck(set, 'speed');
+    if (s == null || s === '') return 0xFFFF;
+    const s16 = Number(s).toString(16);
+    return Number(`0x${s16}`);
+  })();
+  const setTone = (function() {
+    const s = objectCheck(set, 'tone');
+    if (s == null || s === '') return 0xFFFF;
+    const s16 = Number(s).toString(16);
+    return Number(`0x${s16}`);
+  })();
+  const setVolume = (function() {
+    const s = objectCheck(set, 'volume');
+    if (s == null || s === '') return 0xFFFF;
+    const s16 = Number(s).toString(16);
+    return Number(`0x${s16}`);
+  })();
+  const setVoice = (function() {
+    const s = objectCheck(set, 'voice');
+    if (s == null || s === '') return 0x0000;
+    const s16 = Number(s).toString(16);
+    return Number(`0x${s16}`);
+  })();
+  debugLog('[bouyomiSpeak] setSpeed', setSpeed);
+  debugLog('[bouyomiSpeak] setTone', setTone);
+  debugLog('[bouyomiSpeak] setVolume', setVolume);
+  debugLog('[bouyomiSpeak] setVoice', setVoice);
   const bouyomiClient = net.createConnection(options, () => {
     const messageBuffer = Buffer.from(message);
     const buffer = Buffer.alloc(15 + messageBuffer.length);
     buffer.writeUInt16LE(0x0001, 0);
-    buffer.writeUInt16LE(0xFFFF, 2);
-    buffer.writeUInt16LE(0xFFFF, 4);
-    buffer.writeUInt16LE(0xFFFF, 6);
-    buffer.writeUInt16LE(0x0000, 8);
+    buffer.writeUInt16LE(setSpeed, 2); // 速度 speed
+    buffer.writeUInt16LE(setTone, 4); // 音程 tone
+    buffer.writeUInt16LE(setVolume, 6); // 音量 volume
+    buffer.writeUInt16LE(setVoice, 8); // 声質 voice
     buffer.writeUInt8(0x00, 10);
     buffer.writeUInt32LE(messageBuffer.length, 11);
     messageBuffer.copy(buffer, 15, 0, messageBuffer.length);
@@ -1138,7 +1217,7 @@ function bouyomiSpeak(data) {
       bouyomiClient.end();
     } else {
       setTimeout(function() {
-        bouyomiSpeak(message);
+        bouyomiSpeak(message, set);
       }, 100);
     }
   });
