@@ -1214,7 +1214,7 @@ function errorLog(obj) {
   debugLog(`[errorLog] username`, username);
   debugLog(`[errorLog] jsoRep`, jsoRep);
   if ($('.toast-error').length || msgTxt === '') return;
-  $.post(`${postUrl}?t=e`, JSON.stringify(anonymousObj));
+  if (msgTxt === 'エラーが発生しました') $.post(`${postUrl}?t=e`, JSON.stringify(anonymousObj));
   // mainプロセスのエラー or エラーが発生しました
   if (process == 'main' || msgTxt == 'エラーが発生しました') {
     const toastHTML =
