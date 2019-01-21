@@ -119,7 +119,7 @@ $(function() {
         debugLog('[info] DiSpeak', `v${nowVersion}`);
         debugLog('[info] jQuery', `v${jQueryVersion}`);
         // ログインの処理
-        loginDiscord(objectCheck(setting, 'dispeak.token'));
+        loginDiscord(objectCheck(setting, 'discord.token'));
       } else {
         const loginTime = whatTimeIsIt();
         const loginHtml = `${loginTime} [info]<br>
@@ -148,7 +148,7 @@ $(function() {
     });
   }
   // Discordのトークンがないとき
-  else if (objectCheck(setting, 'dispeak.token') == null || objectCheck(setting, 'dispeak.token') == '') {
+  else if (objectCheck(setting, 'discord.token') == null || objectCheck(setting, 'discord.token') == '') {
     const loginTime = whatTimeIsIt();
     const loginHtml = `${loginTime} [info]<br>
     「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
@@ -167,7 +167,7 @@ $(function() {
     debugLog('[info] DiSpeak', `v${nowVersion}`);
     debugLog('[info] jQuery', `v${jQueryVersion}`);
     // ログインの処理
-    loginDiscord(objectCheck(setting, 'dispeak.token'));
+    loginDiscord(objectCheck(setting, 'discord.token'));
   }
   // バージョンを記入
   $('#info button span').eq(0).text(nowVersion);
@@ -232,7 +232,7 @@ $(function() {
   $(document).on('click', '#offline, #online', function() {
     if ($('.toast-discord').length) return;
     const id = $(this).attr('id');
-    const token = objectCheck(setting, 'dispeak.token');
+    const token = objectCheck(setting, 'discord.token');
     // ログイン時
     if (id == 'offline') {
       // トークンがないとき
