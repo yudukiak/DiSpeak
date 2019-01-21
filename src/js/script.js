@@ -613,20 +613,34 @@ client.on('ready', function() {
     $('#blacklist > .row.section').eq(1).addClass('display-none'); // プログレスを非表示
     $('#whitelist > .row.section').eq(0).removeClass('display-none');
     $('#whitelist > .row.section').eq(1).addClass('display-none');
-    $('#blacklist .chip, #whitelist .chip').each(function(i) {
-      const thisId = $(this).attr('id');
+    $('#blacklist .chip').each(function(i) {
       const id = $(this).text().replace(/[^0-9]/g, '');
       const userData = client.users.get(id);
       if (userData == null) {
         client.fetchUser(id)
           .then(function(val) {
-            chipWrite(val, id, i, thisId);
+            chipWrite(val, id, i, 'blacklist');
           })
           .catch(function(res) {
-            chipWrite(null, id, i, thisId);
+            chipWrite(null, id, i, 'blacklist');
           });
       } else {
-        chipWrite(userData, id, i, thisId);
+        chipWrite(userData, id, i, 'blacklist');
+      }
+    });
+    $('#whitelist .chip').each(function(i) {
+      const id = $(this).text().replace(/[^0-9]/g, '');
+      const userData = client.users.get(id);
+      if (userData == null) {
+        client.fetchUser(id)
+          .then(function(val) {
+            chipWrite(val, id, i, 'whitelist');
+          })
+          .catch(function(res) {
+            chipWrite(null, id, i, 'whitelist');
+          });
+      } else {
+        chipWrite(userData, id, i, 'whitelist');
       }
     });
   }, 1000 * 10);
