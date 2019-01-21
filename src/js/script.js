@@ -604,15 +604,16 @@ client.on('ready', function() {
               '<div class="col s6 valign-wrapper"><div class="col s9"><strong>チャットの読み上げ</strong></div><div class="col s3 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
               '<div class="col s6 valign-wrapper"><div class="col s9"><strong>ボイスチャンネルの通知</strong></div><div class="col s3 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
             '</div>' +
-            '<div class="col s12 row section right-align display-none"></div>' +
-            '<div class="col s12 row section right-align">' +
-              `<div class="col s2 row input-field"><input id="${s_id}_voice" name="voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
-              `<div class="col s2 row input-field"><input id="${s_id}_volume" name="volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
-              `<div class="col s2 row input-field"><input id="${s_id}_speed" name="speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
-              `<div class="col s2 row input-field"><input id="${s_id}_tone" name="tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
-              `<div class="col s2 row input-field"></div>` +
-              `<div class="col s2 row input-field"><input id="${s_id}_top" name="top" type="text" value=""><label for="${s_id}_top">コマンド</label></div>` +
-              `<span>各種設定については<a href="https://github.com/micelle/dc_DiSpeak/wiki/alpha230" target="_blank">こちら</a>をご確認ください。` +
+            '<div class="col s12 row section right-align display-none">' +
+              '<div class="col s12 row section right-align">' +
+                `<div class="col s2 row input-field"><input id="${s_id}_voice" name="voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_volume" name="volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_speed" name="speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_tone" name="tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
+                `<div class="col s2 row input-field"></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_command" name="command" type="text" value=""><label for="${s_id}_command">コマンド</label></div>` +
+                '<span class="col s12 row input-field">各種設定については<a href="https://github.com/micelle/dc_DiSpeak/wiki/alpha230" target="_blank">こちら</a>をご確認ください。</span>' +
+              '</div>' +
             '</div>' +
           '</div>'
         );
@@ -953,7 +954,7 @@ function readFile() {
           if (/object Boolean/.test(serverValType)) {
             $(`#${name} input[name=${serverName}]`).prop('checked', serverVal);
           } else {
-            $(`#${name} input[name=${serverName}][type=number]`).val(serverVal);
+            $(`#${name} input[name=${serverName}][type=number], #${name} input[name=${serverName}][type=text]`).val(serverVal);
           }
         }
       }
