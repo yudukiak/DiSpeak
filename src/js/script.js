@@ -446,9 +446,20 @@ $(function() {
       writeFile();
     }
   });
-  // エラーをわざと出す
+  // 画像クリックでIDをコピー
   $(document).on('click', '#log img', function(event) {
-    if (objectCheck(setting, 'dispeak.debug') && event.ctrlKey && event.shiftKey) console.log(this_variable_is_error);
+    if (objectCheck(setting, 'dispeak.debug') && event.ctrlKey && event.shiftKey) console.log(this_variable_is_error); // デバッグ用
+    const userid = $(this).data('userid');
+    if (userid == null) return;
+    const result = copyTextToClipboard(userid);
+    const text = (function() {
+      if (result) return 'コピーに成功しました。'
+      return 'コピーに失敗しました。'
+    })();
+    M.toast({
+      html: `ユーザーID: ${userid}<br>${text}`
+    });
+    debugLog('[logImg] userid', userid);
   });
   // エラーログを送信しますか？
   $(document).on('click', '.toast-error button', function() {
@@ -521,7 +532,7 @@ client.on('ready', function() {
   localStorage.setItem('DiscordLoginId', userId); // 最後にログインしたIDを保存しておく
   const loginTime = whatTimeIsIt();
   const loginHtml = `${loginTime} [info]<br>Discordのログインに成功しました`;
-  logProcess(loginHtml, avatarURL);
+  logProcess(loginHtml, avatarURL, userId);
   // 各チャンネル
   client.channels.map(function(val, key) {
     // ダイレクトメッセージ
@@ -726,7 +737,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
   bouyomiSpeak(template_bymRep);
-  logProcess(template_logRep, avatarURL);
+  logProcess(template_logRep, avatarURL, oldMember.id);
 });
 // チャットが送信された時
 client.on('message', function(data) {
@@ -821,7 +832,7 @@ client.on('message', function(data) {
     //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
   bouyomiSpeak(template_bymRep);
-  logProcess(template_logRep, avatarURL);
+  logProcess(template_logRep, avatarURL, authorId);
 });
 // WebSocketに接続エラーが起きたときの処理
 client.on('error', function(data) {
@@ -1126,10 +1137,23 @@ function bouyomiSpeak(data) {
     bouyomiRetryNum = 0;
   });
 }
+// クリップボードへコピー
+function copyTextToClipboard(textVal){
+  const temp = document.createElement('div');
+  temp.appendChild(document.createElement('pre')).textContent = textVal;
+  const s = temp.style;
+  s.position = 'fixed';
+  s.left = '-100%';
+  document.body.appendChild(temp);
+  document.getSelection().selectAllChildren(temp);
+  const result = document.execCommand('copy');
+  document.body.removeChild(temp);
+  return result;
+}
 // ログを書き出す
-function logProcess(html, image) {
+function logProcess(html, image, userId) {
   debugLog('[logProcess] html', html);
-  const htmlAdd = `<li class="collection-item avatar valign-wrapper"><img src="${image}" class="circle"><p>${html}</p></li>`;
+  const htmlAdd = `<li class="collection-item avatar valign-wrapper"><img src="${image}" class="circle" data-userid="${userId}"><p>${html}</p></li>`;
   const emoji = twemoji.parse(htmlAdd);
   $('#log .collection').prepend(emoji);
   // ログの削除
