@@ -67,6 +67,7 @@
               <li class="collection-item waves-effect waves-light">絵文字</li>
               <li class="collection-item waves-effect waves-light">棒読みちゃん</li>
               <li class="collection-item waves-effect waves-light">ブラックリスト</li>
+              <li class="collection-item waves-effect waves-light">ホワイトリスト</li>
             </ul>
           </div>
           <div id="setting_table" class="col s9">
@@ -95,6 +96,11 @@
               <div class="row section valign-wrapper">
                 <div class="col s10"><strong>自分以外のチャットを読み上げる？</strong></div>
                 <div class="col s2 switch right-align"><label><input name="other_chat" type="checkbox" checked><span class="lever"></span></label></div>
+              </div>
+              <div class="divider"></div>
+              <div class="row section valign-wrapper">
+                <div class="col s10"><strong class="valign-wrapper">ホワイトリストを利用する？</strong>Onで利用する。Offで利用しない。</div>
+                <div class="col s2 switch right-align"><label><input name="whitelist" type="checkbox"><span class="lever"></span></label></div>
               </div>
               <div class="divider"></div>
               <div class="row section">
@@ -315,6 +321,46 @@
               <div class="row section">
                 <div class="col s12">
                   <span class="helper-text">特定のユーザーをブラックリストに追加することで「全てのチャット」と「サーバーのボイスチャンネル」の通知を読ませない・ログを表示させないことができます。</span>
+                </div>
+                <div class="col s12">
+                  <div class="chips chips-placeholder"></div>
+                </div>
+              </div>
+              <div class="row section display-none">
+                <div class="col s12 center-align row section">
+                  <h4>読み込み中です</h4>
+                  <p>しばらくお待ちください</p>
+                  <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-blue">
+                      <div class="circle-clipper left"><div class="circle"></div></div>
+                      <div class="gap-patch"><div class="circle"></div></div>
+                      <div class="circle-clipper right"><div class="circle"></div></div>
+                    </div>
+                    <div class="spinner-layer spinner-red">
+                      <div class="circle-clipper left"><div class="circle"></div></div>
+                      <div class="gap-patch"><div class="circle"></div></div>
+                      <div class="circle-clipper right"><div class="circle"></div></div>
+                    </div>
+                    <div class="spinner-layer spinner-yellow">
+                      <div class="circle-clipper left"><div class="circle"></div></div>
+                      <div class="gap-patch"><div class="circle"></div></div>
+                      <div class="circle-clipper right"><div class="circle"></div>
+                      </div>
+                    </div>
+                    <div class="spinner-layer spinner-green">
+                      <div class="circle-clipper left"><div class="circle"></div></div>
+                      <div class="gap-patch"><div class="circle"></div></div>
+                      <div class="circle-clipper right"><div class="circle"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- ホワイトリスト -->
+            <div id="whitelist" class="collection col s12 display-none">
+              <div class="row section">
+                <div class="col s12">
+                  <span class="helper-text">特定のユーザーをホワイトリストに追加することで、該当ユーザーのみ「全てのチャット」と「サーバーのボイスチャンネル」の通知を読ませる・ログを表示させることができます。</span>
                 </div>
                 <div class="col s12">
                   <div class="chips chips-placeholder"></div>

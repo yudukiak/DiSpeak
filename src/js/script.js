@@ -44,7 +44,7 @@ $(function() {
   M.Modal.init($('.modal'), {
     dismissible: false
   });
-  M.Chips.init($('.chips'), {
+  M.Chips.init($('#blacklist .chips'), {
     placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
     secondaryPlaceholder: '+ ユーザーのIDを追加する',
     data: (function() {
@@ -52,7 +52,7 @@ $(function() {
       return setting.blacklist;
     })(),
     onChipAdd: function() {
-      const instance = M.Chips.getInstance($('.chips'));
+      const instance = M.Chips.getInstance($('#blacklist .chips'));
       const ary = instance.chipsData;
       const aryLen = ary.length - 1;
       const lastAry = ary[aryLen];
@@ -69,7 +69,7 @@ $(function() {
         if (userData == null) {
           client.fetchUser(lastTag)
             .then(function(val) {
-              chipWrite(val, lastTag, aryLen);
+              chipWrite(val, lastTag, aryLen, 'blacklist');
               writeFile();
             })
             .catch(function(res) {
@@ -77,11 +77,54 @@ $(function() {
                 html: `ID「${lastTag}」が見つかりませんでした`,
                 classes: 'toast-chips'
               });
-              chipWrite(null, lastTag, aryLen);
+              chipWrite(null, lastTag, aryLen, 'blacklist');
               writeFile();
             });
         } else {
-          chipWrite(userData, lastTag, aryLen);
+          chipWrite(userData, lastTag, aryLen, 'blacklist');
+          writeFile();
+        }
+      }
+    }
+  });
+  M.Chips.init($('#whitelist .chips'), {
+    placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
+    secondaryPlaceholder: '+ ユーザーのIDを追加する',
+    data: (function() {
+      if (objectCheck(setting, 'whitelist') == null) return [];
+      return setting.whitelist;
+    })(),
+    onChipAdd: function() {
+      const instance = M.Chips.getInstance($('#whitelist .chips'));
+      const ary = instance.chipsData;
+      const aryLen = ary.length - 1;
+      const lastAry = ary[aryLen];
+      const lastTag = lastAry.tag;
+      const lastImg = lastAry.image;
+      if (setting == null || !loginDiscordCheck) {
+        instance.deleteChip(aryLen);
+        M.toast({
+          html: 'Discordにログインをしてください',
+          classes: 'toast-chips'
+        });
+      } else if (lastImg == null) {
+        const userData = client.users.get(lastTag);
+        if (userData == null) {
+          client.fetchUser(lastTag)
+            .then(function(val) {
+              chipWrite(val, lastTag, aryLen, 'whitelist');
+              writeFile();
+            })
+            .catch(function(res) {
+              M.toast({
+                html: `ID「${lastTag}」が見つかりませんでした`,
+                classes: 'toast-chips'
+              });
+              chipWrite(null, lastTag, aryLen, 'whitelist');
+              writeFile();
+            });
+        } else {
+          chipWrite(userData, lastTag, aryLen, 'whitelist');
           writeFile();
         }
       }
@@ -185,7 +228,7 @@ $(function() {
     $(this).val(val.replace(/[^a-zA-Z0-9!-/:-@¥[-`{-~]/g, '').replace(/"/g, ''));
   });
   // NGユーザー・ログの数 入力制限（数字以外を削除）
-  $(document).on('blur input keyup', '#blacklist input, #log_num', function() {
+  $(document).on('blur input keyup', '#blacklist input, #whitelist input, #log_num', function() {
     const val = $(this).val();
     $(this).val(val.replace(/[^0-9]/g, ''));
   });
@@ -293,15 +336,20 @@ $(function() {
     }
   });
   // ブラックリストの情報を再取得
-  $(document).on('click', '#blacklist img', function() {
+  $(document).on('click', '#blacklist img, #whitelist img', function() {
     if ($(this).attr('src') != 'images/discord.png') return;
-    const index = $('#blacklist img').index(this);
+    const thisId = $(this).attr('id');
+    const index = (function(){
+      if (thisId === 'blacklist') $('#blacklist img').index(this);
+      if (thisId === 'whitelist') $('#whitelist img').index(this);
+    })();
+    console.info('index', index); // 削除
     const id = $(this).next('div').text().match(/\((\d+)\)$/)[1];
     const userData = client.users.get(id);
     if (userData == null) {
       client.fetchUser(id)
         .then(function(val) {
-          chipWrite(val, id, index);
+          chipWrite(val, id, index, thisId);
         })
         .catch(function(res) {
           M.toast({
@@ -309,10 +357,10 @@ $(function() {
             html: `ID「${id}」が見つかりませんでした`,
             classes: 'toast-chips'
           });
-          chipWrite(null, id, index);
+          chipWrite(null, id, index, thisId);
         });
     } else {
-      chipWrite(userData, id, index);
+      chipWrite(userData, id, index, thisId);
     }
   });
   // フォームの送信
@@ -455,6 +503,8 @@ client.on('ready', function() {
   $('#online').removeClass('display-none');
   $('#blacklist > .row.section').eq(0).addClass('display-none'); // blacklistを非表示
   $('#blacklist > .row.section').eq(1).removeClass('display-none'); // プログレスを表示
+  $('#whitelist > .row.section').eq(0).addClass('display-none');
+  $('#whitelist > .row.section').eq(1).removeClass('display-none');
   M.toast({
     html: 'Discordのログインに成功しました',
     classes: 'toast-discord'
@@ -550,19 +600,22 @@ client.on('ready', function() {
   setTimeout(function() {
     $('#blacklist > .row.section').eq(0).removeClass('display-none'); // blacklistを表示
     $('#blacklist > .row.section').eq(1).addClass('display-none'); // プログレスを非表示
-    $('#blacklist .chip').each(function(i) {
+    $('#whitelist > .row.section').eq(0).removeClass('display-none');
+    $('#whitelist > .row.section').eq(1).addClass('display-none');
+    $('#blacklist .chip, #whitelist .chip').each(function(i) {
+      const thisId = $(this).attr('id');
       const id = $(this).text().replace(/[^0-9]/g, '');
       const userData = client.users.get(id);
       if (userData == null) {
         client.fetchUser(id)
           .then(function(val) {
-            chipWrite(val, id, i);
+            chipWrite(val, id, i, thisId);
           })
           .catch(function(res) {
-            chipWrite(null, id, i);
+            chipWrite(null, id, i, thisId);
           });
       } else {
-        chipWrite(userData, id, i);
+        chipWrite(userData, id, i, thisId);
       }
     });
   }, 1000 * 10);
@@ -637,6 +690,11 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     const blacklistTag = blacklist[i].tag;
     if (blacklistTag == oldMember.id) return;
   }
+  // ホワイトリストの処理
+  if (objectCheck(setting, 'dispeak.whitelist')) {
+    const whitelist = setting.whitelist;
+    if (whitelist.indexOf(oldMember.id) == -1) return;
+  }
   // テキストの生成
   const time = whatTimeIsIt(); // 現在の時刻
   const guildName = oldMember.guild.name; // 対象サーバーの名前
@@ -707,6 +765,11 @@ client.on('message', function(data) {
   for (let i = 0, n = blacklist.length; i < n; i++) {
     const blacklistTag = blacklist[i].tag;
     if (blacklistTag == authorId) return;
+  }
+  // ホワイトリストの処理
+  if (objectCheck(setting, 'dispeak.whitelist')) {
+    const whitelist = setting.whitelist;
+    if (whitelist.indexOf(authorId) == -1) return;
   }
   // テキストの生成
   const template_bym = setting[channelType].template_bym;
@@ -863,7 +926,8 @@ function writeFile() {
       $.extend(true, setting_AutoSave.server, parentObj);
     }
   });
-  setting_AutoSave.blacklist = M.Chips.getInstance($('.chips')).chipsData;
+  setting_AutoSave.blacklist = M.Chips.getInstance($('#blacklist .chips')).chipsData;
+  setting_AutoSave.whitelist = M.Chips.getInstance($('#whitelist .chips')).chipsData;
   setting_AutoSave.version = nowVersion;
   setting_AutoSave.clientID = clientID;
   if (!setting_AutoSave.dispeak.debug) delete setting_AutoSave.dispeak.debug;
@@ -918,15 +982,15 @@ function loginDiscord(token) {
     });
 }
 // チップ
-function chipWrite(userData, tag, len) {
+function chipWrite(userData, tag, len, listId) {
   debugLog('[Discord] onChipAdd', userData);
   if (userData == null) {
-    $('#blacklist .chip').eq(len).html(`<img src="images/discord.png"><div>- (${tag})</div><i class="material-icons close">close</i>`);
+    $(`#${listId} .chip`).eq(len).html(`<img src="images/discord.png"><div>- (${tag})</div><i class="material-icons close">close</i>`);
   } else {
     const userName = userData.username;
     const userDiscriminator = userData.discriminator;
     const useAvatarURL = userData.displayAvatarURL.replace(/\?size=\d+/, '');
-    $('#blacklist .chip').eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`);
+    $(`#${listId} .chip`).eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`);
   }
 }
 // サーバーチャンネルの表示非表示
