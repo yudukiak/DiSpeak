@@ -2,7 +2,7 @@
   header
 ******************** */
 header {
-  -webkit-app-region: drag;
+  -webkit-app-region: no-drag;
   -webkit-user-select: none;
   background: #4a5459;
   color: #fff;
@@ -12,15 +12,15 @@ header {
   height: 25px;
 }
 header > div:first-child {
-  -webkit-app-region: no-drag;
+  -webkit-app-region: drag;
   width: 100%;
-  padding-left: 5px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 header > div:first-child svg {
   height: 100%;
   width: auto;
-  padding: 5px;
-  padding: 5px;
+  padding-bottom: 5px;
   fill: #fff;
 }
 header > div:not(:first-child) {
