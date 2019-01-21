@@ -483,6 +483,7 @@ $(function() {
         $('#modal_notification .collection').removeClass('hide');
         $('#modal_notification .preloader-wrapper').addClass('hide');
         $('#modal_notification > .modal-content > div > div:nth-child(1) > p').addClass('hide');
+        $('#modal_notification a[href^=http]').attr('target', '_blank').attr('draggable', 'false');
       })
       // 通信エラーの場合
       .fail(function(data) {
