@@ -38,7 +38,7 @@ window.console.log = function(e) {
 };
 $(function() {
   analytics();
-  $.get(releaseUrl, null, release, "json");
+  $.get(releaseUrl, null, release, 'json');
   // materializeの処理
   M.AutoInit();
   M.Modal.init($('.modal'), {
