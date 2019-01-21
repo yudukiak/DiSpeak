@@ -38,6 +38,7 @@ window.console.log = function(e) {
 };
 $(function() {
   analytics();
+  getNotificationJson();
   $.get(releaseUrl, null, release, 'json');
   // materializeの処理
   M.AutoInit();
@@ -448,6 +449,50 @@ $(function() {
   // バージョンチェック
   $(document).on('click', '#version_check', function() {
     ipcRenderer.send('version-check');
+  });
+  // お知らせチェック
+  $(document).on('click', '#notification', function() {
+    $('#modal_notification .collection').addClass('hide');
+    $('#modal_notification .preloader-wrapper').removeClass('hide');
+    $('#modal_notification > .modal-content > div > div:nth-child(1) > p').removeClass('hide');
+    M.Modal.getInstance($('#modal_notification')).open();
+    $.get(`${postUrl}?t=notification`, null)
+      // サーバーからの返信を受け取る
+      .done(function(data) {
+        debugLog('[notification] click done data', data);
+        let html = '';
+        if (data.length == null ) {
+          M.toast({
+            html: 'おしらせの取得に失敗しました<br>時間を置いて再度お試し下さい',
+            classes: 'toast-notification'
+          });
+          M.Modal.getInstance($('#modal_notification')).close();
+          return;
+        } else if (data.length === 0) {
+         html += `<li class="collection-item left-align"><p>新しいお知らせはありませんでした…っ！ (っ◞‸◟c)</p></li>`;
+        } else {
+          for (let i = 0, n = data.length; i < n; i++) {
+            const time = whatTimeIsIt(data[i].time);
+            const title = data[i].title;
+            const message = markdown.markdown.toHTML(data[i].message, 'Gruber').replace(/~~([^~]+)~~/g, '<del>$1</del>');
+            html += `<li class="collection-item left-align"><p>${title} (${time})</p><div>${message}</div></li>`;
+          }
+        }
+        const emoji = twemoji.parse(html);
+        $('#modal_notification ul').html(emoji);
+        $('#modal_notification .collection').removeClass('hide');
+        $('#modal_notification .preloader-wrapper').addClass('hide');
+        $('#modal_notification > .modal-content > div > div:nth-child(1) > p').addClass('hide');
+      })
+      // 通信エラーの場合
+      .fail(function(data) {
+        M.toast({
+          html: 'おしらせの取得に失敗しました<br>時間を置いて再度お試し下さい',
+          classes: 'toast-notification'
+        });
+        M.Modal.getInstance($('#modal_notification')).close();
+        debugLog('[notification] click fail data', data);
+      });
   });
   // デバッグ
   $(document).on('click', '#info button:eq(0)', function() {
@@ -1283,6 +1328,19 @@ function analytics() {
   obj.version = nowVersion;
   obj.clientID = clientID;
   $.post(url, JSON.stringify(obj)).done(function(data) {}).fail(function() {});
+}
+// お知らせを定期チェック
+function getNotificationJson() {
+  $.get(`${postUrl}?t=notification`, null)
+    .done(function(data) {
+      debugLog('[notification] setTimeout done data', data);
+      if (!$('#notification').hasClass('hide')) $('#notification').addClass('hide');
+      if (data.length > 0 ) $('#notification').removeClass('hide');
+    });
+  const time = 1000 * 60 * 10;
+  setTimeout(function () {
+    getNotificationJson();
+  }, time);
 }
 // 更新履歴を反映
 function release(data) {

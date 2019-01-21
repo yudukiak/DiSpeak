@@ -36,6 +36,11 @@ header > div:not(:first-child):not(:last-child):hover {
 header > div:last-child:hover {
   background: #e81123;
 }
+#notification {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 /* ********************
   main
 ******************** */

@@ -29,6 +29,9 @@
         <path d="M4e-8 34.3960732h9.4155817c5.00512388 0 8.62268965-1.1860751 11.79425388-3.97077054 3.76623228-3.24880135 5.99623795-8.1477937 5.99623795-13.25305869 0-5.15683564-2.18045016-10.055828-5.89712694-13.20149803C18.1869379 1.2891918 14.3215946-.0000146 9.46513725-.0000146H5e-8zm6.44223948-5.82722417V5.82719957h1.73444963c4.16267831 0 6.690018.77352984 8.82091266 2.78469544 2.23000566 2.06273626 3.56800926 5.25997695 3.56800926 8.56034896 0 3.300372-1.3380036 6.60075402-3.56800926 8.66348027-2.03178365 1.90802429-4.65823435 2.73312479-8.82091266 2.73312479zM38.5504552 10.01175137h-5.84757143v24.38510169h5.84757143zM65.20909396 3.66768085C62.43397576 1.2390809 59.11374501-.0000046 55.49617924-.0000046c-5.94668245 0-10.30758377 4.0641836-10.30758377 9.61526781 0 4.36155974 2.18045116 6.74058868 8.1271336 8.92137355 2.6760072.9912604 3.9644553 1.5364616 4.60867885 1.98253078 1.18933709.84257734 1.78400513 1.9825308 1.78400513 3.32072832 0 2.72598608-2.13089466 4.65894585-5.10423588 4.65894585s-5.4511264-1.58602263-6.93779652-4.41112075l-4.1626783 4.0146126c2.97334122 4.3119987 6.54135148 6.2945295 11.34825334 6.2945295 6.8386845 0 11.49691985-4.41112076 11.49691985-10.90390433 0-2.92423017-.99111407-5.30325911-2.92378571-6.93885276-1.48667111-1.28863651-2.97334122-1.98252079-6.590907-3.32072832-3.86534328-1.43733957-5.00512487-2.37903894-5.00512487-4.16331565 0-2.0320918 2.03178365-3.66767546 4.65823535-3.66767546 2.08133816 0 3.61756477.7434453 5.3520144 2.67641506zM77.36263024 25.87197767h2.87422322c2.8742332 0 4.95557036-.7434453 6.34312847-2.23034588 1.3380046-1.43732957 2.08134715-3.46942138 2.08134715-5.65020625 0-2.37902894-.94156657-4.60937483-2.57690219-6.0467044-1.58578212-1.38777855-3.36978825-1.93296977-6.54135249-1.93296977h-8.0280176v24.38510169h5.84757344zm0-4.95632197v-5.94758236h1.73444263c2.6760092 0 3.76623628.84257734 3.76623628 3.0233522 0 1.98253079-1.09022708 2.92423016-3.51845876 2.92423016zM108.06005155 14.96807334v-4.95632197h-14.7675941v24.38510169h14.7675941v-4.95632197h-8.92002067V24.186833h8.62268965v-4.95632197h-8.62268965v-4.26243769zM119.1922758 30.18397639h9.76247024l1.68489912 4.21287667h5.99623395L126.37785384 9.51612118h-4.31134482l-10.55536628 24.88073188h5.94668044zm1.93267665-4.80762891l3.02289373-7.533605 2.92378671 7.533605zM147.1749708 25.12853238l7.38380206 9.26832068h6.8386835L150.69342958 21.1634708l9.91113074-11.15171943h-6.6404595l-7.97846409 9.61525782v-9.61525782h-5.84757344v24.38510169h5.84757344V26.4667399z"/>
       </svg>
     </div>
+    <div id="notification" class="hide">
+      <i class="tiny material-icons">info</i>
+    </div>
     <div id="window-minimize">
       <svg width="12" height="12"><path stroke="#fff" stroke-width="2" d="M0 6h12"/></svg>
     </div>
@@ -627,6 +630,45 @@
       <div class="modal-footer">
         <a href="#!" class="modal-close waves-effect waves-green btn-flat" data-error="false">キャンセル</a>
         <a href="#!" class="modal-close waves-effect waves-green btn-flat" data-error="true">送信</a>
+      </div>
+    </div>
+    <div id="modal_notification" class="modal">
+      <div class="modal-content">
+        <div class="row">
+          <div class="col s12 center-align row section">
+            <h4>お知らせ</h4>
+            <p>読み込み中です</p>
+          </div>
+          <div class="col s12 center-align row section">
+            <ul class="collection hide"></ul>
+            <div class="preloader-wrapper big active">
+              <div class="spinner-layer spinner-blue">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+              </div>
+              <div class="spinner-layer spinner-red">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+              </div>
+              <div class="spinner-layer spinner-yellow">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div>
+                </div>
+              </div>
+              <div class="spinner-layer spinner-green">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">閉じる</a>
       </div>
     </div>
   </main>
