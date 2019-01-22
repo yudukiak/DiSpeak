@@ -45,6 +45,9 @@ $(function() {
   M.Modal.init($('.modal'), {
     dismissible: false
   });
+  M.Modal.init($('#modal_notification.modal'), {
+    dismissible: true
+  });
   M.Chips.init($('#blacklist .chips'), {
     placeholder: 'ユーザーのIDを記入し、エンターで追加できます',
     secondaryPlaceholder: '+ ユーザーのIDを追加する',
