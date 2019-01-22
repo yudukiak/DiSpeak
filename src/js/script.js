@@ -282,6 +282,7 @@ $(function() {
     } else {
       $('.fixed-action-btn').addClass('display-none');
     }
+    $('main').scrollTop(0);
   });
   // 設定リストの切り替え
   $(document).on('click', '#setting_menu li, #help_menu li', function() {
@@ -291,6 +292,7 @@ $(function() {
     $(`#${id}_table > div`).eq(index).removeClass('display-none');
     $(`#${id}_menu li`).removeClass('active blue');
     $(this).addClass('active blue');
+    $('main').scrollTop(0);
   });
   // 再生・停止
   $(document).on('click', '.fixed-action-btn a', function() {
@@ -459,6 +461,7 @@ $(function() {
     $('#modal_notification .preloader-wrapper').removeClass('hide');
     $('#modal_notification > .modal-content > div > div:nth-child(1) > p').removeClass('hide');
     M.Modal.getInstance($('#modal_notification')).open();
+    $('#modal_notification').scrollTop(0);
     $.get(`${postUrl}?t=notification`, null)
       // サーバーからの返信を受け取る
       .done(function(data) {
