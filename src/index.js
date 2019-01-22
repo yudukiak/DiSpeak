@@ -23,10 +23,18 @@ const appName = app.getName();
 let mainWindow = null; // メインウィンドウはGCされないようにグローバル宣言
 let tray = null;
 // 起動時にバージョンのチェックを行う
-let updateCheckNum = 0; // 初回時の処理のため
+let updateFirst = true; // 初回の時のみtrue
+let updateInterval = false; // 定期アップデートの時のみtrue
 let updateDownloaded = false; // ダウンロード済みの場合true
 autoUpdater.setFeedURL('https://prfac.com/dispeak/update');
-try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
+autoUpdateCheck();
+setInterval(() => {
+  autoUpdateCheck('interval');
+}, 1000 * 60 * 60);
+function autoUpdateCheck(timing) {
+  if (timing == 'interval') updateInterval = true;
+  try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
+}
 autoUpdater.on("update-downloaded", () => {
   const mesOptions = {
     type: 'warning',
@@ -42,40 +50,42 @@ autoUpdater.on("update-downloaded", () => {
       updateDownloaded = true;
     }
   });
-  updateCheckNum = 1;
+  updateFirst = false;
+  updateInterval = false;
 });
 autoUpdater.on("update-not-available", () => {
-  // 二回目以降のときのみ処理する
-  if (updateCheckNum > 0) {
-    // ダウンロードが合った場合（＝ダウンロード済み）
-    if (updateDownloaded) {
-      const mesOptions = {
-        type: 'warning',
-        buttons: ['する', 'あとで'],
-        title: '再起動するっす？',
-        message: '新しいバージョンをダウンロードしたっす！',
-        detail: '再起動してインストールするっす？\nあとでを選んだときは終了時にインストールするっすよ。'
-      };
-      dialog.showMessageBox(mesOptions, (res) => {
-        if (res == 0) autoUpdater.quitAndInstall();
-      });
-    }
-    // ダウンロードが無かった場合
-    else {
-      const mesOptions = {
-        type: 'info',
-        buttons: ['OK'],
-        title: 'アップデートないっす！',
-        message: 'おぉ…！！',
-        detail: '最新のバージョンを使ってるっす。ありがとおぉおおぉっ！！'
-      };
-      dialog.showMessageBox(mesOptions);
-    }
-  } else {
-    updateCheckNum = 1;
+  if (updateFirst || updateInterval) {
+    return;
   }
+  // ダウンロードが合った場合（＝ダウンロード済み）
+  else if (updateDownloaded) {
+    const mesOptions = {
+      type: 'warning',
+      buttons: ['する', 'あとで'],
+      title: '再起動するっす？',
+      message: '新しいバージョンをダウンロードしたっす！',
+      detail: '再起動してインストールするっす？\nあとでを選んだときは終了時にインストールするっすよ。'
+    };
+    dialog.showMessageBox(mesOptions, (res) => {
+      if (res == 0) autoUpdater.quitAndInstall();
+    });
+  }
+  // ダウンロードが無かった場合
+  else {
+    const mesOptions = {
+      type: 'info',
+      buttons: ['OK'],
+      title: 'アップデートないっす！',
+      message: 'おぉ…！！',
+      detail: '最新のバージョンを使ってるっす。ありがとおぉおおぉっ！！'
+    };
+    dialog.showMessageBox(mesOptions);
+  }
+  updateFirst = false;
+  updateInterval = false;
 });
-autoUpdater.on("error", () => {
+autoUpdater.on("error", (e) => {
+  if (updateFirst || updateInterval) return;
   const mesOptions = {
     type: 'error',
     buttons: ['OK'],
@@ -84,7 +94,17 @@ autoUpdater.on("error", () => {
     detail: '時間を置いてからご確認ください。お願いします。'
   };
   dialog.showMessageBox(mesOptions);
-  updateCheckNum = 1;
+  updateFirst = false;
+  updateInterval = false;
+  // エラーの送信
+  const obj = {};
+  obj.time = whatTimeIsIt(true);
+  obj.version = nowVersion;
+  obj.process = 'main';
+  obj.message = e.message;
+  obj.stack = e.stack;
+  const jsn = JSON.stringify(obj);
+  mainWindow.webContents.send('log-error', jsn);
 });
 // Electronの初期化完了後に実行
 app.on('ready', () => {
@@ -298,7 +318,7 @@ ipcMain.on('bouyomi-exe-start', (event, data) => {
 });
 // バージョンチェック
 ipcMain.on('version-check', () => {
-  try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
+  autoUpdateCheck();
 });
 // ログアウト処理
 ipcMain.on('logout-process', () => {
@@ -349,7 +369,7 @@ function mainWindowMenu() {
       {
         label: '最新のバージョンを確認',
         accelerator: 'CmdOrCtrl+H',
-        click:  () => {try { autoUpdater.checkForUpdates(); } catch(e) {}} // batから起動したときの対策
+        click:  () => {autoUpdateCheck()}
       },
       {
         label: 'ウィンドウを閉じる',
