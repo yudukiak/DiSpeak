@@ -460,13 +460,16 @@ $(function() {
       // サーバーからの返信を受け取る
       .done(function(data) {
         debugLog('[notification] click done data', data);
+        const storage = localStorage.getItem('notificationLog');
         let html = '';
+        let logAry = [];
         if (data.length == null ) {
           M.toast({
             html: 'おしらせの取得に失敗しました<br>時間を置いて再度お試し下さい',
             classes: 'toast-notification'
           });
           M.Modal.getInstance($('#modal_notification')).close();
+          if (storage != null) logAry = storage;
           return;
         } else if (data.length === 0) {
          html += `<li class="collection-item left-align"><p>新しいお知らせはありませんでした…っ！ (っ◞‸◟c)</p></li>`;
@@ -476,9 +479,12 @@ $(function() {
             const title = data[i].title;
             const message = markdown.markdown.toHTML(data[i].message, 'Gruber').replace(/~~([^~]+)~~/g, '<del>$1</del>');
             html += `<li class="collection-item left-align"><p>${title} (${time})</p><div>${message}</div></li>`;
+            logAry.push(data[i].time);
           }
         }
         const emoji = twemoji.parse(html);
+        localStorage.setItem('notificationLog', JSON.stringify(logAry));
+        $('#notification').removeClass('red-text text-accent-1');
         $('#modal_notification ul').html(emoji);
         $('#modal_notification .collection').removeClass('hide');
         $('#modal_notification .preloader-wrapper').addClass('hide');
@@ -1332,11 +1338,28 @@ function analytics() {
 }
 // お知らせを定期チェック
 function getNotificationJson() {
+  const storage = localStorage.getItem('notificationLog');
   $.get(`${postUrl}?t=notification`, null)
     .done(function(data) {
       debugLog('[notification] setTimeout done data', data);
-      if (!$('#notification').hasClass('hide')) $('#notification').addClass('hide');
-      if (data.length > 0 ) $('#notification').removeClass('hide');
+      debugLog('[notification] setTimeout done storage', storage);
+      if (!$('#notification').hasClass('hide')) $('#notification').addClass('hide').removeClass('red-text text-accent-1'); // 表示されていたら隠す
+      if (data == null || data.length === 0) return; // 通知データがなければそのまま
+      const dataLen = data.length;
+      let count = 0;
+      if (dataLen > 0 ) {
+        $('#notification').removeClass('hide'); // 通知データがあった場合、表示させてから既読・未読をチェック
+        if (storage == null) {
+          $('#notification').addClass('red-text text-accent-1');
+        } else {
+          for (let i = 0; i < dataLen; i++) {
+            const dataTime = data[i].time;
+            debugLog('[notification] setTimeout done dataTime', dataTime);
+            if (storage.indexOf(dataTime) >= 0) count++;
+          }
+          if (dataLen > count) $('#notification').addClass('red-text text-accent-1');
+        }
+      }
     });
   const time = 1000 * 60 * 10;
   setTimeout(function () {
