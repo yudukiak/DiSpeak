@@ -662,8 +662,8 @@ client.on('ready', function() {
           `<div id="${s_id}" class="collection-item row">` +
             `<div class="collection-item avatar valign-wrapper"><img src="${s_iconURL}" alt="" class="circle"><span class="title">${s_name}</span></div>` +
             '<div class="col s12 row section right-align">' +
-              '<div class="col s6 valign-wrapper"><div class="col s9"><strong>チャットの読み上げ</strong></div><div class="col s3 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
-              '<div class="col s6 valign-wrapper"><div class="col s9"><strong>ボイスチャンネルの通知</strong></div><div class="col s3 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
+              '<div class="col s6 valign-wrapper"><div class="col s10"><strong>チャットの読み上げ</strong></div><div class="col s2 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
+              '<div class="col s6 valign-wrapper"><div class="col s10"><strong>ボイスチャンネルの通知</strong></div><div class="col s2 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
             '</div>' +
             '<div class="col s12 row section right-align display-none">' +
               '<div class="col s12 row section right-align">' +
