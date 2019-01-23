@@ -80,7 +80,7 @@ main .tabs .indicator {
 #log .collection .collection-item.avatar p {
   word-wrap: break-word;
   overflow-wrap: break-word;
-  word-break: break-all;  
+  word-break: break-all;
 }
 /* ********************
   setting_menu, help_menu
