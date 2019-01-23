@@ -251,6 +251,10 @@ main .tabs .indicator {
   border-radius: 2px;
   border: 1px solid #2cbe4e;
 }
+#release .collapsible-header span.badge.new.pre-release {
+  color: #f66a0a;
+  border: 1px solid #f66a0a;
+}
 /* ********************
   toast
 ******************** */

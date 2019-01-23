@@ -1379,24 +1379,35 @@ function getNotificationJson() {
 function release(data) {
   let html = '';
   let num = 0;
+  let latestreleaseAry = [];
   for (let i = 0, n = data.length; i < n; i++) {
+    const prerelease = data[i].prerelease;
     const url = data[i].html_url;
     const tag = data[i].tag_name;
     const name = data[i].name;
+    const id = data[i].id;
     const time = whatTimeIsIt(data[i].published_at);
     const text = markdown.markdown.toHTML(data[i].body, 'Gruber').replace(/~~([^~]+)~~/g, '<del>$1</del>');
+    const badge = (function() {
+      if (prerelease) return '<span class="new badge pre-release" data-badge-caption="Pre-release"></span>';
+      if (!prerelease && latestreleaseAry.length === 0) return '<span class="new badge" data-badge-caption="Latest release"></span>';
+      return '';
+    })();
     const nowVer = nowVersion.replace(/^(\d+\.\d+)\.\d+.*/, '$1');
     const nowVerReg = new RegExp(`^v${nowVer}`);
-    if (nowVerReg.test(tag)) num = i + 1;
+    const classActive = (function() {
+      if (nowVerReg.test(tag)) return 'active';
+      return '';
+    })();
+    if (!prerelease) latestreleaseAry.push(id);
     html +=
-      `<li><div class="collapsible-header valign-wrapper"><i class="material-icons">library_books</i>${tag} (${time})</div>` +
-      `<div class="collapsible-body"><p><a href="${url}" target="_blank">${name}</a></p><p>${text}</p></div></li>`;
+      `<li id="release-${id}" class="${classActive}">` +
+      `<div class="collapsible-header valign-wrapper"><i class="material-icons">library_books</i>${tag} (${time})${badge}</div>` +
+      `<div class="collapsible-body"><p><a href="${url}" target="_blank">${name}</a></p><p>${text}</p></div>` +
+      '</li>';
   }
   const emoji = twemoji.parse(html);
   $('#release ul').append(emoji);
-  if (num == 0) num++;
-  for (let i = 0; i < num; i++) $('#release > ul > li').eq(i).addClass('active');
-  $('#release > ul > li:eq(0) > .collapsible-header').append('<span class="new badge" data-badge-caption="Latest release"></span>');
   $('#release a[href^=http]').attr('target', '_blank').attr('draggable', 'false');
   M.Collapsible.init($('.collapsible.expandable'), {
     accordion: false
