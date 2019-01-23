@@ -62,10 +62,19 @@ main > .container > .row {
 main .tabs .tab a {
   color: rgba(33,150,243,0.7);
 }
-main .tabs .tab a:hover, main .tabs .tab a.active {
+main .tabs .tab a:hover,
+main .tabs .tab a.active {
   color: #2196f3;
 }
-main .tabs .tab a:focus, main .tabs .tab a:focus.active {
+main .tabs .tab a.active {
+  font-weight: bolder;
+}
+main .tabs .tab a:focus,
+main .tabs .tab a:focus.active,
+main .tabs .tab a:hover.active {
+  background-color: transparent;
+}
+main .tabs .tab a:hover {
   background-color: rgba(33,150,243,0.2);
 }
 main .tabs .indicator {

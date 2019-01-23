@@ -283,9 +283,6 @@ $(function() {
       $('.fixed-action-btn').addClass('display-none');
     }
     $('main').scrollTop(0);
-    setTimeout(function () {
-      document.activeElement.blur();
-    }, 250);
   });
   // 設定リストの切り替え
   $(document).on('click', '#setting_menu li, #help_menu li', function() {
