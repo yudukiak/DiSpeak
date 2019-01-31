@@ -541,44 +541,6 @@ $(function() {
     });
     debugLog('[logImg] userid', userid);
   });
-  // エラーログを送信しますか？
-  $(document).on('click', '.toast-error button', function() {
-    const error = $(this).data('error');
-    const errorDom = $(this).parents('.toast-error');
-    const errorLog = errorDom.find('.display-none').text();
-    $('#textarea_error').val(errorLog);
-    M.Toast.getInstance(errorDom).dismiss();
-    // モーダルを表示
-    if (error) {
-      M.Modal.getInstance($('#modal_error')).open();
-      M.textareaAutoResize($('#textarea_error'));
-    }
-  });
-  // エラーログを送信します
-  $(document).on('click', '#modal_error a', function() {
-    const error = $(this).data('error');
-    const errorLog = $('#textarea_error').val();
-    if (error) {
-      const url = `${postUrl}?t=e`;
-      $.post(url, errorLog)
-        // サーバーからの返信を受け取る
-        .done(function(data) {
-          M.toast({
-            html: 'エラーログの送信が完了しました',
-            classes: 'toast-errorPost'
-          });
-        })
-        // 通信エラーの場合
-        .fail(function() {
-          M.toast({
-            html: 'エラーログの送信に失敗しました',
-            classes: 'toast-errorPost'
-          });
-        });
-    }
-    $('#textarea_error').val();
-    $('#textarea_error').css('height', '0');
-  });
 });
 
 // ------------------------------
@@ -1493,36 +1455,17 @@ function errorLog(obj) {
   const username = homepathAry[2];
   const usernameReg = new RegExp(username, 'ig');
   const jsn = JSON.stringify(obj);
-  const jsoRep = jsn.replace(usernameReg, '***');
-  const process = obj.process;
-  const anonymousObj = {};
-  Object.assign(anonymousObj, obj);
-  anonymousObj.stack = 'Anonymous';
+  const jsnRep = jsn.replace(usernameReg, '***');
   debugLog(`[errorLog] homepathAry`, homepathAry);
   debugLog(`[errorLog] username`, username);
-  debugLog(`[errorLog] jsoRep`, jsoRep);
+  debugLog(`[errorLog] jsnRep`, jsnRep);
   if ($('.toast-error').length || msgTxt === '') return;
-  if (msgTxt === 'エラーが発生しました') $.post(`${postUrl}?t=e`, JSON.stringify(anonymousObj));
-  // mainプロセスのエラー or エラーが発生しました
-  if (process == 'main' || msgTxt == 'エラーが発生しました') {
-    const toastHTML =
-      `<i class="material-icons red-text text-accent-1">highlight_off</i><span>${msgTxt}<br>エラーログを送信しますか？</span><span class="display-none">${jsoRep}</span>` +
-      '<div><button class="btn-flat toast-action" data-error="true">はい</button>' +
-      '<button class="btn-flat toast-action" data-error="false">いいえ</button></div>';
-    M.toast({
-      displayLength: 'stay',
-      html: toastHTML,
-      classes: 'toast-error'
-    });
-  }
-  // rendererプロセスのエラーなど
-  else {
-    const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxt}</span>`;
-    M.toast({
-      html: toastHTML,
-      classes: 'toast-error'
-    });
-  }
+  const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxt}</span>`;
+  M.toast({
+    html: toastHTML,
+    classes: 'toast-error'
+  });
+  if (objectCheck(setting, 'dispeak.errorlog') && msgTxt === 'エラーが発生しました') $.post(`${postUrl}?t=e`, jsnRep);
 }
 // デバッグ
 function debugLog(fnc, data) {
