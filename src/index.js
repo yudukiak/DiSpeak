@@ -106,10 +106,22 @@ autoUpdater.on("error", (e) => {
   const jsn = JSON.stringify(obj);
   mainWindow.webContents.send('log-error', jsn);
 });
-// Electronの初期化完了後に実行
-app.on('ready', () => {
-  createMainwindow(); // mainWindowの生成
-});
+// 多重起動を防ぐ
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+    }
+  });
+  // Electronの初期化完了後に実行
+  app.on('ready', () => {
+    createMainwindow(); // mainWindowの生成
+  });
+}
 // 全てのウィンドウが閉じたら終了
 app.on('window-all-closed', () => {
   if (process.platform != 'darwin') {
