@@ -834,7 +834,11 @@ client.on('message', function(data) {
     if (channelType == 'server') return data.channel.guild.id;
     return '';
   })();
-  if (channelType == 'directmessage' && userId != authorId) {
+  if (channelType == 'directmessage' && userId == authorId) {
+    // DMで発言者が自分、ただし該当DMが読まない設定の時
+    const recipientId = data.channel.recipient.id;
+    if(!setting.directmessage[recipientId]) return;
+  } else if (channelType == 'directmessage' && userId != authorId) {
     // settingにDMIDがない or 特定のDMを読み上げない
     if (setting.directmessage[authorId] == null || !setting.directmessage[authorId]) return;
   } else if (channelType == 'group') {
