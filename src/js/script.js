@@ -1453,7 +1453,11 @@ function errorLog(obj) {
     if (/read ECONNRESET/.test(msg)) return 'エラーが発生しました'; // Discord.jsの問題？
     if (/connect ETIMEDOUT/.test(msg)) return 'エラーが発生しました'; // 他のソフトと競合？
     //if (/Uncaught, unspecified "error" event/.test(msg)) return 'エラーが発生しました。';
-    return `エラーが発生しました`;
+    return 'エラーが発生しました';
+  })();
+  const msgTxtAdd = (function() {
+    if (msgTxt === 'エラーが発生しました') return `${msgTxt}<br>${msg}`;
+    return msgTxt
   })();
   const homepathAry = homepath.split('\\');
   const username = homepathAry[2];
@@ -1464,7 +1468,7 @@ function errorLog(obj) {
   debugLog(`[errorLog] username`, username);
   debugLog(`[errorLog] jsnRep`, jsnRep);
   if ($('.toast-error').length || msgTxt === '') return;
-  const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxt}</span>`;
+  const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxtAdd}</span>`;
   M.toast({
     html: toastHTML,
     classes: 'toast-error'
