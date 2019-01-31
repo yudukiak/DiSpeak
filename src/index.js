@@ -293,9 +293,9 @@ ipcMain.on('window-maximize', () => {
   }
 });
 ipcMain.on('window-close', () => {
-  if (appSettingObj == null || appSettingObj.dispeak == null) {
+  if (objectCheck(appSettingObj, 'dispeak.close') == null) {
     mainWindow.close();
-  } else if (appSettingObj.dispeak.close) {
+  } else if (objectCheck(appSettingObj, 'dispeak.close')) {
     mainWindow.close();
   } else {
     mainWindow.hide();
