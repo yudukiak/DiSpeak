@@ -59,6 +59,7 @@ autoUpdater.on("update-not-available", () => {
   sendDebugLog('[update-not-available] updateFirst', updateFirst);
   sendDebugLog('[update-not-available] updateInterval', updateInterval);
   if (updateFirst || updateInterval) {
+    updateFirst = false;
     return;
   }
   // ダウンロードが合った場合（＝ダウンロード済み）
@@ -85,7 +86,6 @@ autoUpdater.on("update-not-available", () => {
     };
     dialog.showMessageBox(mesOptions);
   }
-  updateFirst = false;
   updateInterval = false;
 });
 autoUpdater.on("error", (e) => {
@@ -334,6 +334,7 @@ ipcMain.on('bouyomi-exe-start', (event, data) => {
 });
 // バージョンチェック
 ipcMain.on('version-check', () => {
+  updateInterval = false;
   autoUpdateCheck();
 });
 // ログアウト処理
