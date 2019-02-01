@@ -950,6 +950,9 @@ ipcRenderer.on('log-error', (event, jsn) => {
   const obj = JSON.parse(jsn);
   errorLog(obj);
 });
+ipcRenderer.on('log-debug', (event, title, data) => {
+  debugLog(title, data);
+});
 
 // ------------------------------
 // 各種エラーをキャッチ

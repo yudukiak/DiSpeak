@@ -32,6 +32,8 @@ setInterval(() => {
   autoUpdateCheck('interval');
 }, 1000 * 60 * 60);
 function autoUpdateCheck(timing) {
+  sendDebugLog('[autoUpdateCheck] timing', timing);
+  sendDebugLog('[autoUpdateCheck] updateInterval', updateInterval);
   if (timing == 'interval') updateInterval = true;
   try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
 }
@@ -54,6 +56,8 @@ autoUpdater.on("update-downloaded", () => {
   updateInterval = false;
 });
 autoUpdater.on("update-not-available", () => {
+  sendDebugLog('[update-not-available] updateFirst', updateFirst);
+  sendDebugLog('[update-not-available] updateInterval', updateInterval);
   if (updateFirst || updateInterval) {
     return;
   }
@@ -363,6 +367,10 @@ process.on('uncaughtException', (e) => {
   const jsn = JSON.stringify(obj);
   mainWindow.webContents.send('log-error', jsn);
 });
+// ログ
+function sendDebugLog(title, data) {
+  if (mainWindow != null) mainWindow.webContents.send('log-debug', title, data);
+}
 // ウィンドウメニューをカスタマイズ
 function mainWindowMenu() {
   const template = [{
