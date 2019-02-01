@@ -632,7 +632,6 @@ client.on('ready', function() {
                 `<div class="col s2 row input-field"><input id="${s_id}_tone" name="tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
                 `<div class="col s2 row input-field"></div>` +
                 `<div class="col s2 row input-field"><input id="${s_id}_command" name="command" type="text" value=""><label for="${s_id}_command">コマンド</label></div>` +
-                '<span class="col s12 row input-field">各種設定については<a href="https://github.com/micelle/dc_DiSpeak/wiki/alpha230" target="_blank">こちら</a>をご確認ください。</span>' +
               '</div>' +
             '</div>' +
           '</div>'
