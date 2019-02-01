@@ -12,7 +12,7 @@
     "universal-analytics": "^0.4.20"
   },
   "devDependencies": {
-    "electron": "^4.0.1",
+    "electron": "^4.0.3",
     "electron-packager": "^13.0.1",
     "electron-winstaller": "^2.7.0",
     "fs-extra": "^7.0.1",
