@@ -626,12 +626,12 @@ client.on('ready', function() {
             '</div>' +
             '<div class="col s12 row section right-align display-none">' +
               '<div class="col s12 row section right-align">' +
-                `<div class="col s2 row input-field"><input id="${s_id}_voice" name="voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
-                `<div class="col s2 row input-field"><input id="${s_id}_volume" name="volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
-                `<div class="col s2 row input-field"><input id="${s_id}_speed" name="speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
-                `<div class="col s2 row input-field"><input id="${s_id}_tone" name="tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_voice" name="b_voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_volume" name="b_volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_speed" name="b_speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_tone" name="b_tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
                 `<div class="col s2 row input-field"></div>` +
-                `<div class="col s2 row input-field"><input id="${s_id}_command" name="command" type="text" value=""><label for="${s_id}_command">コマンド</label></div>` +
+                `<div class="col s2 row input-field"><input id="${s_id}_command" name="b_command" type="text" value=""><label for="${s_id}_command">コマンド</label></div>` +
               '</div>' +
             '</div>' +
           '</div>'
@@ -745,6 +745,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   debugLog('[Discord] voiceStateUpdate newMember', newMember);
   if (client.user.id == oldMember.id) return; // 自分自身のイベントは処理しない
   const guildId = oldMember.guild.id; // サーバのID
+  debugLog('[Discord] voiceStateUpdate server[guildId]', objectCheck(setting, `server.${guildId}`));
   if (setting.server[guildId] == null) return; // settingがない場合は読まない
   if (setting.server[guildId].voice == false) return; // settingがfalseのとき読まない
   const guildChannel = oldMember.guild.channels; // サーバのチャンネル一覧を取得
@@ -763,12 +764,14 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     return channelNextData.name;
   })();
   // ブラックリストの処理
+  debugLog('[Discord] voiceStateUpdate dispeak.blacklist', objectCheck(setting, 'dispeak.blacklist'));
   const blacklist = setting.blacklist;
   for (let i = 0, n = blacklist.length; i < n; i++) {
     const blacklistTag = blacklist[i].tag;
     if (blacklistTag == oldMember.id) return;
   }
   // ホワイトリストの処理
+  debugLog('[Discord] voiceStateUpdate dispeak.whitelist', objectCheck(setting, 'dispeak.whitelist'));
   if (objectCheck(setting, 'dispeak.whitelist')) {
     const whitelist = setting.whitelist;
     if (whitelist.indexOf(oldMember.id) == -1) return;
@@ -804,11 +807,11 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
   let set = {};
-  set.voice = setting.server[guildId].voice;
-  set.volume = setting.server[guildId].volume;
-  set.speed = setting.server[guildId].speed;
-  set.tone = setting.server[guildId].tone;
-  const templateCommand = setting.server[guildId].command;
+  set.voice = setting.server[guildId].b_voice;
+  set.volume = setting.server[guildId].b_volume;
+  set.speed = setting.server[guildId].b_speed;
+  set.tone = setting.server[guildId].b_tone;
+  const templateCommand = setting.server[guildId].b_command;
   const template_bymRepAdd = `${templateCommand}${template_bymRep}`;
   bouyomiSpeak(template_bymRepAdd, set);
   logProcess(template_logRep, avatarURL, oldMember.id);
@@ -912,11 +915,11 @@ client.on('message', function(data) {
   let template_bymRepAdd = template_bymRep;
   let set = {};
   if (guildId != '') {
-    set.voice = setting.server[guildId].voice;
-    set.volume = setting.server[guildId].volume;
-    set.speed = setting.server[guildId].speed;
-    set.tone = setting.server[guildId].tone;
-    const templateCommand = setting.server[guildId].command;
+    set.voice = setting.server[guildId].b_voice;
+    set.volume = setting.server[guildId].b_volume;
+    set.speed = setting.server[guildId].b_speed;
+    set.tone = setting.server[guildId].b_tone;
+    const templateCommand = setting.server[guildId].b_command;
     template_bymRepAdd = `${templateCommand}${template_bymRep}`;
   }
   bouyomiSpeak(template_bymRepAdd, set);
