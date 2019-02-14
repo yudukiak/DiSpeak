@@ -337,18 +337,12 @@ main #modal_error.modal .modal-content {
 .hiddendiv.common {
   word-break: break-all;
 }
-main .modal-content {
-  height: 100%;
-  display: table;
-  width: 100%;
-}
-main .modal-content .row {
-  display: table-cell;
-  vertical-align: middle;
-}
 .swal2-container,
 main .modal-overlay {
   top: 25px;
+}
+#modal_notification .modal-content {
+  overflow-y: scroll;
 }
 /* ********************
   各種微調整
