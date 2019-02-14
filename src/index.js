@@ -325,7 +325,21 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
   });
 });
 ipcMain.on('bouyomi-exe-start', (event, data) => {
-  const child = execFile(data, (error, stdout, stderr) => {});
+  const child = execFile('cmd.exe', ['/c', data], (error, stdout, stderr) => {
+    if (error) {
+      const obj = {};
+      obj.time = whatTimeIsIt(true);
+      obj.version = nowVersion;
+      obj.process = 'main';
+      obj.message = error.message;
+      obj.stack = error.stack;
+      const jsn = JSON.stringify(obj);
+      mainWindow.webContents.send('log-error', jsn);
+      sendDebugLog('[execFile] error', error);
+    }
+    sendDebugLog('[execFile] stdout', stdout);
+    sendDebugLog('[execFile] stderr', stderr);
+  });
   const res = (() => {
     if (child.pid == null) return false;
     return true;
