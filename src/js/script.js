@@ -461,7 +461,7 @@ $(function() {
     $('#modal_notification .preloader-wrapper').removeClass('hide');
     $('#modal_notification > .modal-content > div > div:nth-child(1) > p').removeClass('hide');
     M.Modal.getInstance($('#modal_notification')).open();
-    $('#modal_notification').scrollTop(0);
+    $('#modal_notification .modal-content').scrollTop(0);
     $.get(`${postUrl}?t=notification`, null)
       // サーバーからの返信を受け取る
       .done(function(data) {
