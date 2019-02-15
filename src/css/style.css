@@ -439,6 +439,11 @@ b, strong {
   width: 20px;
   margin: 0 1px;
 }
+.thumbnail {
+  height: 120px;
+  width: auto;
+  margin: 0 1px;
+}
 .keyboard {
     height: 41px;
     min-width: 24px;
@@ -454,6 +459,12 @@ b, strong {
     text-align: center;
     line-height: 41px;
     display: inline-block;
+}
+.m0 {
+  margin: 0;
+}
+.mb0 {
+  margin-bottom: 0;
 }
 #swal2-content td {
   word-wrap: break-word;

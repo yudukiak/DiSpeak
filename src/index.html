@@ -107,6 +107,26 @@
               </div>
               <div class="divider"></div>
               <div class="row section valign-wrapper">
+                <div class="col s10"><strong>ログに画像を表示させる？</strong></div>
+                <div class="col s2 switch right-align"><label><input name="image_log" type="checkbox" checked><span class="lever"></span></label></div>
+              </div>
+              <div class="divider"></div>
+              <div class="row section">
+                <div class="valign-wrapper">
+                  <div class="col s10"><strong class="valign-wrapper">画像を読み上げる？</strong>Onで以下のテキストを読み上げます。</div>
+                  <div class="col s2 switch right-align"><label><input name="image_chat" type="checkbox"><span class="lever"></span></label></div>
+                </div>
+                <div class="col s12 valign-wrapper template" data-template="画像が$filenum$枚（$filename$）送信されました">
+                  <div class="input-field col s8 m0">
+                    <input id="image_bym" name="image_bym" type="text" value="画像が$filenum$枚（$filename$）送信されました">
+                  </div>
+                  <div class="input-field col s4 center-align m0">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="row section valign-wrapper">
                 <div class="col s10"><strong class="valign-wrapper">ホワイトリストを利用する？</strong>Onで利用する。Offで利用しない。</div>
                 <div class="col s2 switch right-align"><label><input name="whitelist" type="checkbox"><span class="lever"></span></label></div>
               </div>

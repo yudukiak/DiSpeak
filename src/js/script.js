@@ -894,8 +894,31 @@ client.on('message', function(data) {
   const avatarURL = data.author.displayAvatarURL.replace(/\?size=\d+/, '');
   // チャットの内容 (リプライ/チャンネルタグを読ませない)
   const content = data.content.replace(/<@!?[0-9]+>/g, '').replace(/<#[0-9]+>/g, '');
+  // 画像の処理
+  const imageTemplate = objectCheck(setting, 'dispeak.image_bym');
+  const attachmentsSize = data.attachments.size;
+  let attachmentsBym = '';
+  let attachmentsHtml = '';
+  if (attachmentsSize > 0) {
+    const filenameAry = data.attachments.map(function(val, key) {
+      return val.filename;
+    });
+    const fileurlHtmlAry = data.attachments.map(function(val, key) {
+      const filename = val.filename;
+      const url = val.url;
+      return `<img class="thumbnail" src="${url}" alt="${filename}">`;
+    });
+    const filenameList = filenameAry.join(', ');
+    const fileurlHtml = fileurlHtmlAry.join('');
+    if (objectCheck(setting, 'dispeak.image_chat') && imageTemplate != null) {
+      attachmentsBym = imageTemplate.replace(/\$filenum\$/, attachmentsSize).replace(/\$filename\$/, filenameList);
+    }
+    if (objectCheck(setting, 'dispeak.image_log')) {
+      attachmentsHtml = fileurlHtml;
+    }
+  }
   // 画像オンリー、スペースのみを読ませない
-  if (content == '' || /^([\s]+)$/.test(content)) return;
+  if (content==='' && !objectCheck(setting, 'dispeak.image_log') || /^([\s]+)$/.test(content) && !objectCheck(setting, 'dispeak.image_log')) return;
   // チャットをエスケープ処理する
   const contentEsc = escapeHtml(content);
   // 絵文字の処理をする
@@ -912,7 +935,11 @@ client.on('message', function(data) {
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
     //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
-  let template_bymRepAdd = template_bymRep;
+  let template_bymRepAdd = `${template_bymRep} ${attachmentsBym}`;
+  let template_logRepAdd = (function() {
+    if (content === '') return `${template_logRep}${attachmentsHtml}`;
+    return `${template_logRep}<br>${attachmentsHtml}`;
+  })();
   let set = {};
   if (guildId != '') {
     set.voice = setting.server[guildId].b_voice;
@@ -920,10 +947,10 @@ client.on('message', function(data) {
     set.speed = setting.server[guildId].b_speed;
     set.tone = setting.server[guildId].b_tone;
     const templateCommand = setting.server[guildId].b_command;
-    template_bymRepAdd = `${templateCommand}${template_bymRep}`;
+    template_bymRepAdd = `${templateCommand} ${template_bymRepAdd}`;
   }
   bouyomiSpeak(template_bymRepAdd, set);
-  logProcess(template_logRep, avatarURL, authorId);
+  logProcess(template_logRepAdd, avatarURL, authorId);
 });
 // WebSocketに接続エラーが起きたときの処理
 client.on('error', function(data) {
