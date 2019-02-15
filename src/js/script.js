@@ -912,28 +912,34 @@ client.on('message', function(data) {
       attachmentsHtml = fileurlHtml;
     }
   }
-  // 画像オンリー、スペースのみを読ませない
-  if (content==='' && !objectCheck(setting, 'dispeak.image_log') || /^([\s]+)$/.test(content) && !objectCheck(setting, 'dispeak.image_log')) return;
   // チャットをエスケープ処理する
   const contentEsc = escapeHtml(content);
   // 絵文字の処理をする
   const contentEscRep = contentEsc
     .replace(/&lt;(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
     .replace(/&lt;a(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
-  // テンプレートにはめ込み
-  // $time$ $server$ $channel$ $group$ $channel-prev$ $channel-next$ $username$ $nickname$ $memo$ $text$
-  const template_bymRep = template_bym
-    .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
-    //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
-    .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, content);
-  const template_logRep = template_log
-    .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
-    //.replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
-    .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
-  let template_bymRepAdd = `${template_bymRep} ${attachmentsBym}`;
-  let template_logRepAdd = (function() {
-    if (content === '') return `${template_logRep}${attachmentsHtml}`;
-    return `${template_logRep}<br>${attachmentsHtml}`;
+  // 送信するテキストを作成（$time$ $server$ $channel$ $group$ $channel-prev$ $channel-next$ $username$ $nickname$ $memo$ $text$）
+  let sendTextToBouyomi = (function() {
+    // テンプレートの処理
+    let tmp = template_bym
+      .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
+      .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, content);
+    // 画像の処理
+    tmp += ` ${attachmentsBym}`;
+    return tmp;
+  })();
+  let sendTextToLog = (function() { // template_logRep
+    // テンプレートの処理
+    let tmp = template_log
+      .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
+      .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
+    // 画像の処理
+    if (content === '') {
+      tmp += `${attachmentsHtml}`;
+    } else {
+      tmp += `<br>${attachmentsHtml}`;
+    }
+    return tmp;
   })();
   let set = {};
   if (guildId != '') {
@@ -942,10 +948,16 @@ client.on('message', function(data) {
     set.speed = setting.server[guildId].b_speed;
     set.tone = setting.server[guildId].b_tone;
     const templateCommand = setting.server[guildId].b_command;
-    template_bymRepAdd = `${templateCommand} ${template_bymRepAdd}`;
+    sendTextToBouyomi = `${templateCommand} ${sendTextToBouyomi}`;
   }
-  bouyomiSpeak(template_bymRepAdd, set);
-  logProcess(template_logRepAdd, avatarURL, authorId);
+  // 画像オンリー、スペースのみ
+  if (content === '' || /^([\s]+)$/.test(content)) {
+    if (objectCheck(setting, 'dispeak.image_chat')) bouyomiSpeak(sendTextToBouyomi, set);
+    if (objectCheck(setting, 'dispeak.image_log')) logProcess(sendTextToLog, avatarURL, authorId);
+  } else {
+    bouyomiSpeak(sendTextToBouyomi, set);
+    logProcess(sendTextToLog, avatarURL, authorId);
+  }
 });
 // WebSocketに接続エラーが起きたときの処理
 client.on('error', function(data) {
