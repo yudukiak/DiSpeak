@@ -536,6 +536,10 @@ $(function() {
     });
     debugLog('[logImg] userid', userid);
   });
+  // スポイラーをクリック
+  $(document).on('click', '.spoiler', function() {
+    $(this).addClass('spoiler-non');
+  });
 });
 
 // ------------------------------
@@ -896,12 +900,26 @@ client.on('message', function(data) {
   let attachmentsHtml = '';
   if (attachmentsSize > 0) {
     const filenameAry = data.attachments.map(function(val, key) {
-      return val.filename;
+      const filename = val.filename;
+      const spoilerText = (function(){
+        const spoiler_bym = objectCheck(setting, 'dispeak.spoiler_bym');
+        if (spoiler_bym != null) return spoiler_bym;
+        return '';
+      })();
+      const text = (function() {
+        if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return spoilerText;
+        return filename;
+      })();
+      return text;
     });
     const fileurlHtmlAry = data.attachments.map(function(val, key) {
       const filename = val.filename;
       const url = val.url;
-      return `<img class="thumbnail" src="${url}" alt="${filename}">`;
+      const html = (function() {
+        if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return `<span class="spoiler"><img class="thumbnail" src="${url}" alt="${filename}"></span>`;
+        return `<img class="thumbnail" src="${url}" alt="${filename}">`;
+      })();
+      return html;
     });
     const filenameList = filenameAry.join(', ');
     const fileurlHtml = fileurlHtmlAry.join('');
@@ -926,6 +944,13 @@ client.on('message', function(data) {
       .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, content);
     // 画像の処理
     tmp += ` ${attachmentsBym}`;
+    // スポイラーの処理
+    const spoilerText = (function(){
+      const spoiler_bym = objectCheck(setting, 'dispeak.spoiler_bym');
+      if (spoiler_bym != null) return spoiler_bym;
+      return '';
+    })();
+    if (!objectCheck(setting, 'dispeak.spoiler')) tmp = tmp.replace(/\|\|(.*?)\|\|/g, spoilerText);
     return tmp;
   })();
   let sendTextToLog = (function() {
@@ -939,6 +964,8 @@ client.on('message', function(data) {
     } else {
       tmp += `<br>${attachmentsHtml}`;
     }
+    // スポイラーの処理
+    if (!objectCheck(setting, 'dispeak.spoiler')) tmp = tmp.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler">$1</span>');
     return tmp;
   })();
   let set = {};
