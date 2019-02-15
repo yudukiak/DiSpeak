@@ -236,27 +236,22 @@ $(function() {
     const val = $(this).val();
     $(this).val(val.replace(/[^0-9]/g, ''));
   });
-  $(document).on('blur input keyup', '#server-list input[type=number]', function() {
+  $(document).on('blur input keyup', '#server-list input[type=number], #bouyomi_port', function() {
     const val = $(this).val();
     const valRep = val.replace(/[^0-9]/g, '');
-    if (valRep === '') {
+    if (valRep === '' || 0 <= Number(valRep) && Number(valRep) < 65536) {
       $(this).val(valRep);
-    } else if (Number(valRep) > 65535) {
-      $(this).val('65535');
-      if ($('.toast-serverinput').length) return;
-      M.toast({
-        html: '65535より大きい値は登録できません',
-        classes: 'toast-serverinput'
-      });
-    } else if (Number(valRep) < 0) {
-      $(this).val('0');
-      if ($('.toast-serverinput').length) return;
-      M.toast({
-        html: '0より小さい値は登録できません',
-        classes: 'toast-serverinput'
-      });
     } else {
-      $(this).val(valRep);
+      const valSet = (function() {
+        if (Number(valRep) > 65536) return '65535';
+        return '0';
+      })();
+      $(this).val(valSet);
+      if ($('.toast-serverinput').length) return;
+      M.toast({
+        html: '0～65535の値で設定してください',
+        classes: 'toast-serverinput'
+      });
     }
   });
   // オートセーブ
