@@ -928,7 +928,7 @@ client.on('message', function(data) {
     tmp += ` ${attachmentsBym}`;
     return tmp;
   })();
-  let sendTextToLog = (function() { // template_logRep
+  let sendTextToLog = (function() {
     // テンプレートの処理
     let tmp = template_log
       .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
