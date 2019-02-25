@@ -891,8 +891,59 @@ client.on('message', function(data) {
     return data.author.note;
   })();
   const avatarURL = data.author.displayAvatarURL.replace(/\?size=\d+/, '');
-  // チャットの内容 (リプライ/チャンネルタグを読ませない)
-  const content = data.content.replace(/<@!?[0-9]+>/g, '').replace(/<#[0-9]+>/g, '');
+  // チャットの内容
+  let content = data.content;
+  // チャンネルの処理
+  const contentMatchChannel = content.match(/<#([0-9]*?)>/g);
+  if (contentMatchChannel != null) {
+    for (let i = 0, n = contentMatchChannel.length; i < n; i++) {
+      const contentChannel = contentMatchChannel[i];
+      const contentChannelId = contentChannel.replace(/[<#>]/g, ''); // IDだけ取り出す
+      const contentChannelReg= new RegExp(contentChannel, 'g');
+      const channels = data.channel.guild.channels;
+      const channel = channels.get(contentChannelId);
+      const contentChannelName = channel.name;
+      content = content.replace(contentChannelReg, `#${contentChannelName}`);
+      debugLog('[Discord] channels', channels);
+      debugLog('[Discord] channel', channel);
+    }
+  }
+  // メンションの処理
+  const contentMatchMention = content.match(/<@!?([0-9]*?)>/g);
+  if (contentMatchMention != null) {
+    for (let i = 0, n = contentMatchMention.length; i < n; i++) {
+      const contentMention = contentMatchMention[i];
+      const contentMentionId = contentMention.replace(/[<@!>]/g, ''); // IDだけ取り出す
+      const contentMentionReg= new RegExp(contentMention, 'g');
+      const myMention = (function() {
+        const tmp = objectCheck(setting, 'dispeak.my_mention_bym');
+        if (tmp == null) return '';
+        return tmp;
+      })();
+      const otherMention = (function() {
+        const tmp = objectCheck(setting, 'dispeak.other_mention_bym');
+        if (tmp == null) return '';
+        return tmp;
+      })();
+      const members = data.member.guild.members;
+      const member = members.get(contentMentionId);
+      const mentionUsername = member.user.username;
+      const mentionNickname = (function() {
+        const nick = member.nickname;
+        if (nick == null) return mentionUsername;
+        return nick;
+      })();
+      debugLog('[Discord] members', members);
+      debugLog('[Discord] member', member);
+      if (!objectCheck(setting, 'dispeak.mention')) {
+        content = content.replace(/<@!?([0-9]*?)>/g, '');
+      } else if (contentMentionId == userId) {
+        content = content.replace(contentMentionReg, myMention).replace(/\$username\$/, mentionUsername).replace(/\$nickname\$/, mentionNickname);
+      } else {
+        content = content.replace(contentMentionReg, otherMention).replace(/\$username\$/, mentionUsername).replace(/\$nickname\$/, mentionNickname);
+      }
+    }
+  }
   // 画像の処理
   const imageTemplate = objectCheck(setting, 'dispeak.image_bym');
   const attachmentsSize = data.attachments.size;
