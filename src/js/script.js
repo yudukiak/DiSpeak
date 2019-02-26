@@ -363,7 +363,7 @@ $(function() {
   $(document).on('click', '#blacklist img, #whitelist img', function() {
     if ($(this).attr('src') != 'images/discord.png') return;
     const thisId = $(this).attr('id');
-    const index = (function(){
+    const index = (function() {
       if (thisId === 'blacklist') $('#blacklist img').index(this);
       if (thisId === 'whitelist') $('#whitelist img').index(this);
     })();
@@ -464,7 +464,7 @@ $(function() {
         const storage = localStorage.getItem('notificationLog');
         let html = '';
         let logAry = [];
-        if (data.length == null ) {
+        if (data.length == null) {
           M.toast({
             html: 'おしらせの取得に失敗しました<br>時間を置いて再度お試し下さい',
             classes: 'toast-notification'
@@ -473,7 +473,7 @@ $(function() {
           if (storage != null) logAry = storage;
           return;
         } else if (data.length === 0) {
-         html += `<li class="collection-item left-align"><p>新しいお知らせはありませんでした…っ！ (っ◞‸◟c)</p></li>`;
+          html += `<li class="collection-item left-align"><p>新しいお知らせはありませんでした…っ！ (っ◞‸◟c)</p></li>`;
         } else {
           for (let i = 0, n = data.length; i < n; i++) {
             const time = whatTimeIsIt(data[i].time);
@@ -618,21 +618,21 @@ client.on('ready', function() {
       if (document.getElementById(s_id) == null) {
         $('#server-list').append(
           `<div id="${s_id}" class="collection-item row">` +
-            `<div class="collection-item avatar valign-wrapper"><img src="${s_iconURL}" alt="" class="circle"><span class="title">${s_name}</span></div>` +
-            '<div class="col s12 row section right-align">' +
-              '<div class="col s6 valign-wrapper"><div class="col s10"><strong>チャットの読み上げ</strong></div><div class="col s2 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
-              '<div class="col s6 valign-wrapper"><div class="col s10"><strong>ボイスチャンネルの通知</strong></div><div class="col s2 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
-            '</div>' +
-            '<div class="col s12 row section right-align display-none">' +
-              '<div class="col s12 row section right-align">' +
-                `<div class="col s2 row input-field"><input id="${s_id}_voice" name="b_voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
-                `<div class="col s2 row input-field"><input id="${s_id}_volume" name="b_volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
-                `<div class="col s2 row input-field"><input id="${s_id}_speed" name="b_speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
-                `<div class="col s2 row input-field"><input id="${s_id}_tone" name="b_tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
-                `<div class="col s2 row input-field"></div>` +
-                `<div class="col s2 row input-field"><input id="${s_id}_command" name="b_command" type="text" value=""><label for="${s_id}_command">コマンド</label></div>` +
-              '</div>' +
-            '</div>' +
+          `<div class="collection-item avatar valign-wrapper"><img src="${s_iconURL}" alt="" class="circle"><span class="title">${s_name}</span></div>` +
+          '<div class="col s12 row section right-align">' +
+          '<div class="col s6 valign-wrapper"><div class="col s10"><strong>チャットの読み上げ</strong></div><div class="col s2 switch right-align"><label><input name="chat" type="checkbox"><span class="lever"></span></label></div></div>' +
+          '<div class="col s6 valign-wrapper"><div class="col s10"><strong>ボイスチャンネルの通知</strong></div><div class="col s2 switch right-align"><label><input name="voice" type="checkbox"><span class="lever"></span></label></div></div>' +
+          '</div>' +
+          '<div class="col s12 row section right-align display-none">' +
+          '<div class="col s12 row section right-align">' +
+          `<div class="col s2 row input-field"><input id="${s_id}_voice" name="b_voice" type="number" value="" min="0" max="65535"><label for="${s_id}_voice">声質</label></div>` +
+          `<div class="col s2 row input-field"><input id="${s_id}_volume" name="b_volume" type="number" value="" min="0" max="65535"><label for="${s_id}_volume">音量</label></div>` +
+          `<div class="col s2 row input-field"><input id="${s_id}_speed" name="b_speed" type="number" value="" min="0" max="65535"><label for="${s_id}_speed">速度</label></div>` +
+          `<div class="col s2 row input-field"><input id="${s_id}_tone" name="b_tone" type="number" value="" min="0" max="65535"><label for="${s_id}_tone">音程</label></div>` +
+          `<div class="col s2 row input-field"></div>` +
+          `<div class="col s2 row input-field"><input id="${s_id}_command" name="b_command" type="text" value=""><label for="${s_id}_command">コマンド</label></div>` +
+          '</div>' +
+          '</div>' +
           '</div>'
         );
       }
@@ -838,7 +838,7 @@ client.on('message', function(data) {
   if (channelType == 'directmessage' && userId == authorId) {
     // DMで発言者が自分、ただし該当DMが読まない設定の時
     const recipientId = data.channel.recipient.id;
-    if(!setting.directmessage[recipientId]) return;
+    if (!setting.directmessage[recipientId]) return;
   } else if (channelType == 'directmessage' && userId != authorId) {
     // settingにDMIDがない or 特定のDMを読み上げない
     if (setting.directmessage[authorId] == null || !setting.directmessage[authorId]) return;
@@ -899,7 +899,7 @@ client.on('message', function(data) {
     for (let i = 0, n = contentMatchChannel.length; i < n; i++) {
       const contentChannel = contentMatchChannel[i];
       const contentChannelId = contentChannel.replace(/[<#>]/g, ''); // IDだけ取り出す
-      const contentChannelReg= new RegExp(contentChannel, 'g');
+      const contentChannelReg = new RegExp(contentChannel, 'g');
       const channels = data.channel.guild.channels;
       const channel = channels.get(contentChannelId);
       const contentChannelName = channel.name;
@@ -914,7 +914,7 @@ client.on('message', function(data) {
     for (let i = 0, n = contentMatchMention.length; i < n; i++) {
       const contentMention = contentMatchMention[i];
       const contentMentionId = contentMention.replace(/[<@!>]/g, ''); // IDだけ取り出す
-      const contentMentionReg= new RegExp(contentMention, 'g');
+      const contentMentionReg = new RegExp(contentMention, 'g');
       const myMention = (function() {
         const tmp = objectCheck(setting, 'dispeak.my_mention_bym');
         if (tmp == null) return '';
@@ -952,7 +952,7 @@ client.on('message', function(data) {
   if (attachmentsSize > 0) {
     const filenameAry = data.attachments.map(function(val, key) {
       const filename = val.filename;
-      const spoilerText = (function(){
+      const spoilerText = (function() {
         const spoiler_bym = objectCheck(setting, 'dispeak.spoiler_bym');
         if (spoiler_bym != null) return spoiler_bym;
         return '';
@@ -996,7 +996,7 @@ client.on('message', function(data) {
     // 画像の処理
     tmp += ` ${attachmentsBym}`;
     // スポイラーの処理
-    const spoilerText = (function(){
+    const spoilerText = (function() {
       const spoiler_bym = objectCheck(setting, 'dispeak.spoiler_bym');
       if (spoiler_bym != null) return spoiler_bym;
       return '';
@@ -1379,7 +1379,7 @@ function bouyomiSpeak(data, set) {
   });
 }
 // クリップボードへコピー
-function copyTextToClipboard(textVal){
+function copyTextToClipboard(textVal) {
   const temp = document.createElement('div');
   temp.appendChild(document.createElement('pre')).textContent = textVal;
   const s = temp.style;
@@ -1436,7 +1436,7 @@ function getNotificationJson() {
       if (data == null || data.length === 0) return; // 通知データがなければそのまま
       const dataLen = data.length;
       let count = 0;
-      if (dataLen > 0 ) {
+      if (dataLen > 0) {
         $('#notification').removeClass('hide'); // 通知データがあった場合、表示させてから既読・未読をチェック
         if (storage == null) {
           $('#notification').addClass('red-text text-accent-1');
@@ -1451,7 +1451,7 @@ function getNotificationJson() {
       }
     });
   const time = 1000 * 60 * 10;
-  setTimeout(function () {
+  setTimeout(function() {
     getNotificationJson();
   }, time);
 }
