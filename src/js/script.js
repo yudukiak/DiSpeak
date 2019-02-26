@@ -1564,17 +1564,18 @@ function errorLog(obj) {
     if (/Something took too long to do/.test(msg)) return 'Discordに接続できません';
     if (/getaddrinfo ENOTFOUND/.test(msg)) return 'IPが正しくありません';
     if (/"port" option should be/.test(msg)) return 'ポートが正しくありません';
+    if (/Port should be > 0 and < 65536/.test(msg)) return 'ポートが正しくありません';
     if (/connect ECONNREFUSED \d+\.\d+\.\d+\.\d+:\d+/.test(msg)) return '棒読みちゃんが起動していない、もしくは接続できません';
     if (/\$ is not a function/.test(msg)) return 'エラーが発生しました<br>Ctrl+Rで画面を更新してください';
-    if (/([0-9a-zA-Z]+) is not defined/.test(msg)) return 'エラーが発生しました';
-    if (/read ECONNRESET/.test(msg)) return 'エラーが発生しました'; // Discord.jsの問題？
-    if (/connect ETIMEDOUT/.test(msg)) return 'エラーが発生しました'; // 他のソフトと競合？
-    //if (/Uncaught, unspecified "error" event/.test(msg)) return 'エラーが発生しました。';
-    return 'エラーが発生しました';
-  })();
-  const msgTxtAdd = (function() {
-    if (msgTxt === 'エラーが発生しました') return `${msgTxt}<br>${msg}`;
-    return msgTxt
+    // 原因不明のエラー
+    if (/read ECONNRESET/.test(msg)) return `[${msg}]<br>Discordに接続できません<br>引き続き起きる場合はDiSpeakやパソコン、<br>ネットワークの再起動もお試し下さい`; // Discord.jsの問題？
+    if (/connect ETIMEDOUT/.test(msg)) return `[${msg}]<br>棒読みちゃんにアクセスできません<br>同一ポートを使用しているソフトがある場合、<br>閉じてからお試し下さい`; // 他のソフトと競合？
+    if (/Can not find Squirrel/.test(msg)) return `[${msg}]<br>エラーが発生しました`; // 自動更新周りのエラー？
+    if (/no such file or directory/.test(msg)) return `[${msg}]<br>エラーが発生しました`; // ファイルが存在しないっぽい？
+    // プログラムミスのエラー
+    if (/([0-9a-zA-Z]+) is not defined/.test(msg)) return `[${msg}]<br>エラーが発生しました`;
+    if (/Cannot read property .+ of null/.test(msg)) return `[${msg}]<br>エラーが発生しました`;
+    return `[${msg}]<br>エラーが発生しました`;
   })();
   const homepathAry = homepath.split('\\');
   const username = homepathAry[2];
@@ -1585,12 +1586,12 @@ function errorLog(obj) {
   debugLog(`[errorLog] username`, username);
   debugLog(`[errorLog] jsnRep`, jsnRep);
   if ($('.toast-error').length || msgTxt === '') return;
-  const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxtAdd}</span>`;
+  const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxt}</span>`;
   M.toast({
     html: toastHTML,
     classes: 'toast-error'
   });
-  if (objectCheck(setting, 'dispeak.errorlog') && msgTxt === 'エラーが発生しました') $.post(`${postUrl}?t=e`, jsnRep);
+  if (objectCheck(setting, 'dispeak.errorlog') && /\[.+]<br>/.test(msgTxt)) $.post(`${postUrl}?t=e`, jsnRep);
 }
 // デバッグ
 function debugLog(fnc, data) {
