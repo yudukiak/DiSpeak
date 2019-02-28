@@ -925,16 +925,18 @@ client.on('message', function(data) {
         if (tmp == null) return '';
         return tmp;
       })();
-      const members = data.member.guild.members;
-      const member = members.get(contentMentionId);
-      const mentionUsername = member.user.username;
+      const mentionUserdata = client.users.get(contentMentionId);
+      const mentionUsername = mentionUserdata.username;
       const mentionNickname = (function() {
+        if (channelType !== 'server') return mentionUsername;
+        const members = data.member.guild.members;
+        const member = members.get(contentMentionId);
         const nick = member.nickname;
+        debugLog('[Discord] members', members);
+        debugLog('[Discord] member', member);
         if (nick == null) return mentionUsername;
         return nick;
       })();
-      debugLog('[Discord] members', members);
-      debugLog('[Discord] member', member);
       if (!objectCheck(setting, 'dispeak.mention')) {
         content = content.replace(/<@!?([0-9]*?)>/g, '');
       } else if (contentMentionId == userId) {
