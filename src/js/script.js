@@ -929,7 +929,10 @@ client.on('message', function(data) {
       const mentionUsername = mentionUserdata.username;
       const mentionNickname = (function() {
         if (channelType !== 'server') return mentionUsername;
-        const members = data.member.guild.members;
+        const members = (function() {
+          if (objectCheck(data, 'member') == null) return data.mentions._guild.members;
+          return data.member.guild.members;
+        })();
         const member = members.get(contentMentionId);
         const nick = member.nickname;
         debugLog('[Discord] members', members);
