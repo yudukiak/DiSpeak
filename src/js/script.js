@@ -986,6 +986,8 @@ client.on('message', function(data) {
       attachmentsHtml = fileurlHtml;
     }
   }
+  // 画像がない＆メッセージがないときは処理を終了（埋め込み・ピン止めなど）
+  if (attachmentsSize === 0 && content === '') return;
   // チャットをエスケープ処理する
   const contentEsc = escapeHtml(content);
   // 絵文字の処理をする
