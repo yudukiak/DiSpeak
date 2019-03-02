@@ -18,7 +18,8 @@ Discordを起動していなくても読み上げてくれます。
 エラーや警告が出たときは[Defender SmartScreenについて](https://github.com/micelle/dc_DiSpeak/wiki/Defender)をご確認ください。
 
 1. インストーラーのダウンロードは[releases](https://github.com/micelle/dc_DiSpeak/releases)から行えます。
-1. 「 **DiSpeakSetup-xxx.exe** 」をクリックし、インストーラーのダウンロードを行います。
+1. 「 **DiSpeakSetup-xxx.exe** 」をクリックし、インストーラーのダウンロードを行います。  
+   どれが最新か分からないときは[こちら](https://github.com/micelle/dc_DiSpeak/releases/latest)にある「 **DiSpeakSetup-xxx.exe** 」をダウンロードしてください。
 1. ダウンロード後、インストーラーを実行することでDiSpeakのインストールが開始されます。
 1. インストールが完了すると自動的にDiSpeakが起動します。
 
