@@ -1014,8 +1014,8 @@ client.on('message', function(data) {
   let sendTextToLog = (function() {
     // テンプレートの処理
     let tmp = template_log
-      .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
-      .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
+      .replace(/\$time\$/, time).replace(/\$server\$/, escapeHtml(guildName)).replace(/\$channel\$/, escapeHtml(channelName)).replace(/\$group\$/, escapeHtml(groupName))
+      .replace(/\$username\$/, escapeHtml(username)).replace(/\$nickname\$/, escapeHtml(nickname)).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
     // 画像の処理
     if (content === '') {
       tmp += `${attachmentsHtml}`;
