@@ -988,42 +988,48 @@ client.on('message', function(data) {
   }
   // 画像がない＆メッセージがないときは処理を終了（埋め込み・ピン止めなど）
   if (attachmentsSize === 0 && content === '') return;
-  // チャットをエスケープ処理する
-  const contentEsc = escapeHtml(content);
-  // 絵文字の処理をする
-  const contentEscRep = contentEsc
-    .replace(/&lt;(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
-    .replace(/&lt;a(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
   // 送信するテキストを作成（$time$ $server$ $channel$ $group$ $channel-prev$ $channel-next$ $username$ $nickname$ $memo$ $text$）
   let sendTextToBouyomi = (function() {
-    // テンプレートの処理
-    let tmp = template_bym
-      .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
-      .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, content);
-    // 画像の処理
-    tmp += ` ${attachmentsBym}`;
     // スポイラーの処理
     const spoilerText = (function() {
       const spoiler_bym = objectCheck(setting, 'dispeak.spoiler_bym');
       if (spoiler_bym != null) return spoiler_bym;
       return '';
     })();
-    if (!objectCheck(setting, 'dispeak.spoiler')) tmp = tmp.replace(/\|\|(.*?)\|\|/g, spoilerText);
+    const sendContent = (function() {
+      if (!objectCheck(setting, 'dispeak.spoiler')) return content.replace(/\|\|(.*?)\|\|/g, spoilerText);
+      return content;
+    })();
+    // テンプレートの処理
+    let tmp = template_bym
+      .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
+      .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, sendContent);
+    // 画像の処理
+    tmp += ` ${attachmentsBym}`;
     return tmp;
   })();
   let sendTextToLog = (function() {
+    // チャットをエスケープ処理する
+    let sendContent = escapeHtml(content);
+    // 絵文字の処理をする
+    sendContent = sendContent
+      .replace(/&lt;(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
+      .replace(/&lt;a(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
+    // スポイラーの処理
+    sendContent = (function() {
+      if (!objectCheck(setting, 'dispeak.spoiler')) return sendContent.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler">$1</span>');
+      return sendContent;
+    })();
     // テンプレートの処理
     let tmp = template_log
       .replace(/\$time\$/, time).replace(/\$server\$/, escapeHtml(guildName)).replace(/\$channel\$/, escapeHtml(channelName)).replace(/\$group\$/, escapeHtml(groupName))
-      .replace(/\$username\$/, escapeHtml(username)).replace(/\$nickname\$/, escapeHtml(nickname)).replace(/\$memo\$/, note).replace(/\$text\$/, contentEscRep);
+      .replace(/\$username\$/, escapeHtml(username)).replace(/\$nickname\$/, escapeHtml(nickname)).replace(/\$memo\$/, note).replace(/\$text\$/, sendContent);
     // 画像の処理
     if (content === '') {
       tmp += `${attachmentsHtml}`;
     } else {
       tmp += `<br>${attachmentsHtml}`;
     }
-    // スポイラーの処理
-    if (!objectCheck(setting, 'dispeak.spoiler')) tmp = tmp.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler">$1</span>');
     return tmp;
   })();
   let set = {};
