@@ -1007,12 +1007,13 @@ client.on('message', function(data) {
     }
   }
   // 画像の処理
-  const imageTemplate = objectCheck(setting, 'dispeak.image_bym');
+  const filesTemplate = objectCheck(setting, 'dispeak.files_bym');
   const attachmentsSize = data.attachments.size;
   let attachmentsBym = '';
   let attachmentsHtml = '';
   if (attachmentsSize > 0) {
-    const filenameAry = data.attachments.map(function(val, key) {
+    let mimeTypeName = ''
+    const filelistAry = data.attachments.map(function(val, key) {
       const filename = val.filename;
       const spoilerText = (function() {
         const spoiler_bym = objectCheck(setting, 'dispeak.spoiler_bym');
@@ -1023,24 +1024,38 @@ client.on('message', function(data) {
         if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return spoilerText;
         return filename;
       })();
+      const mimeType = mime.lookup(filename);
+      const mimeTypeRepFull = mimeType.replace(/\/|\*/g, '');
+      const mimeTypeRepOdd = mimeType.replace(/\/.*/g, '');
+      mimeTypeName = (function() {
+        const mimeFull = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepFull}`);
+        const mimeOdd = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepOdd}`);
+        const mimeALL = objectCheck(setting, `dispeak.files_read_all`);
+        if (mimeFull != null) return mimeFull;
+        if (mimeOdd != null) return mimeOdd;
+        if (mimeALL != null) return mimeALL;
+        return 'ファイル';
+      })();
       return text;
     });
-    const fileurlHtmlAry = data.attachments.map(function(val, key) {
+    const fileHtmlAry = data.attachments.map(function(val, key) {
       const filename = val.filename;
+      const mimeType = mime.lookup(filename);
       const url = val.url;
       const html = (function() {
+        if (!/^image/.test(mimeType)) return '';
         if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return `<span class="spoiler"><img class="thumbnail" src="${url}" alt="${filename}"></span>`;
         return `<img class="thumbnail" src="${url}" alt="${filename}">`;
       })();
       return html;
     });
-    const filenameList = filenameAry.join(', ');
-    const fileurlHtml = fileurlHtmlAry.join('');
-    if (objectCheck(setting, 'dispeak.image_chat') && imageTemplate != null) {
-      attachmentsBym = imageTemplate.replace(/\$filenum\$/, attachmentsSize).replace(/\$filename\$/, filenameList);
+    const filelist = filelistAry.join(', ');
+    const fileHtml = fileHtmlAry.join('');
+    if (objectCheck(setting, 'dispeak.files_chat') && filesTemplate != null) {
+      attachmentsBym = filesTemplate.replace(/\$filename\$/, mimeTypeName).replace(/\$filenum\$/, attachmentsSize).replace(/\$filelist\$/, filelist);
     }
     if (objectCheck(setting, 'dispeak.image_log')) {
-      attachmentsHtml = fileurlHtml;
+      attachmentsHtml = fileHtml;
     }
   }
   // 画像がない＆メッセージがないときは処理を終了（埋め込み・ピン止めなど）
