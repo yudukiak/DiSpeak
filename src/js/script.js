@@ -648,7 +648,7 @@ client.on('ready', function() {
     })();
     let html = `<li><div class="collapsible-header valign-wrapper"><img src="${server_iconURL}" alt="" class="circle">${server_name}</div><div class="collapsible-body">`;
     v.emojis.map(function(val, key) {
-      const emoji_name = escapeHtml(val.nam)e;
+      const emoji_name = escapeHtml(val.name);
       const emoji_id = key;
       const emoji_url = val.url;
       html +=
