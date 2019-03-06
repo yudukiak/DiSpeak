@@ -143,7 +143,7 @@ $(function() {
   // 設定ファイルが存在しないが、localStorageには存在するとき
   const storage = localStorage.getItem('DiscordSetting');
   if (setting == null && storage != null) {
-    Swal({
+    Swal.fire({
       title: '設定ファイルが存在しません',
       text: '以前使用していた設定を元に復元しますか？',
       type: 'question',
@@ -401,14 +401,14 @@ $(function() {
       `<tr><th>内容</th><td>${comment}</td></tr>` +
       '</table>';
     if (commentLength < 1) {
-      Swal(
+      Swal.fire(
         'おっと？',
         '「コメント」は必須です',
         'warning'
       );
       return;
     }
-    Swal({
+    Swal.fire({
       title: '以下の内容で送信します',
       html: html,
       type: 'question',
