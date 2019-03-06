@@ -1011,7 +1011,9 @@ client.on('message', function(data) {
   const attachmentsSize = data.attachments.size;
   let attachmentsBym = '';
   let attachmentsHtml = '';
+  let attachmentsMime = '';
   if (attachmentsSize > 0) {
+    debugLog('[Discord] data.attachments', data.attachments);
     let mimeTypeName = ''
     const filelistAry = data.attachments.map(function(val, key) {
       const filename = val.filename;
@@ -1027,15 +1029,23 @@ client.on('message', function(data) {
       const mimeType = mime.lookup(filename);
       const mimeTypeRepFull = mimeType.replace(/\/|\*/g, '');
       const mimeTypeRepOdd = mimeType.replace(/\/.*/g, '');
+      debugLog('[Discord] mimeType', mimeType);
+      debugLog('[Discord] mimeTypeRepFull', mimeTypeRepFull);
+      debugLog('[Discord] mimeTypeRepOdd', mimeTypeRepOdd);
       mimeTypeName = (function() {
-        const mimeFull = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepFull}`);
-        const mimeOdd = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepOdd}`);
+        const mimeFull_add = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepFull}`);
+        const mimeFull = objectCheck(setting, `dispeak.files_read_${mimeTypeRepFull}`);
+        const mimeOdd_add = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepOdd}`);
+        const mimeOdd = objectCheck(setting, `dispeak.files_read_${mimeTypeRepOdd}`);
         const mimeALL = objectCheck(setting, `dispeak.files_read_all`);
+        if (mimeFull_add != null) return mimeFull_add;
         if (mimeFull != null) return mimeFull;
+        if (mimeOdd_add != null) return mimeOdd_add;
         if (mimeOdd != null) return mimeOdd;
         if (mimeALL != null) return mimeALL;
         return 'ファイル';
       })();
+      attachmentsMime = mimeType;
       return text;
     });
     const fileHtmlAry = data.attachments.map(function(val, key) {
@@ -1051,6 +1061,9 @@ client.on('message', function(data) {
     });
     const filelist = filelistAry.join(', ');
     const fileHtml = fileHtmlAry.join('');
+    debugLog('[Discord] mimeTypeName', mimeTypeName);
+    debugLog('[Discord] filelistAry', filelistAry);
+    debugLog('[Discord] fileHtmlAry', fileHtmlAry);
     if (objectCheck(setting, 'dispeak.files_chat') && filesTemplate != null) {
       attachmentsBym = filesTemplate.replace(/\$filename\$/, mimeTypeName).replace(/\$filenum\$/, attachmentsSize).replace(/\$filelist\$/, filelist);
     }
@@ -1113,10 +1126,10 @@ client.on('message', function(data) {
     const templateCommand = setting.server[guildId].b_command;
     sendTextToBouyomi = `${templateCommand} ${sendTextToBouyomi}`;
   }
-  // 画像オンリー、スペースのみ
+  // テキストが存在しないときの処理
   if (content === '' || /^([\s]+)$/.test(content)) {
-    if (objectCheck(setting, 'dispeak.image_chat')) bouyomiSpeak(sendTextToBouyomi, set);
-    if (objectCheck(setting, 'dispeak.image_log')) logProcess(sendTextToLog, avatarURL, authorId);
+    if (objectCheck(setting, 'dispeak.files_chat')) bouyomiSpeak(sendTextToBouyomi, set);
+    if (/^image/.test(attachmentsMime) && objectCheck(setting, 'dispeak.image_log')) logProcess(sendTextToLog, avatarURL, authorId);
   } else {
     bouyomiSpeak(sendTextToBouyomi, set);
     logProcess(sendTextToLog, avatarURL, authorId);
