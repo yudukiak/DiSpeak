@@ -5,6 +5,7 @@ const $ = require('jquery');
 const net = require('net');
 const ua = require('universal-analytics');
 const markdown = require('markdown');
+const mime = require('mime-types');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const pathExe = ipcRenderer.sendSync('get-path-exe');
 const client = new Discord.Client();
@@ -569,8 +570,8 @@ $(function() {
             const read = result.value[1];
             const html =
               '<tr>' +
-              `<td><input name="files_mime_add_${mimeName}" type="text" value="${mime}"></td>` +
-              `<td><input name="files_read_add_${mimeName}" type="text" value="${read}"></td>` +
+              `<td class="input-field"><input name="files_mime_add_${mimeName}" type="text" value="${mime}"></td>` +
+              `<td class="input-field"><input name="files_read_add_${mimeName}" type="text" value="${read}"></td>` +
               '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
               '</tr>';
             if ($(`#files-list input[name=files_mime_add_${mimeName}]`).length || /\*\/\*/.test(mime) || /^(image|audio|video|text)$/.test(mimeName)) {
@@ -587,6 +588,12 @@ $(function() {
         });
     } else if (/close/.test(text)) {
       $(this).parents('tr').remove();
+      writeFile();
+    } else  if (/replay/.test(text)) {
+      $(this).parents('tr').find('[data-template]').each(function() {
+        const data = $(this).data('template');
+        $(this).children('input').val(data);
+      });
       writeFile();
     }
   });
@@ -1174,8 +1181,8 @@ function readFile() {
         const readVal = objectCheck(setting, `dispeak.${readName}`);
         const html =
           '<tr>' +
-          `<td><input name="${mimeName}" type="text" value="${mimeVal}"></td>` +
-          `<td><input name="${readName}" type="text" value="${readVal}"></td>` +
+          `<td class="input-field"><input name="${mimeName}" type="text" value="${mimeVal}"></td>` +
+          `<td class="input-field"><input name="${readName}" type="text" value="${readVal}"></td>` +
           '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
           '</tr>';
         $('#files-list tbody').prepend(html);
