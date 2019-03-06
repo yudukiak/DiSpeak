@@ -285,6 +285,10 @@ ipcMain.on('setting-file-write', (event, data) => {
   appSettingObj = data;
   event.returnValue = writeFileSync(appSetting, data);
 });
+// exeのパスを返す
+ipcMain.on('get-path-exe', (event) => {
+  event.returnValue = app.getPath('exe');
+});
 // UIの挙動
 ipcMain.on('window-minimize', () => {
   mainWindow.minimize();

@@ -6,6 +6,7 @@ const net = require('net');
 const ua = require('universal-analytics');
 const markdown = require('markdown');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
+const pathExe = ipcRenderer.sendSync('get-path-exe');
 const client = new Discord.Client();
 const jQueryVersion = $.fn.jquery;
 const homepath = process.env.HOMEPATH;
@@ -1604,7 +1605,7 @@ function errorLog(obj) {
     html: toastHTML,
     classes: 'toast-error'
   });
-  if (jsn.match(usernameReg) != null) return; // インストール先に存在しない場合のは送らないよ
+  if (pathExe.match(usernameReg) == null) return; // インストール先に存在しない場合のは送らないよ
   if (objectCheck(setting, 'dispeak.errorlog') && /\[.+]<br>/.test(msgTxt)) $.post(`${postUrl}?t=e`, jsnRep);
 }
 // デバッグ
