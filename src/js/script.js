@@ -541,6 +541,55 @@ $(function() {
   $(document).on('click', '.spoiler', function() {
     $(this).addClass('spoiler-non');
   });
+  // $filename$の設定
+  $(document).on('click', '#files-list button', function() {
+    const text = $(this).children('i').text();
+    debugLog('[files-list] text', text);
+    if (/add/.test(text)) {
+      Swal.mixin({
+          input: 'text',
+          confirmButtonText: 'Next &rarr;',
+          showCancelButton: true,
+          progressSteps: ['1', '2']
+        })
+        .queue([{
+            title: 'MIMEタイプを記入',
+            text: '例）「image/*」「image/png」など'
+          },
+          {
+            title: '読み方を記入',
+            text: '例）「画像ファイル」など'
+          }
+        ])
+        .then((result) => {
+          debugLog('[files-list add] result', result);
+          if (result.value) {
+            const mime = result.value[0];
+            const mimeName = mime.replace(/\/|\*/g, '');
+            const read = result.value[1];
+            const html =
+              '<tr>' +
+              `<td><input name="files_mime_add_${mimeName}" type="text" value="${mime}"></td>` +
+              `<td><input name="files_read_add_${mimeName}" type="text" value="${read}"></td>` +
+              '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
+              '</tr>';
+            if ($(`#files-list input[name=files_mime_add_${mimeName}]`).length || /\*\/\*/.test(mime) || /^(image|audio|video|text)$/.test(mimeName)) {
+              Swal.fire(
+                'おっと？',
+                'そのMIMEタイプは追加されています',
+                'warning'
+              );
+            } else {
+              $('#files-list tbody').prepend(html);
+              writeFile();
+            }
+          }
+        });
+    } else if (/close/.test(text)) {
+      $(this).parents('tr').remove();
+      writeFile();
+    }
+  });
 });
 
 // ------------------------------
@@ -1116,6 +1165,20 @@ function readFile() {
       // チェックボックス
       else if (/object Boolean/.test(type)) {
         $(`#${id} input[name=${name}]`).prop('checked', val);
+      }
+      // $filename$の設定
+      else if (/^files_mime_add_/.test(name)) {
+        const mimeName = name;
+        const mimeVal = val;
+        const readName = mimeName.replace(/^files_mime_add_/, 'files_read_add_');
+        const readVal = objectCheck(setting, `dispeak.${readName}`);
+        const html =
+          '<tr>' +
+          `<td><input name="${mimeName}" type="text" value="${mimeVal}"></td>` +
+          `<td><input name="${readName}" type="text" value="${readVal}"></td>` +
+          '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
+          '</tr>';
+        $('#files-list tbody').prepend(html);
       }
       // それ以外
       else {

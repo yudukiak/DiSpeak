@@ -143,16 +143,61 @@
               <div class="divider"></div>
               <div class="row section">
                 <div class="valign-wrapper">
-                  <div class="col s10"><strong class="valign-wrapper">画像を読み上げる？</strong>以下の文章を末尾に付けて読み上げます。</div>
-                  <div class="col s2 switch right-align"><label><input name="image_chat" type="checkbox"><span class="lever"></span></label></div>
+                  <div class="col s10"><strong class="valign-wrapper">ファイルを読み上げる？</strong>以下の文章を末尾に付けて読み上げます。</div>
+                  <div class="col s2 switch right-align"><label><input name="files_chat" type="checkbox"><span class="lever"></span></label></div>
                 </div>
-                <div class="col s12 valign-wrapper template" data-template="画像が$filenum$枚（$filename$）送信しました">
+                <div class="col s12 valign-wrapper template" data-template="$filename$が$filenum$件（$filelist$）送信されました">
                   <div class="input-field col s8 m0">
-                    <input id="image_bym" name="image_bym" type="text" value="画像が$filenum$枚（$filename$）送信しました">
+                    <input id="files_bym" name="files_bym" type="text" value="$filename$が$filenum$件（$filelist$）送信されました">
                   </div>
                   <div class="input-field col s4 center-align m0">
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
+                </div>
+                <div class="col s12">
+                  <ul class="collapsible z-depth-0">
+                    <li>
+                      <div class="collapsible-header"><i class="material-icons">library_books</i>$filename$の設定</div>
+                      <div class="collapsible-body">
+                        <table id="files-list" class="centered">
+                          <thead>
+                            <tr>
+                              <th>拡張子（カンマ区切り）</th>
+                              <th>読み方</th>
+                              <th><button class="btn waves-effect waves-light indigo lighten-1" type="button"><i class="material-icons">add</i></button></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td data-template="image/*"><input name="files_mime_image" type="text" value="image/*"></td>
+                              <td data-template="画像ファイル"><input name="files_read_image" type="text" value="画像ファイル"></td>
+                              <td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">replay</i></button></td>
+                            </tr>
+                            <tr>
+                              <td data-template="audio/*"><input name="files_mime_audio" type="text" value="audio/*"></td>
+                              <td data-template="音声ファイル"><input name="files_read_audio" type="text" value="音声ファイル"></td>
+                              <td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">replay</i></button></td>
+                            </tr>
+                            <tr>
+                              <td data-template="video/*"><input name="files_mime_video" type="text" value="video/*"></td>
+                              <td data-template="動画ファイル"><input name="files_read_video" type="text" value="動画ファイル"></td>
+                              <td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">replay</i></button></td>
+                            </tr>
+                            <tr>
+                              <td data-template="text/*"><input name="files_mime_text" type="text" value="text/*"></td>
+                              <td data-template="テキストファイル"><input name="files_read_text" type="text" value="テキストファイル"></td>
+                              <td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">replay</i></button></td>
+                            </tr>
+                            <tr>
+                              <td data-template="*/*"><input name="files_mime_all" type="text" value="*/*"></td>
+                              <td data-template="ファイル"><input name="files_read_all" type="text" value="ファイル"></td>
+                              <td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">replay</i></button></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
               </div>
               <div class="divider"></div>
