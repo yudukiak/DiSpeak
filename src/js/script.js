@@ -1604,6 +1604,7 @@ function errorLog(obj) {
     html: toastHTML,
     classes: 'toast-error'
   });
+  if (jsn.match(usernameReg) != null) return; // インストール先に存在しない場合のは送らないよ
   if (objectCheck(setting, 'dispeak.errorlog') && /\[.+]<br>/.test(msgTxt)) $.post(`${postUrl}?t=e`, jsnRep);
 }
 // デバッグ
