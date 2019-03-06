@@ -579,7 +579,7 @@ client.on('ready', function() {
     // ダイレクトメッセージ
     if (val.type == 'dm') {
       const avatarURL = val.recipient.displayAvatarURL.replace(/\?size=\d+/, '');
-      const name = val.recipient.username;
+      const name = escapeHtml(val.recipient.username);
       const id = val.recipient.id;
       const discriminator = val.recipient.discriminator;
       $('#directmessage-list').append(
@@ -596,7 +596,7 @@ client.on('ready', function() {
         return val.iconURL.replace(/\?size=\d+/, '');
       })();
       const name = val.recipients.map(function(v) {
-        return v.username;
+        return escapeHtml(v.username);
       }).join(', ');
       $('#group-list').append(
         '<div class="collection-item avatar valign-wrapper">' +
@@ -608,9 +608,9 @@ client.on('ready', function() {
     // サーバーのテキストチャンネル
     else if (val.type == 'text') {
       const c_id = key;
-      const c_name = val.name;
+      const c_name = escapeHtml(val.name);
       const s_id = val.guild.id;
-      const s_name = val.guild.name;
+      const s_name = escapeHtml(val.guild.name);
       const s_iconURL = (function() {
         if (val.guild.iconURL == null) return 'images/group.svg';
         return val.guild.iconURL.replace(/\?size=\d+/, '');
@@ -641,14 +641,14 @@ client.on('ready', function() {
   });
   // 絵文字
   client.guilds.map(function(v, k) {
-    const server_name = v.name;
+    const server_name = escapeHtml(v.name);
     const server_iconURL = (function() {
       if (v.iconURL == null) return 'images/group.svg';
       return v.iconURL.replace(/\?size=\d+/, '');
     })();
     let html = `<li><div class="collapsible-header valign-wrapper"><img src="${server_iconURL}" alt="" class="circle">${server_name}</div><div class="collapsible-body">`;
     v.emojis.map(function(val, key) {
-      const emoji_name = val.name;
+      const emoji_name = escapeHtml(val.nam)e;
       const emoji_id = key;
       const emoji_url = val.url;
       html +=
@@ -802,9 +802,9 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
     .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
   const template_logRep = template_log
-    .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
-    .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
-    .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
+    .replace(/\$time\$/, time).replace(/\$server\$/, escapeHtml(guildName)).replace(/\$channel\$/, escapeHtml(channelName))
+    .replace(/\$channel-prev\$/, escapeHtml(channelPrevName)).replace(/\$channel-next\$/, escapeHtml(channelNextName))
+    .replace(/\$username\$/, escapeHtml(username)).replace(/\$nickname\$/, escapeHtml(nickname)).replace(/\$memo\$/, note);
   let set = {};
   set.voice = setting.server[guildId].b_voice;
   set.volume = setting.server[guildId].b_volume;
@@ -1223,7 +1223,7 @@ function chipWrite(userData, tag, len, listId) {
   if (userData == null) {
     $(`#${listId} .chip`).eq(len).html(`<img src="images/discord.png"><div>- (${tag})</div><i class="material-icons close">close</i>`);
   } else {
-    const userName = userData.username;
+    const userName = escapeHtml(userData.username);
     const userDiscriminator = userData.discriminator;
     const useAvatarURL = userData.displayAvatarURL.replace(/\?size=\d+/, '');
     $(`#${listId} .chip`).eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`);
