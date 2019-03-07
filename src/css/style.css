@@ -543,26 +543,44 @@ b, strong {
   margin: 0 1px;
 }
 
-.spoiler {
+.spoiler-text {
   color: transparent;
   background-color: rgb(51, 51, 51);
   display: inline-block;
   cursor: pointer;
 }
 
-.spoiler img {
+.spoiler-text img {
   opacity: 0;
-  display: block;
+  /*display: block;*/
 }
 
-.spoiler.spoiler-non {
+.spoiler-text.spoiler-non {
   color: rgb(51, 51, 51);
   background-color: transparent;
   cursor: auto;
 }
 
-.spoiler.spoiler-non img {
+.spoiler-text.spoiler-non img {
   opacity: 1;
+}
+
+.spoiler-image {
+  overflow: hidden;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.spoiler-image span {
+  filter: blur(44px);
+}
+
+.spoiler-image.spoiler-non {
+  cursor: auto;
+}
+
+.spoiler-image.spoiler-non span {
+  filter: blur(0px);
 }
 
 .keyboard {

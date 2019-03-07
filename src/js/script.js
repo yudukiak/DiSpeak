@@ -539,7 +539,7 @@ $(function() {
     debugLog('[logImg] userid', userid);
   });
   // スポイラーをクリック
-  $(document).on('click', '.spoiler', function() {
+  $(document).on('click', '.spoiler-text, .spoiler-image', function() {
     $(this).addClass('spoiler-non');
   });
   // $filename$の設定
@@ -1071,7 +1071,7 @@ client.on('message', function(data) {
       const url = val.url;
       const html = (function() {
         if (!/^image/.test(mimeType)) return '';
-        if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return `<span class="spoiler"><img class="thumbnail" src="${url}" alt="${filename}"></span>`;
+        if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return `<span class="spoiler-image"><span><img class="thumbnail" src="${url}" alt="${filename}"></span></span>`;
         return `<img class="thumbnail" src="${url}" alt="${filename}">`;
       })();
       fileHtmlAry.push(html);
@@ -1151,7 +1151,7 @@ client.on('message', function(data) {
       .replace(/&lt;a(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
     // スポイラーの処理
     sendContent = (function() {
-      if (!objectCheck(setting, 'dispeak.spoiler')) return sendContent.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler">$1</span>');
+      if (!objectCheck(setting, 'dispeak.spoiler')) return sendContent.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler-text">$1</span>');
       return sendContent;
     })();
     // テンプレートの処理
