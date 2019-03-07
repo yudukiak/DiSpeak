@@ -589,7 +589,7 @@ $(function() {
     } else if (/close/.test(text)) {
       $(this).parents('tr').remove();
       writeFile();
-    } else  if (/replay/.test(text)) {
+    } else if (/replay/.test(text)) {
       $(this).parents('tr').find('[data-template]').each(function() {
         const data = $(this).data('template');
         $(this).children('input').val(data);
