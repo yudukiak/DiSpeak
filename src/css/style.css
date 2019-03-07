@@ -462,6 +462,16 @@ textarea.materialize-textarea:focus:not([readonly])+label {
   color: #3949ab;
 }
 
+.swal2-popup input.swal2-input.swal2-inputerror {
+  /*
+  border-color: #f27474 !important;
+  box-shadow: 0 0 2px #f27474 !important;
+  */
+  border: 0 !important;
+  border-bottom: 1px solid #F44336 !important;
+  box-shadow: 0 1px 0 0 #F44336 !important;
+}
+
 .collection:empty {
   margin: 0;
   border: none;

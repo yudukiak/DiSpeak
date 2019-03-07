@@ -549,13 +549,18 @@ $(function() {
     if (/add/.test(text)) {
       Swal.mixin({
           input: 'text',
+          confirmButtonColor: '#3949ab',
+          cancelButtonColor: '#d33',
           confirmButtonText: 'Next &rarr;',
           showCancelButton: true,
           progressSteps: ['1', '2']
         })
         .queue([{
             title: 'MIMEタイプを記入',
-            text: '例）「image/*」「image/png」など'
+            text: '例）「image/*」「image/png」など',
+            inputValidator: (value) => {
+              return !value && 'MIMEタイプは必須です'
+            }
           },
           {
             title: '読み方を記入',
@@ -570,11 +575,17 @@ $(function() {
             const read = result.value[1];
             const html =
               '<tr>' +
-              `<td class="input-field"><input name="files_mime_add_${mimeName}" type="text" value="${mime}"></td>` +
+              `<td class="input-field"><input name="files_mime_add_${mimeName}" type="text" value="${mime}" readonly></td>` +
               `<td class="input-field"><input name="files_read_add_${mimeName}" type="text" value="${read}"></td>` +
               '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
               '</tr>';
-            if ($(`#files-list input[name=files_mime_add_${mimeName}]`).length || /\*\/\*/.test(mime) || /^(image|audio|video|text)$/.test(mimeName)) {
+            if (mime === '') {
+              Swal.fire(
+                'おっと？',
+                'MIMEタイプは必須です',
+                'warning'
+              );
+            } else if ($(`#files-list input[name=files_mime_add_${mimeName}]`).length || /\*\/\*/.test(mime) || /^(image|audio|video|text)$/.test(mimeName)) {
               Swal.fire(
                 'おっと？',
                 'そのMIMEタイプは追加されています',
@@ -1247,7 +1258,7 @@ function readFile() {
         const readVal = objectCheck(setting, `dispeak.${readName}`);
         const html =
           '<tr>' +
-          `<td class="input-field"><input name="${mimeName}" type="text" value="${mimeVal}"></td>` +
+          `<td class="input-field"><input name="${mimeName}" type="text" value="${mimeVal}" readonly></td>` +
           `<td class="input-field"><input name="${readName}" type="text" value="${readVal}"></td>` +
           '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
           '</tr>';
