@@ -1015,8 +1015,12 @@ client.on('message', function(data) {
   if (attachmentsSize > 0) {
     debugLog('[Discord] data.attachments', data.attachments);
     let mimeTypeName = ''
-    const filelistAry = data.attachments.map(function(val, key) {
+    let filelistAry = [];
+    let fileHtmlAry = [];
+    let fileListHtmlAry = [];
+    data.attachments.map(function(val, key) {
       const filename = val.filename;
+      // ファイル名（スポイラー対応）
       const spoilerText = (function() {
         const spoiler_bym = objectCheck(setting, 'dispeak.spoiler_bym');
         if (spoiler_bym != null) return spoiler_bym;
@@ -1026,18 +1030,24 @@ client.on('message', function(data) {
         if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return spoilerText;
         return filename;
       })();
-      const mimeType = mime.lookup(filename);
-      const mimeTypeRepFull = mimeType.replace(/\/|\*/g, '');
-      const mimeTypeRepOdd = mimeType.replace(/\/.*/g, '');
+      filelistAry.push(text);
+      // ファイル読み上げのテンプレート処理
+      const mimeType = (function() {
+        if (!/\./.test(filename)) return '-';
+        return mime.lookup(filename);
+      })();
       debugLog('[Discord] mimeType', mimeType);
-      debugLog('[Discord] mimeTypeRepFull', mimeTypeRepFull);
-      debugLog('[Discord] mimeTypeRepOdd', mimeTypeRepOdd);
       mimeTypeName = (function() {
+        if (!/\./.test(filename)) return 'ファイル';
+        const mimeTypeRepFull = mimeType.replace(/\/|\*/g, '');
+        const mimeTypeRepOdd = mimeType.replace(/\/.*/g, '');
         const mimeFull_add = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepFull}`);
         const mimeFull = objectCheck(setting, `dispeak.files_read_${mimeTypeRepFull}`);
         const mimeOdd_add = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepOdd}`);
         const mimeOdd = objectCheck(setting, `dispeak.files_read_${mimeTypeRepOdd}`);
         const mimeALL = objectCheck(setting, `dispeak.files_read_all`);
+        debugLog('[Discord] mimeTypeRepFull', mimeTypeRepFull);
+        debugLog('[Discord] mimeTypeRepOdd', mimeTypeRepOdd);
         if (mimeFull_add != null) return mimeFull_add;
         if (mimeFull != null) return mimeFull;
         if (mimeOdd_add != null) return mimeOdd_add;
@@ -1046,29 +1056,57 @@ client.on('message', function(data) {
         return 'ファイル';
       })();
       attachmentsMime = mimeType;
-      return text;
-    });
-    const fileHtmlAry = data.attachments.map(function(val, key) {
-      const filename = val.filename;
-      const mimeType = mime.lookup(filename);
+      // 画像のHTMLを生成
       const url = val.url;
       const html = (function() {
         if (!/^image/.test(mimeType)) return '';
         if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return `<span class="spoiler"><img class="thumbnail" src="${url}" alt="${filename}"></span>`;
         return `<img class="thumbnail" src="${url}" alt="${filename}">`;
       })();
-      return html;
+      fileHtmlAry.push(html);
+      // ファイルリスト化 ( https://cdn.jsdelivr.net/gh/jshttp/mime-db@master/db.json )
+      const filesize = calculationByteSize(val.filesize);
+      const listIcon = (function() {
+        // 一般的
+        if (/^application\//.test(mimeType)) return 'description';
+        if (/^audio\//.test(mimeType)) return 'library_music';
+        if (/^font\//.test(mimeType)) return 'font_download';
+        if (/^image\//.test(mimeType)) return 'photo_library';
+        if (/^text\//.test(mimeType)) return 'library_books';
+        if (/^video\//.test(mimeType)) return 'video_library';
+        // メール
+        if (/^message\//.test(mimeType)) return 'email';
+        if (/^multipart\//.test(mimeType)) return 'email';
+        // 化学系ソフト
+        if (/^chemical\//.test(mimeType)) return 'description';
+        // CADなどの2D・3Dソフト
+        if (/^model\//.test(mimeType)) return 'description';
+        // その他
+        if (/^example\//.test(mimeType)) return 'description';
+        if (/^x-conference\//.test(mimeType)) return 'description';
+        if (/^x-shader\//.test(mimeType)) return 'description';
+        return 'description';
+      })();
+      const listHtml =
+        `<span class="file-list-log">` +
+        `<a class="truncate" href="${url}" target="_blank"><i class="material-icons tiny">${listIcon}</i><span>${filename}</span></a>` +
+        `<span>(${filesize}, ${mimeType})</span>` +
+        `</span>`;
+      fileListHtmlAry.push(listHtml);
     });
-    const filelist = filelistAry.join(', ');
-    const fileHtml = fileHtmlAry.join('');
     debugLog('[Discord] mimeTypeName', mimeTypeName);
     debugLog('[Discord] filelistAry', filelistAry);
     debugLog('[Discord] fileHtmlAry', fileHtmlAry);
+    debugLog('[Discord] fileListHtmlAry', fileListHtmlAry);
     if (objectCheck(setting, 'dispeak.files_chat') && filesTemplate != null) {
-      attachmentsBym = filesTemplate.replace(/\$filename\$/, mimeTypeName).replace(/\$filenum\$/, attachmentsSize).replace(/\$filelist\$/, filelist);
+      const filelist = filelistAry.join(', ');
+      attachmentsBym += filesTemplate.replace(/\$filename\$/, mimeTypeName).replace(/\$filenum\$/, attachmentsSize).replace(/\$filelist\$/, filelist);
     }
     if (objectCheck(setting, 'dispeak.image_log')) {
-      attachmentsHtml = fileHtml;
+      attachmentsHtml += fileHtmlAry.join('');
+    }
+    if (objectCheck(setting, 'dispeak.files_log')) {
+      attachmentsHtml += fileListHtmlAry.join('');
     }
   }
   // 画像がない＆メッセージがないときは処理を終了（埋め込み・ピン止めなど）
@@ -1129,7 +1167,7 @@ client.on('message', function(data) {
   // テキストが存在しないときの処理
   if (content === '' || /^([\s]+)$/.test(content)) {
     if (objectCheck(setting, 'dispeak.files_chat')) bouyomiSpeak(sendTextToBouyomi, set);
-    if (/^image/.test(attachmentsMime) && objectCheck(setting, 'dispeak.image_log')) logProcess(sendTextToLog, avatarURL, authorId);
+    if (objectCheck(setting, 'dispeak.image_log') || objectCheck(setting, 'dispeak.files_log')) logProcess(sendTextToLog, avatarURL, authorId);
   } else {
     bouyomiSpeak(sendTextToBouyomi, set);
     logProcess(sendTextToLog, avatarURL, authorId);
@@ -1651,6 +1689,23 @@ function zeroPadding(num) {
 function escapeHtml(str) {
   const rep = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   return rep;
+}
+// バイト計算
+function calculationByteSize(size) {
+  const unitList = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let sizeNum = (function() {
+    if (typeof size === 'string') return Number(size.replace(/[^0-9]/g, ''));
+    if (typeof size === 'number') return size;
+    return 0;
+  })();
+  let unitSelect = unitList[0];
+  for (let i = 1, n = unitList.length; i < n; i++) {
+    if (sizeNum >= 1024) {
+      sizeNum = sizeNum / 1024;
+      unitSelect = unitList[i];
+    }
+  }
+  return Math.round(sizeNum * 10) / 10 + unitSelect;
 }
 // エラーログのオブジェクトを生成
 function erroeObj(e) {

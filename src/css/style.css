@@ -110,6 +110,16 @@ main .tabs .indicator {
   width: 100%
 }
 
+.file-list-log {
+  font-size: 12px;
+  display: flex;
+}
+
+.file-list-log>span {
+  white-space: nowrap;
+  margin-left: 5px;
+}
+
 /* ********************
   setting_menu, help_menu
 ******************** */
