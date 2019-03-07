@@ -1215,6 +1215,21 @@ ipcRenderer.on('log-error', (event, jsn) => {
 ipcRenderer.on('log-debug', (event, title, data) => {
   debugLog(title, data);
 });
+// ログを保存する
+ipcRenderer.on('saving-log-create', (event) => {
+  let txtlogAry = [];
+  $('#log > div > .collection > .collection-item').each(function() {
+    const userid = $(this).children('img').data('userid');
+    const contents = $(this).children('p').html();
+    const contentsText = contents.replace(/<br>/g, '\n').replace(/<img(.*?)>|<span(.+)\/span>|\n$/g, '');
+    let txtlogObj = {}
+    txtlogObj.userid = userid;
+    txtlogObj.contents = contentsText;
+    txtlogAry.push(txtlogObj);
+  });
+  debugLog('[saving-log-create]', txtlogAry);
+  ipcRenderer.send('saving-log-return', JSON.stringify(txtlogAry, null, 2));
+});
 
 // ------------------------------
 // 各種エラーをキャッチ

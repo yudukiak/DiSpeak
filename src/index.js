@@ -255,6 +255,7 @@ function whatTimeIsIt(iso) {
   const seconds = zeroPadding(time.getSeconds());
   const text = (() => {
     if (iso == null) return `${year}/${month}/${day} ${hours}:${minutes}`;
+    if (iso === 'YYYYMMDDThhmmss') return `${year}${month}${day}T${hours}${minutes}${seconds}`;
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+0900`;
   })();
   return text;
@@ -372,6 +373,32 @@ ipcMain.on('logout-process', () => {
     }
   });
 });
+// ログの保存
+ipcMain.on('saving-log-return', (event, data) => {
+  const date = whatTimeIsIt('YYYYMMDDThhmmss');
+  const path = app.getPath('desktop');
+  const savePath = `${path}\\DiSpeak_${date}`;
+  dialog.showSaveDialog({
+    defaultPath: savePath,
+    filters: [{
+      name: 'JSON File',
+      extensions: ['json']
+    }]
+  }, filename => {
+    if (filename) {
+      fs.writeFile(filename, data, 'utf8', err => {
+        const obj = {};
+        obj.time = whatTimeIsIt(true);
+        obj.version = nowVersion;
+        obj.process = 'main';
+        obj.message = err.message;
+        obj.stack = err.stack;
+        const jsn = JSON.stringify(obj);
+        mainWindow.webContents.send('log-error', jsn);
+      });
+    }
+  });
+});
 // ------------------------------
 // その他
 // ------------------------------
@@ -404,6 +431,13 @@ function mainWindowMenu() {
         label: 'リロード',
         accelerator: 'CmdOrCtrl+R',
         click: () => {mainWindow.reload()}
+      },
+      {
+        label: 'ログの保存',
+        accelerator: 'CmdOrCtrl+S',
+        click: () => {
+          mainWindow.webContents.send('saving-log-create')
+        }
       },
       {
         label: '最新のバージョンを確認',
@@ -462,6 +496,15 @@ function taskTrayMenu() {
     {
       label: 'Localを開く',
       click: () => {shell.openExternal(process.env.LOCALAPPDATA + '\\DiSpeak')}
+    },
+    {
+      type: "separator"
+    },
+    {
+      label: 'ログの保存',
+      click: () => {
+        mainWindow.webContents.send('saving-log-create')
+      }
     },
     {
       type: "separator"
