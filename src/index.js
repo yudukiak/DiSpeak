@@ -5,6 +5,7 @@ if (require('electron-squirrel-startup')) return;
 const {app, Menu, Tray, shell, BrowserWindow, dialog, ipcMain, autoUpdater} = require('electron');
 const {execFile} = require('child_process');
 const fs = require('fs');
+const path = require('path');
 const packageJson = require('./package.json');
 const userData = app.getPath('userData'); // \AppData\Roaming\DiSpeak
 // DiSpeakの設定ファイル
@@ -155,7 +156,7 @@ function createMainwindow() {
   });
   // ウィンドウの準備ができたら表示
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
+    if (!winSettingObj.hide) mainWindow.show();
   });
   // ウィンドウメニューをカスタマイズ
   const template = mainWindowMenu();
@@ -177,23 +178,32 @@ function createMainwindow() {
   }
   // ウィンドウが閉じる時
   mainWindow.on('close', () => {
-    let ary = {};
     const isMaximized = mainWindow.isMaximized(); // true, false
     const isMinimized = mainWindow.isMinimized();
     const bounds = mainWindow.getBounds(); // {x:0, y:0, width:0, height:0}
-    ary.maximized = isMaximized;
-    ary.minimized = isMinimized;
+    winSettingObj.maximized = isMaximized;
+    winSettingObj.minimized = isMinimized;
     if (isMaximized) {
-      ary.bounds = winSettingObj.bounds; // 最大化してるときは変更しない
+      winSettingObj.bounds = winSettingObj.bounds; // 最大化してるときは変更しない
     } else {
-      ary.bounds = bounds;
+      winSettingObj.bounds = bounds;
     }
     const close = objectCheck(appSettingObj, 'dispeak.window');
-    if (close) writeFileSync(winSetting, ary);
+    if (close) writeFileSync(winSetting, winSettingObj);
   });
   // ウィンドウが閉じられたらアプリも終了
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+  // ウィンドウが非表示になるとき
+  mainWindow.on('hide', () => {
+    winSettingObj.hide = true;
+    writeFileSync(winSetting, winSettingObj);
+  });
+  // ウィンドウが表示されるとき
+  mainWindow.on('show', () => {
+    winSettingObj.hide = false;
+    writeFileSync(winSetting, winSettingObj);
   });
 }
 // タスクトレイ
@@ -268,6 +278,51 @@ function zeroPadding(num) {
     return str;
   })();
   return txt;
+}
+// 自動ログイン機能
+function setupAutomaticLogin() {
+  const appFolder = path.dirname(process.execPath);
+  const updateExe = path.resolve(appFolder, '..', 'Update.exe');
+  const exeName = path.basename(process.execPath);
+  const argsSettings = [
+    '--processStart', `"${exeName}"`,
+    '--process-start-args', `"--hidden"`
+  ];
+  const loginItemSettings = app.getLoginItemSettings({
+    path: updateExe,
+    args: argsSettings
+  });
+  const openAtLogin = loginItemSettings.openAtLogin; // true:登録済、false:未登録
+  const mesOptions = (() => {
+    if (openAtLogin) {
+      return {
+        type: 'warning',
+        buttons: ['削除する', 'しない'],
+        title: '削除するっす？',
+        message: 'スタートアップから削除しちゃうよ？',
+        detail: 'レジストリからDiSpeakを削除するっす。\nまた登録することもできるっすよ”'
+      };
+    } else {
+      return {
+        type: 'info',
+        buttons: ['登録する', 'しない'],
+        title: '登録するっす？',
+        message: 'スタートアップに登録しちゃうよ？',
+        detail: 'レジストリにDiSpeakを自動起動するよう書き込むっす。\nあとで削除もできるっすよ！'
+      };
+    }
+  })();
+  sendDebugLog('[setupAutomaticLogin] loginItemSettings', loginItemSettings);
+  dialog.showMessageBox(mesOptions, (res) => {
+    sendDebugLog('[setupAutomaticLogin] res', res);
+    if (res !== 0) return;
+    app.setLoginItemSettings({
+      openAtLogin: !openAtLogin,
+      openAsHidden: true,
+      path: updateExe,
+      args: argsSettings
+    });
+  });
 }
 // ------------------------------
 // レンダラープロセスとのやりとり
@@ -479,6 +534,12 @@ function taskTrayMenu() {
     {
       label: 'サイズを元に戻す',
       click: () => {mainWindow.setSize(960, 540), mainWindow.center()}
+    },
+    {
+      label: 'スタートアップの設定',
+      click: () => {
+        setupAutomaticLogin()
+      }
     },
     {
       type: "separator"
