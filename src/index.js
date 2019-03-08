@@ -387,6 +387,7 @@ ipcMain.on('saving-log-return', (event, data) => {
   }, filename => {
     if (filename) {
       fs.writeFile(filename, data, 'utf8', err => {
+        if (err == null) return;
         const obj = {};
         obj.time = whatTimeIsIt(true);
         obj.version = nowVersion;
