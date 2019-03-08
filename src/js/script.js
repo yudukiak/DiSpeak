@@ -1071,7 +1071,7 @@ client.on('message', function(data) {
       const url = val.url;
       const html = (function() {
         if (!/^image/.test(mimeType)) return '';
-        if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return `<span class="spoiler-image"><span><img class="thumbnail" src="${url}" alt="${filename}"></span></span>`;
+        if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return `<span class="spoiler-image"><span class="spoiler-image-warning">spoiler</span><span class="spoiler-image-filter"><img class="thumbnail" src="${url}" alt="${filename}"></span></span>`;
         return `<img class="thumbnail" src="${url}" alt="${filename}">`;
       })();
       fileHtmlAry.push(html);

@@ -573,9 +573,28 @@ b, strong {
   overflow: hidden;
   display: inline-block;
   cursor: pointer;
+  position: relative;
 }
 
-.spoiler-image span {
+.spoiler-image .spoiler-image-warning {
+  background-color: rgba(0,0,0,.6);
+  color: #dcddde;
+  border-radius: 12px;
+  font-size: 8px;
+  font-weight: 600;
+  left: 50%;
+  letter-spacing: .5px;
+  padding: 2px 8px;
+  position: absolute;
+  text-transform: uppercase;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  user-select: none;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.spoiler-image .spoiler-image-filter {
   filter: blur(44px);
 }
 
@@ -583,7 +602,11 @@ b, strong {
   cursor: auto;
 }
 
-.spoiler-image.spoiler-non span {
+.spoiler-image.spoiler-non .spoiler-image-warning {
+  display: none;
+}
+
+.spoiler-image.spoiler-non .spoiler-image-filter {
   filter: blur(0px);
 }
 
