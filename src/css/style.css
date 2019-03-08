@@ -149,6 +149,10 @@ main .tabs .indicator {
   font-size: 1.5rem;
 }
 
+#dispeak .collapsible-body {
+  padding-top: 0;
+}
+
 /* ********************
   server
 ******************** */
