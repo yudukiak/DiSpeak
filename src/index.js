@@ -32,11 +32,15 @@ autoUpdateCheck();
 setInterval(() => {
   autoUpdateCheck('interval');
 }, 1000 * 60 * 60);
+// バージョンチェック用の関数
 function autoUpdateCheck(timing) {
   sendDebugLog('[autoUpdateCheck] timing', timing);
   sendDebugLog('[autoUpdateCheck] updateInterval', updateInterval);
   if (timing == 'interval') updateInterval = true;
-  try { autoUpdater.checkForUpdates(); } catch(e) {} // batから起動したときの対策
+  // batから起動したときの対策
+  try {
+    autoUpdater.checkForUpdates();
+  } catch (e) {}
 }
 autoUpdater.on("update-downloaded", () => {
   const mesOptions = {
@@ -413,7 +417,7 @@ ipcMain.on('version-check', () => {
 });
 // ログアウト処理
 ipcMain.on('logout-process', () => {
-  fs.unlink(appSetting, function (e) {
+  fs.unlink(appSetting, function(e) {
     if (e) {
       const obj = {};
       obj.time = whatTimeIsIt(true);
@@ -477,16 +481,19 @@ function sendDebugLog(title, data) {
 function mainWindowMenu() {
   const template = [{
     label: 'メニュー',
-    submenu: [
-      {
+    submenu: [{
         label: 'Wikiを開く',
         accelerator: 'F1',
-        click: () => {shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')}
+        click: () => {
+          shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')
+        }
       },
       {
         label: 'リロード',
         accelerator: 'CmdOrCtrl+R',
-        click: () => {mainWindow.reload()}
+        click: () => {
+          mainWindow.reload()
+        }
       },
       {
         label: 'ログの保存',
@@ -498,27 +505,37 @@ function mainWindowMenu() {
       {
         label: '最新のバージョンを確認',
         accelerator: 'CmdOrCtrl+H',
-        click:  () => {autoUpdateCheck()}
+        click: () => {
+          autoUpdateCheck()
+        }
       },
       {
         label: 'ウィンドウを閉じる',
         accelerator: 'CmdOrCtrl+W',
-        click:  () => {mainWindow.hide()}
+        click: () => {
+          mainWindow.hide()
+        }
       },
       {
         label: '終了する',
         accelerator: 'CmdOrCtrl+Shift+Q',
-        click:  () => {mainWindow.close()}
+        click: () => {
+          mainWindow.close()
+        }
       },
       {
         label: 'デバッグ',
         accelerator: 'CmdOrCtrl+Shift+I',
-        click:  () => {mainWindow.toggleDevTools()}
+        click: () => {
+          mainWindow.toggleDevTools()
+        }
       },
       {
         label: 'エラー',
         accelerator: 'CmdOrCtrl+Shift+E',
-        click:  () => {if (objectCheck(appSettingObj, 'dispeak.debug')) console.log(this_variable_is_error)}
+        click: () => {
+          if (objectCheck(appSettingObj, 'dispeak.debug')) console.log(this_variable_is_error)
+        }
       }
     ]
   }];
@@ -526,14 +543,17 @@ function mainWindowMenu() {
 }
 
 function taskTrayMenu() {
-  const template = [
-    {
+  const template = [{
       label: '表示する',
-      click: () => {mainWindow.show()}
+      click: () => {
+        mainWindow.show()
+      }
     },
     {
       label: 'サイズを元に戻す',
-      click: () => {mainWindow.setSize(960, 540), mainWindow.center()}
+      click: () => {
+        mainWindow.setSize(960, 540), mainWindow.center()
+      }
     },
     {
       label: 'スタートアップの設定',
@@ -546,18 +566,24 @@ function taskTrayMenu() {
     },
     {
       label: 'Wikiを開く',
-      click: () => {shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')}
+      click: () => {
+        shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')
+      }
     },
     {
       type: "separator"
     },
     {
       label: 'Roamingを開く',
-      click: () => {shell.openExternal(process.env.APPDATA + '\\DiSpeak')}
+      click: () => {
+        shell.openExternal(process.env.APPDATA + '\\DiSpeak')
+      }
     },
     {
       label: 'Localを開く',
-      click: () => {shell.openExternal(process.env.LOCALAPPDATA + '\\DiSpeak')}
+      click: () => {
+        shell.openExternal(process.env.LOCALAPPDATA + '\\DiSpeak')
+      }
     },
     {
       type: "separator"
@@ -573,7 +599,9 @@ function taskTrayMenu() {
     },
     {
       label: '終了する',
-      click: () => {mainWindow.close()}
+      click: () => {
+        mainWindow.close()
+      }
     }
   ];
   return template;
