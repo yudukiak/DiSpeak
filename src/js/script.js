@@ -6,7 +6,6 @@ const net = require('net');
 const ua = require('universal-analytics');
 const markdown = require('markdown');
 const mime = require('mime-types');
-const activeWindow = require('active-window');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const pathExe = ipcRenderer.sendSync('get-path-exe');
 const client = new Discord.Client();
@@ -25,8 +24,6 @@ let debugNum = 0;
 let bouyomiRetryNum = 0;
 // 状態を保持
 let lastStatus = '';
-// アクティブウィンドウの名称を保持
-let activeWindowApp = '';
 // analytics
 let clientID = (function() {
   if (objectCheck(setting, 'clientID') == null) return '';
@@ -220,18 +217,6 @@ $(function() {
     debugLog('[info] jQuery', `v${jQueryVersion}`);
     // ログインの処理
     loginDiscord(objectCheck(setting, 'discord.token'));
-  }
-  // アクティブウィンドウを取得
-  if (objectCheck(setting, 'dispeak.activeWindow')) {
-    const timer = (function() {
-      const t = objectCheck(setting, 'dispeak.activeWindowTime');
-      if (t == null) return 3;
-      return Number(t);
-    })();
-    activeWindow.getActiveWindow((window) => {
-      activeWindowApp = window.app;
-      debugLog('[getActiveWindow] window', window);
-    }, -1, timer);
   }
   // バージョンを記入
   $('#info button span').eq(0).text(nowVersion);
