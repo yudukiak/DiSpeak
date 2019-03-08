@@ -4,7 +4,6 @@
   "description": "For DiSpeak build.",
   "main": "index.js",
   "dependencies": {
-    "active-window": "^0.1.0",
     "discord.js": "^11.4.2",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.3.1",

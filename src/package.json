@@ -1,10 +1,9 @@
 {
   "name": "DiSpeak",
-  "version": "2.4.0-Alpha2",
+  "version": "2.4.0-Alpha1",
   "description": "Bouyomi speaks the notice of Discord.",
   "main": "index.js",
   "dependencies": {
-    "active-window": "^0.1.0",
     "discord.js": "^11.4.2",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.3.1",
