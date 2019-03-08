@@ -1221,7 +1221,7 @@ ipcRenderer.on('saving-log-create', (event) => {
   $('#log > div > .collection > .collection-item').each(function() {
     const userid = $(this).children('img').data('userid');
     const contents = $(this).children('p').html();
-    const contentsText = contents.replace(/<br>/g, '\n').replace(/<img(.*?)>|<span(.+)\/span>|\n$/g, '');
+    const contentsText = contents.replace(/<br>/g, '\n').replace(/<img(.*?)>|<span(.+)\/span>/g, '').trim();
     let txtlogObj = {}
     txtlogObj.userid = userid;
     txtlogObj.contents = contentsText;
