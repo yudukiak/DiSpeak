@@ -1043,13 +1043,10 @@ client.on('message', function(data) {
       })();
       filelistAry.push(text);
       // ファイル読み上げのテンプレート処理
-      const mimeType = (function() {
-        if (!/\./.test(filename)) return '-';
-        return mime.lookup(filename);
-      })();
+      const mimeType = mime.lookup(filename);
       debugLog('[Discord] mimeType', mimeType);
       mimeTypeName = (function() {
-        if (!/\./.test(filename)) return 'ファイル';
+        if (filename == null || !mimeType) return 'ファイル';
         const mimeTypeRepFull = mimeType.replace(/\/|\*/g, '');
         const mimeTypeRepOdd = mimeType.replace(/\/.*/g, '');
         const mimeFull_add = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepFull}`);
@@ -1070,7 +1067,7 @@ client.on('message', function(data) {
       // 画像のHTMLを生成
       const url = val.url;
       const html = (function() {
-        if (!/^image/.test(mimeType)) return '';
+        if (!mimeType || !/^image/.test(mimeType)) return '';
         if (/^SPOILER_/.test(filename) && !objectCheck(setting, 'dispeak.spoiler')) return `<span class="spoiler-image"><span class="spoiler-image-warning">spoiler</span><span class="spoiler-image-filter"><img class="thumbnail" src="${url}" alt="${filename}"></span></span>`;
         return `<img class="thumbnail" src="${url}" alt="${filename}">`;
       })();
@@ -1078,6 +1075,7 @@ client.on('message', function(data) {
       // ファイルリスト化 ( https://cdn.jsdelivr.net/gh/jshttp/mime-db@master/db.json )
       const filesize = calculationByteSize(val.filesize);
       const listIcon = (function() {
+        if (!mimeType) return 'description';
         // 一般的
         if (/^application\//.test(mimeType)) return 'description';
         if (/^audio\//.test(mimeType)) return 'library_music';
@@ -1098,10 +1096,14 @@ client.on('message', function(data) {
         if (/^x-shader\//.test(mimeType)) return 'description';
         return 'description';
       })();
+      const sizeAndMime = (function() {
+        if (!mimeType) return filesize;
+        return `${filesize}, ${mimeType}`;
+      })();
       const listHtml =
         `<span class="file-list-log">` +
         `<a class="truncate" href="${url}" target="_blank"><i class="material-icons tiny">${listIcon}</i><span>${filename}</span></a>` +
-        `<span>(${filesize}, ${mimeType})</span>` +
+        `<span>(${sizeAndMime})</span>` +
         `</span>`;
       fileListHtmlAry.push(listHtml);
     });
