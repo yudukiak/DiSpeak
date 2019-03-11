@@ -551,41 +551,43 @@ $(function() {
           input: 'text',
           confirmButtonColor: '#3949ab',
           cancelButtonColor: '#d33',
-          confirmButtonText: 'Next &rarr;',
+          confirmButtonText: '次へ &rarr;',
+          cancelButtonText: 'キャンセル',
           showCancelButton: true,
           progressSteps: ['1', '2']
         })
         .queue([{
             title: 'MIMEタイプを記入',
             text: '例）「image/*」「image/png」など',
+            confirmButtonText: '次へ &rarr;',
             inputValidator: (value) => {
               return !value && 'MIMEタイプは必須です'
             }
           },
           {
             title: '読み方を記入',
-            text: '例）「画像ファイル」など'
+            text: '例）「画像ファイル」など',
+            confirmButtonText: '登録'
           }
         ])
         .then((result) => {
           debugLog('[files-list add] result', result);
           if (result.value) {
-            const mime = result.value[0];
-            const mimeName = mime.replace(/\/|\*/g, '');
+            const mime = result.value[0].replace(/"|\s/, '');
             const read = result.value[1];
             const html =
               '<tr>' +
-              `<td class="input-field"><input name="files_mime_add_${mimeName}" type="text" value="${mime}" readonly></td>` +
-              `<td class="input-field"><input name="files_read_add_${mimeName}" type="text" value="${read}"></td>` +
+              `<td class="input-field"><input name="files_mime_${mime}_add" type="text" value="${mime}" readonly></td>` +
+              `<td class="input-field"><input name="files_read_${mime}_add" type="text" value="${read}"></td>` +
               '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
               '</tr>';
             if (mime === '') {
               Swal.fire(
                 'おっと？',
-                'MIMEタイプは必須です',
+                'そのMIMEタイプは追加できません',
                 'warning'
               );
-            } else if ($(`#files-list input[name=files_mime_add_${mimeName}]`).length || /\*\/\*/.test(mime) || /^(image|audio|video|text)$/.test(mimeName)) {
+            } else if ($(`#files-list input[name="files_mime_${mime}_add"]`).length || /^(image|audio|video|text|\*)\/\*$/.test(mime)) {
               Swal.fire(
                 'おっと？',
                 'そのMIMEタイプは追加されています',
@@ -1046,21 +1048,31 @@ client.on('message', function(data) {
       const mimeType = mime.lookup(filename);
       debugLog('[Discord] mimeType', mimeType);
       mimeTypeName = (function() {
-        if (filename == null || !mimeType) return 'ファイル';
-        const mimeTypeRepFull = mimeType.replace(/\/|\*/g, '');
-        const mimeTypeRepOdd = mimeType.replace(/\/.*/g, '');
-        const mimeFull_add = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepFull}`);
-        const mimeFull = objectCheck(setting, `dispeak.files_read_${mimeTypeRepFull}`);
-        const mimeOdd_add = objectCheck(setting, `dispeak.files_read_add_${mimeTypeRepOdd}`);
-        const mimeOdd = objectCheck(setting, `dispeak.files_read_${mimeTypeRepOdd}`);
-        const mimeALL = objectCheck(setting, `dispeak.files_read_all`);
-        debugLog('[Discord] mimeTypeRepFull', mimeTypeRepFull);
-        debugLog('[Discord] mimeTypeRepOdd', mimeTypeRepOdd);
-        if (mimeFull_add != null) return mimeFull_add;
-        if (mimeFull != null) return mimeFull;
-        if (mimeOdd_add != null) return mimeOdd_add;
-        if (mimeOdd != null) return mimeOdd;
-        if (mimeALL != null) return mimeALL;
+        const filesList = objectCheck(setting, 'files-list');
+        if (filesList == null || filename == null || !mimeType) return 'ファイル';
+        // ソートさせておく
+        let filesListKeys = [];
+        for (let filesListKey in filesList) filesListKeys.push(filesListKey);
+        filesListKeys.sort(function(a, b) {
+          const strA = a.toString().toLowerCase();
+          const strB  = b.toString().toLowerCase();
+          if (strA > strB) {
+            return -1;
+          } else if (strA < strB) {
+            return 1;
+          }
+          return 0;
+        });
+        debugLog('[Discord] filesListKeys', filesListKeys);
+        // ソートした結果を元に読み方を返す
+        for (let i = 0, n = filesListKeys.length; i < n; i++) {
+          const filesListKey = filesListKeys[i]
+          const filesListVal = filesList[filesListKey];
+          const filesMime = filesListKey.replace(/^files_read_|_add$/g, ''); // "application/*", "image/png,apng"
+          const filesMimeRep = filesMime.replace(/\s/g, '').replace(/^\*\//g, '.*/').replace(/\/\*$/g, '/.*').replace(/\/(.+)/g, '/($1)').replace(/,/g, '|'); // "application/(.*)", "image/(png|apng)"
+          const filesMimeReg = new RegExp(filesMimeRep);
+          if (filesMimeReg.test(mimeType)) return filesListVal;
+        }
         return 'ファイル';
       })();
       attachmentsMime = mimeType;
@@ -1257,22 +1269,24 @@ function readFile() {
           const serverVal = val[serverName];
           const serverValType = toString.call(serverVal);
           if (/object Boolean/.test(serverValType)) {
-            $(`#${name} input[name=${serverName}]`).prop('checked', serverVal);
+            $(`#${name} input[name="${serverName}"]`).prop('checked', serverVal);
           } else {
-            $(`#${name} input[name=${serverName}][type=number], #${name} input[name=${serverName}][type=text]`).val(serverVal);
+            $(`#${name} input[name="${serverName}"][type=number], #${name} input[name="${serverName}"][type=text]`).val(serverVal);
           }
         }
       }
       // チェックボックス
       else if (/object Boolean/.test(type)) {
-        $(`#${id} input[name=${name}]`).prop('checked', val);
+        $(`#${id} input[name="${name}"]`).prop('checked', val);
       }
       // $filename$の設定
-      else if (/^files_mime_add_/.test(name)) {
-        const mimeName = name;
-        const mimeVal = val;
-        const readName = mimeName.replace(/^files_mime_add_/, 'files_read_add_');
-        const readVal = objectCheck(setting, `dispeak.${readName}`);
+      else if (/^files_mime/.test(name)) {
+        return;
+      } else if (/^files_read_(.+)_add/.test(name)) {
+        const readName = name;
+        const readVal = val;
+        const mimeName = readName.replace('files_read_', 'files_mime_');
+        const mimeVal = readName.replace(/files_read_|_add/g, '');
         const html =
           '<tr>' +
           `<td class="input-field"><input name="${mimeName}" type="text" value="${mimeVal}" readonly></td>` +
@@ -1283,7 +1297,7 @@ function readFile() {
       }
       // それ以外
       else {
-        $(`#${id} input[name=${name}]`).val([val]);
+        $(`#${id} input[name="${name}"]`).val([val]);
       }
     }
   }
@@ -1310,6 +1324,7 @@ function writeFile() {
     })();
     let parentObj = {};
     let inputObj = {};
+    let mimeObj = {};
     $(this).find('input').each(function() {
       const input = $(this);
       const name = input.attr('name');
@@ -1318,9 +1333,17 @@ function writeFile() {
         if (input.attr('type') == 'radio') return $(`input:radio[name="${name}"]:checked`).val();
         return input.val();
       })();
-      inputObj[name] = val;
+      // $filename$の設定
+      if (/^files_mime/.test(name)) {
+        return;
+      } else if (/^files_read/.test(name)) {
+        mimeObj[name] = val;
+      } else {
+        inputObj[name] = val;
+      }
     });
     parentObj[id] = inputObj;
+    parentObj['files-list'] = mimeObj;
     if (!/\d+/.test(id)) {
       $.extend(true, setting_AutoSave, parentObj);
     } else {
