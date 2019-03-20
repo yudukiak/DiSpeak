@@ -1145,8 +1145,21 @@ client.on('message', function(data) {
       return '';
     })();
     const sendContent = (function() {
-      if (!objectCheck(setting, 'dispeak.spoiler')) return content.replace(/\|\|(.*?)\|\|/g, spoilerText);
-      return content;
+      let sendContent = content;
+      // スポイラーの処理
+      if (!objectCheck(setting, 'dispeak.spoiler')) {
+        const sendContentMatch = sendContent.match(/([^`]+(?=`[^`]+`)|[^`]+$)/g);
+        debugLog('[Discord] bym sendContentMatch', sendContentMatch);
+        for (let i = 0, n = sendContentMatch.length; i < n; i++) {
+          const matchRep = sendContentMatch[i].replace(/\|\|(.*?)\|\|/g, spoilerText);
+          const sendRep = sendContent.replace(sendContentMatch[i], matchRep);
+          sendContent = sendRep;
+          debugLog('[Discord] bym matchRep', matchRep);
+          debugLog('[Discord] bym sendRep', sendRep);
+        }
+        debugLog('[Discord] bym sendContent', sendContent);
+      }
+      return sendContent;
     })();
     // テンプレートの処理
     let tmp = template_bym
@@ -1164,10 +1177,18 @@ client.on('message', function(data) {
       .replace(/&lt;(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
       .replace(/&lt;a(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
     // スポイラーの処理
-    sendContent = (function() {
-      if (!objectCheck(setting, 'dispeak.spoiler')) return sendContent.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler-text">$1</span>');
-      return sendContent;
-    })();
+    if (!objectCheck(setting, 'dispeak.spoiler')) {
+      const sendContentMatch = sendContent.match(/([^`]+(?=`[^`]+`)|[^`]+$)/g);
+      debugLog('[Discord] text sendContentMatch', sendContentMatch);
+      for (let i = 0, n = sendContentMatch.length; i < n; i++) {
+        const matchRep = sendContentMatch[i].replace(/\|\|(.*?)\|\|/g, '<span class="spoiler-text">$1</span>');
+        const sendRep = sendContent.replace(sendContentMatch[i], matchRep);
+        sendContent = sendRep;
+        debugLog('[Discord] text matchRep', matchRep);
+        debugLog('[Discord] text sendRep', sendRep);
+      }
+      debugLog('[Discord] text sendContent', sendContent);
+    }
     // テンプレートの処理
     let tmp = template_log
       .replace(/\$time\$/, time).replace(/\$server\$/, escapeHtml(guildName)).replace(/\$channel\$/, escapeHtml(channelName)).replace(/\$group\$/, escapeHtml(groupName))
