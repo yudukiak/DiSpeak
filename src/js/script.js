@@ -1150,14 +1150,16 @@ client.on('message', function(data) {
       if (!objectCheck(setting, 'dispeak.spoiler')) {
         const sendContentMatch = sendContent.match(/([^`]+(?=`[^`]+`)|[^`]+$)/g);
         debugLog('[Discord] bym sendContentMatch', sendContentMatch);
-        for (let i = 0, n = sendContentMatch.length; i < n; i++) {
-          const matchRep = sendContentMatch[i].replace(/\|\|(.*?)\|\|/g, spoilerText);
-          const sendRep = sendContent.replace(sendContentMatch[i], matchRep);
-          sendContent = sendRep;
-          debugLog('[Discord] bym matchRep', matchRep);
-          debugLog('[Discord] bym sendRep', sendRep);
+        if (sendContentMatch) {
+          for (let i = 0, n = sendContentMatch.length; i < n; i++) {
+            const matchRep = sendContentMatch[i].replace(/\|\|(.*?)\|\|/g, spoilerText);
+            const sendRep = sendContent.replace(sendContentMatch[i], matchRep);
+            sendContent = sendRep;
+            debugLog('[Discord] bym matchRep', matchRep);
+            debugLog('[Discord] bym sendRep', sendRep);
+          }
+          debugLog('[Discord] bym sendContent', sendContent);
         }
-        debugLog('[Discord] bym sendContent', sendContent);
       }
       return sendContent;
     })();
@@ -1180,14 +1182,16 @@ client.on('message', function(data) {
     if (!objectCheck(setting, 'dispeak.spoiler')) {
       const sendContentMatch = sendContent.match(/([^`]+(?=`[^`]+`)|[^`]+$)/g);
       debugLog('[Discord] text sendContentMatch', sendContentMatch);
-      for (let i = 0, n = sendContentMatch.length; i < n; i++) {
-        const matchRep = sendContentMatch[i].replace(/\|\|(.*?)\|\|/g, '<span class="spoiler-text">$1</span>');
-        const sendRep = sendContent.replace(sendContentMatch[i], matchRep);
-        sendContent = sendRep;
-        debugLog('[Discord] text matchRep', matchRep);
-        debugLog('[Discord] text sendRep', sendRep);
+      if (sendContentMatch) {
+        for (let i = 0, n = sendContentMatch.length; i < n; i++) {
+          const matchRep = sendContentMatch[i].replace(/\|\|(.*?)\|\|/g, '<span class="spoiler-text">$1</span>');
+          const sendRep = sendContent.replace(sendContentMatch[i], matchRep);
+          sendContent = sendRep;
+          debugLog('[Discord] text matchRep', matchRep);
+          debugLog('[Discord] text sendRep', sendRep);
+        }
+        debugLog('[Discord] text sendContent', sendContent);
       }
-      debugLog('[Discord] text sendContent', sendContent);
     }
     // テンプレートの処理
     let tmp = template_log
