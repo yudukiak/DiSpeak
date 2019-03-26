@@ -870,11 +870,11 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   const template_bymRep = template_bym
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
-    .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
+    .replace(/\$userid\$/, oldMember.id).replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note);
   const template_logRep = template_log
     .replace(/\$time\$/, time).replace(/\$server\$/, escapeHtml(guildName)).replace(/\$channel\$/, escapeHtml(channelName))
     .replace(/\$channel-prev\$/, escapeHtml(channelPrevName)).replace(/\$channel-next\$/, escapeHtml(channelNextName))
-    .replace(/\$username\$/, escapeHtml(username)).replace(/\$nickname\$/, escapeHtml(nickname)).replace(/\$memo\$/, note);
+    .replace(/\$userid\$/, oldMember.id).replace(/\$username\$/, escapeHtml(username)).replace(/\$nickname\$/, escapeHtml(nickname)).replace(/\$memo\$/, note);
   let set = {};
   set.voice = setting.server[guildId].b_voice;
   set.volume = setting.server[guildId].b_volume;
@@ -1164,7 +1164,7 @@ client.on('message', function(data) {
     // テンプレートの処理
     let tmp = template_bym
       .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName).replace(/\$group\$/, groupName)
-      .replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, sendContent);
+      .replace(/\$userid\$/, authorId).replace(/\$username\$/, username).replace(/\$nickname\$/, nickname).replace(/\$memo\$/, note).replace(/\$text\$/, sendContent);
     // 画像の処理
     tmp += ` ${attachmentsBym}`;
     return tmp;
@@ -1192,7 +1192,7 @@ client.on('message', function(data) {
     // テンプレートの処理
     let tmp = template_log
       .replace(/\$time\$/, time).replace(/\$server\$/, escapeHtml(guildName)).replace(/\$channel\$/, escapeHtml(channelName)).replace(/\$group\$/, escapeHtml(groupName))
-      .replace(/\$username\$/, escapeHtml(username)).replace(/\$nickname\$/, escapeHtml(nickname)).replace(/\$memo\$/, note).replace(/\$text\$/, sendContent);
+      .replace(/\$userid\$/, authorId).replace(/\$username\$/, escapeHtml(username)).replace(/\$nickname\$/, escapeHtml(nickname)).replace(/\$memo\$/, note).replace(/\$text\$/, sendContent);
     // 画像の処理
     if (content === '') {
       tmp += `${attachmentsHtml}`;
