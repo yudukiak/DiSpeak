@@ -41,17 +41,27 @@ Windows10 64bitで動作確認済み。
 このソフトウェアはMITライセンスでリリースされています。「LICENSE」を参照してください。
 
 ### その他
-* install
+* 必須パッケージ
   ```
-  npm i
+  npm i -g npm-check-updates
   ```
-* run
+* 起動
   ```
-  electron src
+  npm start
   ```
-* build
+* ビルド
   ```
-  node lib/build.js
+  npm run build
+  ```
+* 更新チェック
+  ```
+  npm run c
+  npm run cs
+  ```
+* 更新
+  ```
+  npm run u
+  npm run us
   ```
 
 ## English

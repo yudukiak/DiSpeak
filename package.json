@@ -18,7 +18,14 @@
     "fs-extra": "^7.0.1",
     "ftp-deploy": "^2.3.3"
   },
-  "scripts": {},
+  "scripts": {
+    "c": "ncu",
+    "cs": "cd src && ncu",
+    "u": "ncu -u && npm i",
+    "us": "cd src && ncu -u && npm i",
+    "build": "node lib/build.js",
+    "start": "./node_modules/.bin/electron src"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/micelle/dc_DiSpeak.git"
