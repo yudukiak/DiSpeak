@@ -558,7 +558,7 @@ $(function() {
         })
         .queue([{
             title: 'MIMEタイプを記入',
-            text: '例）「image/*」「image/png」など',
+            text: '例）「image/&#x2A;」「image/png」など',
             confirmButtonText: '次へ &rarr;',
             inputValidator: (value) => {
               return !value && 'MIMEタイプは必須です'
