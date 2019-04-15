@@ -6,17 +6,17 @@
   "dependencies": {
     "discord.js": "^11.4.2",
     "electron-squirrel-startup": "^1.0.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.0",
     "markdown": "^0.5.0",
     "mime-types": "^2.1.22",
     "universal-analytics": "^0.4.20"
   },
   "devDependencies": {
-    "electron": "^4.1.1",
+    "electron": "^4.1.4",
     "electron-packager": "^13.1.1",
     "electron-winstaller": "^3.0.4",
     "fs-extra": "^7.0.1",
-    "ftp-deploy": "^2.3.2"
+    "ftp-deploy": "^2.3.3"
   },
   "scripts": {},
   "repository": {
