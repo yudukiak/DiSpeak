@@ -180,6 +180,9 @@ function createMainwindow() {
     if (winSettingObj.maximized) mainWindow.maximize();
     if (winSettingObj.minimized) mainWindow.minimize();
   }
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('unmaximize');
+  });
   // ウィンドウが閉じる時
   mainWindow.on('close', () => {
     const isMaximized = mainWindow.isMaximized(); // true, false
