@@ -151,7 +151,6 @@ $(function() {
       type: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3949ab',
-      cancelButtonColor: '#d33',
       confirmButtonText: '復元する',
       cancelButtonText: '復元しない'
     }).then((result) => {
@@ -416,7 +415,6 @@ $(function() {
       type: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3949ab',
-      cancelButtonColor: '#d33',
       confirmButtonText: '送信する',
       cancelButtonText: 'キャンセル'
     }).then((result) => {
@@ -550,7 +548,6 @@ $(function() {
       Swal.mixin({
           input: 'text',
           confirmButtonColor: '#3949ab',
-          cancelButtonColor: '#d33',
           confirmButtonText: '次へ &rarr;',
           cancelButtonText: 'キャンセル',
           showCancelButton: true,
@@ -558,7 +555,7 @@ $(function() {
         })
         .queue([{
             title: 'MIMEタイプを記入',
-            text: '例）「image/&#x2A;」「image/png」など',
+            html: '例）「image/&#x2A;」「image/png」など',
             confirmButtonText: '次へ &rarr;',
             inputValidator: (value) => {
               return !value && 'MIMEタイプは必須です'
