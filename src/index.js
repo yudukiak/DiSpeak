@@ -216,6 +216,7 @@ function createMainwindow() {
   mainWindow.on('show', () => {
     winSettingObj.hide = false;
     writeFileSync(winSetting, winSettingObj);
+    mainWindow.webContents.send('resize-textarea');
   });
 }
 // タスクトレイ
