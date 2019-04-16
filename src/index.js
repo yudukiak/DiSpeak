@@ -180,8 +180,13 @@ function createMainwindow() {
     if (winSettingObj.maximized) mainWindow.maximize();
     if (winSettingObj.minimized) mainWindow.minimize();
   }
+  // ウィンドウが最大化状態から抜けるとき
   mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('unmaximize');
+    mainWindow.webContents.send('resize-textarea');
+  });
+  // ウィンドウがリサイズされた後に発生
+  mainWindow.on('resize', () => {
+    mainWindow.webContents.send('resize-textarea');
   });
   // ウィンドウが閉じる時
   mainWindow.on('close', () => {

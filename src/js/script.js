@@ -1247,7 +1247,8 @@ client.on('warn', function(data) {
 // ------------------------------
 // Electronからのメッセージ
 // ------------------------------
-ipcRenderer.on('unmaximize', (event) => {
+ipcRenderer.on('resize-textarea', (event) => {
+  debugLog('[resize-textarea] event', event);
   M.textareaAutoResize($('#request_textarea'));
 });
 ipcRenderer.on('log-error', (event, jsn) => {
