@@ -1523,7 +1523,7 @@ function bouyomiExeStart() {
 function bouyomiSpeak(data, set) {
   debugLog(`[bouyomiSpeak] data (retry${bouyomiRetryNum + 1})`, data);
   debugLog(`[bouyomiSpeak] set (retry${bouyomiRetryNum + 1})`, set);
-  if (!bouyomiSpeakCheck || !bouyomiExeStartCheck) return;
+  if (!bouyomiSpeakCheck || !bouyomiExeStartCheck || bouyomiRetryNum>=10) return;
   bouyomiRetryNum++;
   const bouyomiServer = {};
   bouyomiServer.host = setting.bouyomi.ip;
