@@ -1455,7 +1455,6 @@ function serverChannel(index, val) {
 }
 // 再生開始の処理
 function startSpeak(thisId, siblingsId) {
-  if ($('.toast-bouyomi').length) return;
   // 既にログインしていた場合
   if (loginDiscordCheck) {
     $(`#${thisId}`).addClass('display-none');
