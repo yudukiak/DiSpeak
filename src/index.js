@@ -398,7 +398,7 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
   });
 });
 ipcMain.on('bouyomi-exe-start', (event, data) => {
-  const child = execFile('C:\\Windows\\System32\\cmd.exe', ['/c', data], (error, stdout, stderr) => {
+  const child = execFile('C:\\Windows\\SysWOW64\\cmd.exe', ['/c', data], (error, stdout, stderr) => {
     if (error) {
       const obj = {};
       obj.time = whatTimeIsIt(true);
