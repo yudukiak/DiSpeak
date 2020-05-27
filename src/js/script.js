@@ -1811,12 +1811,15 @@ function errorLog(obj) {
     if (/"port" option should be/.test(msg)) return 'ポートが正しくありません';
     if (/Port should be > 0 and < 65536/.test(msg)) return 'ポートが正しくありません';
     if (/connect ECONNREFUSED \d+\.\d+\.\d+\.\d+:\d+/.test(msg)) return '棒読みちゃんが起動していない、もしくは接続できません';
-    if (/\$ is not a function/.test(msg)) return 'エラーが発生しました<br>Ctrl+Rで画面を更新してください';
+    if (/\$ is not a function/.test(msg)) return 'エラーが発生しました<br>Ctrl+Rで画面を更新して下さい';
+    // 改修済みの不具合
+    if (/Syntax error, unrecognized expression: #files-list input/.test(msg)) return '古いバージョンを利用中です<br>最新版にアップデートして下さい';
     // 原因不明のエラー
-    if (/read ECONNRESET/.test(msg)) return `[${msg}]<br>Discordに接続できません<br>引き続き起きる場合はDiSpeakやパソコン、<br>ネットワークの再起動もお試し下さい`; // Discord.jsの問題？
-    if (/connect ETIMEDOUT/.test(msg)) return `[${msg}]<br>棒読みちゃんにアクセスできません<br>同一ポートを使用しているソフトがある場合、<br>閉じてからお試し下さい`; // 他のソフトと競合？
-    if (/Can not find Squirrel/.test(msg)) return `[${msg}]<br>エラーが発生しました`; // 自動更新周りのエラー？
-    if (/no such file or directory/.test(msg)) return `[${msg}]<br>エラーが発生しました`; // ファイルが存在しないっぽい？
+    if (/read ECONNRESET/.test(msg)) return `Discordに接続できません<br>引き続き起きる場合はDiSpeakやパソコン、<br>ネットワークの再起動もお試し下さい`; // Discord.jsの問題？
+    if (/connect ETIMEDOUT/.test(msg)) return `棒読みちゃんにアクセスできません<br>同一ポートを使用しているソフトがある場合、<br>閉じてからお試し下さい`; // 他のソフトと競合？
+    if (/Can not find Squirrel/.test(msg)) return `アップデートを行えません<br>再起動しても直らない場合は手動でアップデートを行ってください`; // 自動更新周りのエラー？
+    if (/AutoUpdater process with arguments/.test(msg)) return `アップデートを行えません<br>再起動しても直らない場合は手動でアップデートを行って下さい`; // 自動更新周りのエラー？
+    if (/no such file or directory/.test(msg)) return `設定ファイルが見つかりません<br>再起動しても直らない場合は再インストールを行って下さい`; // ファイルが存在しないっぽい？
     // プログラムミスのエラー
     if (/([0-9a-zA-Z]+) is not defined/.test(msg)) return `[${msg}]<br>エラーが発生しました`;
     if (/Cannot read property .+ of null/.test(msg)) return `[${msg}]<br>エラーが発生しました`;
