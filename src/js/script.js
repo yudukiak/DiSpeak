@@ -344,7 +344,9 @@ $(function() {
   $(document).on('click', '#bouyomi_dir_btn', function() {
     if ($('.toast-exe').length) return;
     const bouyomiDir = ipcRenderer.sendSync('bouyomi-dir-dialog');
-    if (bouyomiDir == '') {
+    if (bouyomiDir == null) {
+      // なにもしないよ
+    } else if (bouyomiDir == '') {
       M.toast({
         html: '実行ファイルが選択されていません<br>BouyomiChan.exeを選択してください',
         classes: 'toast-exe'

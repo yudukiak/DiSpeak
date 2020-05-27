@@ -389,13 +389,18 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
     defaultPath: '.',
     properties: ['openFile'],
   };
-  dialog.showOpenDialog(options, (filePaths) => {
+  dialog.showOpenDialog(mainWindow, options).then(result => {
+    if (result.canceled) event.returnValue = null;
+    const filePaths = result.filePaths;
     const filePath = (() => {
       if (filePaths == void 0) return '';
       return filePaths[0];
     })();
     event.returnValue = filePath;
-  });
+  }).catch(err => {
+    sendDebugLog('[showOpenDialog] error', error);
+    event.returnValue = null;
+  })
 });
 ipcMain.on('bouyomi-exe-start', (event, data) => {
   const child = execFile(data, (error, stdout, stderr) => {
