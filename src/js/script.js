@@ -1001,7 +1001,7 @@ client.on('message', function(data) {
           return data.member.guild.members;
         })();
         const member = members.get(contentMentionId);
-        const nick = member.nickname;
+        const nick = objectCheck(member, 'nickname');
         debugLog('[Discord] members', members);
         debugLog('[Discord] member', member);
         if (nick == null) return mentionUsername;
