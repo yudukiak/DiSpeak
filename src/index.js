@@ -404,14 +404,14 @@ ipcMain.on('bouyomi-dir-dialog', (event) => {
 });
 ipcMain.on('bouyomi-exe-start', (event, dir) => {
   const dirRep = dir.replace(/([%&(,\-;=^ ])/g, '^$1');
-  const child = execFile('cmd', ['/c', dirRep], {encoding: 'Shift_JIS'}, (error, stdout, stderr) => {
+  const child = execFile('cmd', ['/c', dirRep], {encoding: 'Shift_JIS', env: {'Path': 'C:\\Windows\\system32\\'}}, (error, stdout, stderr) => {
     if (error) {
       const obj = {};
       obj.time = whatTimeIsIt(true);
       obj.version = nowVersion;
       obj.process = 'main';
       obj.message = error.message;
-      obj.stack = {'stack':error.stack, 'dir':dir, 'dirRep':dirRep, 'process':process.env.ComSpec};
+      obj.stack = {'stack':error.stack, 'dir':dir, 'dirRep':dirRep, 'process':process.env.Path};
       const jsn = JSON.stringify(obj);
       mainWindow.webContents.send('log-error', jsn);
       sendDebugLog('[execFile] error', error);
