@@ -891,10 +891,13 @@ client.on('message', function(data) {
   debugLog('[Discord] message', data);
   const userId = client.user.id; // 自分のID
   const authorId = data.author.id; // チャットユーザーのID
+  const authorBot = data.author.bot; // チャットユーザーがBOTならtrue
   const settingMyChat = setting.dispeak.my_chat;
   const settingOtherChat = setting.dispeak.other_chat;
+  const settingBotChat = objectCheck(setting, 'dispeak.bot_chat');
   if (userId == authorId && !settingMyChat) return; // 自分が発言したとき、読み上げない設定の場合は処理を行わない
   if (userId != authorId && !settingOtherChat) return; // 他人が発言したとき、読み上げない設定の場合は処理を行わない
+  if (authorBot && !settingBotChat) return; // BOTが発言したとき、読み上げない設定の場合は処理を行わない
   const channelType = (function() { // チャンネルごとに判定
     const channel = data.channel.type;
     if (channel == 'dm') return 'directmessage';
