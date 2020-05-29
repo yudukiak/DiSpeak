@@ -789,6 +789,8 @@ client.on('ready', function() {
 // 再接続時
 client.on('reconnecting', function() {
   if ($('.toast-reconnecting').length) return;
+  const reconnecting = objectCheck(setting, 'dispeak.reconnecting');
+  if (!reconnecting) return;
   M.toast({
     html: '再接続をします',
     classes: 'toast-reconnecting'
