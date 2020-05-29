@@ -846,6 +846,18 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     const whitelist = setting.whitelist;
     if (whitelist.indexOf(oldMember.id) == -1) return;
   }
+  // 参加中の通話かチェック
+  const voiceChannelMembers = (function() {
+    if (oldMember.voiceChannel != null) return oldMember.voiceChannel.members; // 退出時
+    if (newMember.voiceChannel != null) return newMember.voiceChannel.members; // 参加時
+  })();
+  debugLog('[Discord] voiceStateUpdate voiceChannelMembers', voiceChannelMembers);
+  let inTheCall = false;
+  voiceChannelMembers.forEach(function(val, key) {
+    if (client.user.id === key) inTheCall = true;
+  });
+  const notInVc = objectCheck(setting, 'dispeak.not_in_vc');
+  if (!inTheCall && !notInVc) return;
   // テキストの生成
   const time = whatTimeIsIt(); // 現在の時刻
   const guildName = oldMember.guild.name; // 対象サーバーの名前
