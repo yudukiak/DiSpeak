@@ -249,6 +249,27 @@
                 <div class="col s10"><strong>「再接続をします」の通知を表示させる？</strong></div>
                 <div class="col s2 switch right-align"><label><input name="reconnecting" type="checkbox" checked><span class="lever"></span></label></div>
               </div>
+              <div class="divider"></div>
+              <div class="row section">
+                <div class="col s12"><strong>通知の表示方法</strong></div>
+                <div class="col s8">
+                  <p>
+                    <label><input name="notification_d" type="checkbox" checked="checked"><span class="black-text">DiSpeak側の通知で表示させる</span></label>
+                  </p>
+                  <p>
+                    <label><input name="notification_w" type="checkbox"><span class="black-text">Windows側の通知で表示させる</span></label>
+                  </p>
+                  <p>
+                    <span>※一部の通知はDiSpeak側での表示になります</span>
+                  </p>
+                </div>
+                <div class="input-field col s4 center-align">
+                  <button id="notification_normal" class="btn waves-effect waves-light indigo lighten-1" type="button">通常の通知<i class="material-icons left">notifications</i></button>
+                </div>
+                <div class="input-field col s4 center-align">
+                  <button id="notification_html" class="btn waves-effect waves-light indigo lighten-1" type="button">一部の通知<i class="material-icons left">notifications_none</i></button>
+                </div>
+              </div>
               <div class="display-none">
                 <div class="divider"></div>
                 <div class="row section valign-wrapper">

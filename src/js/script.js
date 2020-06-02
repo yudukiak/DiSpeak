@@ -66,7 +66,7 @@ $(function() {
       const lastImg = lastAry.image;
       if (setting == null || !loginDiscordCheck) {
         instance.deleteChip(aryLen);
-        M.toast({
+        spawnNotification({
           html: 'Discordにログインをしてください',
           classes: 'toast-chips'
         });
@@ -79,7 +79,7 @@ $(function() {
               writeFile();
             })
             .catch(function(res) {
-              M.toast({
+              spawnNotification({
                 html: `ID「${lastTag}」が見つかりませんでした`,
                 classes: 'toast-chips'
               });
@@ -109,7 +109,7 @@ $(function() {
       const lastImg = lastAry.image;
       if (setting == null || !loginDiscordCheck) {
         instance.deleteChip(aryLen);
-        M.toast({
+        spawnNotification({
           html: 'Discordにログインをしてください',
           classes: 'toast-chips'
         });
@@ -122,7 +122,7 @@ $(function() {
               writeFile();
             })
             .catch(function(res) {
-              M.toast({
+              spawnNotification({
                 html: `ID「${lastTag}」が見つかりませんでした`,
                 classes: 'toast-chips'
               });
@@ -190,7 +190,7 @@ $(function() {
     const loginHtml = `${loginTime} [info]<br>
     「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
     logProcess(loginHtml, 'images/discord.png');
-    M.toast({
+    spawnNotification({
       html: 'v2.0未満の設定ファイルです<br>設定の読み込みを中止しました',
       classes: 'toast-load'
     });
@@ -249,7 +249,7 @@ $(function() {
       })();
       $(this).val(valSet);
       if ($('.toast-serverinput').length) return;
-      M.toast({
+      spawnNotification({
         html: '0～65535の値で設定してください',
         classes: 'toast-serverinput'
       });
@@ -305,7 +305,7 @@ $(function() {
     if (id == 'offline') {
       // トークンがないとき
       if (token == null || token == '') {
-        M.toast({
+        spawnNotification({
           html: 'トークンを入力してください',
           classes: 'toast-discord'
         });
@@ -319,7 +319,7 @@ $(function() {
         '<i class="material-icons light-blue-text text-accent-1">phonelink_off</i><span>ログアウトしますか？<br>設定は初期化されます</span>' +
         '<div><button class="btn-flat toast-action" data-logout="true">はい</button>' +
         '<button class="btn-flat toast-action" data-logout="false">いいえ</button></div>';
-      M.toast({
+      spawnNotification({
         displayLength: 'stay',
         html: toastHTML,
         classes: 'toast-logout'
@@ -347,12 +347,12 @@ $(function() {
     if (bouyomiDir == null) {
       // なにもしないよ
     } else if (bouyomiDir == '') {
-      M.toast({
+      spawnNotification({
         html: '実行ファイルが選択されていません<br>BouyomiChan.exeを選択してください',
         classes: 'toast-exe'
       });
     } else if (!/BouyomiChan\.exe/.test(bouyomiDir)) {
-      M.toast({
+      spawnNotification({
         html: '実行ファイルが異なります<br>BouyomiChan.exeを選択してください',
         classes: 'toast-exe'
       });
@@ -378,7 +378,7 @@ $(function() {
           chipWrite(val, id, index, thisId);
         })
         .catch(function(res) {
-          M.toast({
+          spawnNotification({
             displayLength: 1000,
             html: `ID「${id}」が見つかりませんでした`,
             classes: 'toast-chips'
@@ -429,7 +429,7 @@ $(function() {
       obj.comment = comment;
       $.post(url, JSON.stringify(obj))
         .done(function(data) {
-          M.toast({
+          spawnNotification({
             html: '送信が完了しました',
             classes: 'toast-requestPost'
           });
@@ -441,7 +441,7 @@ $(function() {
           $('#request_textarea').css('height', '43px'); // うまく戻らないので…
         })
         .fail(function() {
-          M.toast({
+          spawnNotification({
             html: '送信に失敗しました',
             classes: 'toast-requestPost'
           });
@@ -467,7 +467,7 @@ $(function() {
         let html = '';
         let logAry = [];
         if (data.length == null) {
-          M.toast({
+          spawnNotification({
             html: 'おしらせの取得に失敗しました<br>時間を置いて再度お試し下さい',
             classes: 'toast-notification'
           });
@@ -496,7 +496,7 @@ $(function() {
       })
       // 通信エラーの場合
       .fail(function(data) {
-        M.toast({
+        spawnNotification({
           html: 'おしらせの取得に失敗しました<br>時間を置いて再度お試し下さい',
           classes: 'toast-notification'
         });
@@ -509,12 +509,12 @@ $(function() {
     debugNum++;
     if (4 < debugNum && debugNum < 10) {
       const num = 10 - debugNum;
-      M.toast({
+      spawnNotification({
         html: `デバッグの許可まであと${num}回`,
         classes: 'toast-chips'
       });
     } else if (debugNum == 10) {
-      M.toast({
+      spawnNotification({
         html: 'デバッグをONにしました',
         classes: 'toast-chips'
       });
@@ -533,7 +533,7 @@ $(function() {
       if (result) return 'コピーに成功しました。'
       return 'コピーに失敗しました。'
     })();
-    M.toast({
+    spawnNotification({
       html: `ユーザーID: ${userid}<br>${text}`
     });
     debugLog('[logImg] userid', userid);
@@ -609,6 +609,21 @@ $(function() {
       writeFile();
     }
   });
+  // 通知テスト
+  $(document).on('click', '#notification_normal, #notification_html', function() {
+    const date = whatTimeIsIt();
+    const text = ($(this).attr('id') === 'notification_normal') ?
+      `${date}<br>これは通常の通知です` :
+      `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${date}<br>これは一部の通知です</span>`;
+    const classes = ($(this).attr('id') === 'notification_normal') ? 'toast-test' : 'toast-error';
+    spawnNotification({
+      html: text,
+      classes: classes
+    });
+    $('#notification_normal, #notification_html').addClass('disabled');
+    debugLog('[notification_test] date', date);
+    setTimeout(() => $('#notification_normal, #notification_html').removeClass('disabled'), 4500);
+  });
 });
 
 // ------------------------------
@@ -626,7 +641,7 @@ client.on('ready', function() {
   $('#blacklist > .row.section').eq(1).removeClass('display-none'); // プログレスを表示
   $('#whitelist > .row.section').eq(0).addClass('display-none');
   $('#whitelist > .row.section').eq(1).removeClass('display-none');
-  M.toast({
+  spawnNotification({
     html: 'Discordのログインに成功しました',
     classes: 'toast-discord'
   });
@@ -791,7 +806,7 @@ client.on('reconnecting', function() {
   if ($('.toast-reconnecting').length) return;
   const reconnecting = objectCheck(setting, 'dispeak.reconnecting');
   if (!reconnecting) return;
-  M.toast({
+  spawnNotification({
     html: '再接続をします',
     classes: 'toast-reconnecting'
   });
@@ -1409,7 +1424,7 @@ function writeFile() {
   // 保存に失敗
   else if (/EPERM|EBUSY/.test(res)) {
     if ($('.toast-writeFile').length) return;
-    M.toast({
+    spawnNotification({
       html: '設定を保存できません<br>設定ファイルを開いている場合は閉じてください',
       classes: 'toast-writeFile'
     });
@@ -1441,7 +1456,7 @@ function loginDiscord(token) {
         入力されたトークンが間違えている、もしくはトークンの値が変わった可能性があります。
         トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
         logProcess(loginHtml, 'images/discord.png');
-        M.toast({
+        spawnNotification({
           html: 'ログインに失敗しました',
           classes: 'toast-discord'
         });
@@ -1478,14 +1493,14 @@ function startSpeak(thisId, siblingsId) {
     $(`#${siblingsId}`).removeClass('display-none');
     if (thisId == 'start') {
       bouyomiSpeakCheck = true; // 読み上げる状態に変更
-      M.toast({
+      spawnNotification({
         html: '再生を開始しています',
         classes: 'toast-bouyomi'
       });
       bouyomiExeStart();
     } else if (thisId == 'stop') {
       bouyomiSpeakCheck = false; // 読み上げない状態に変更
-      M.toast({
+      spawnNotification({
         html: '再生を停止しました',
         classes: 'toast-bouyomi'
       });
@@ -1493,7 +1508,7 @@ function startSpeak(thisId, siblingsId) {
   }
   // まだログインしていない場合
   else {
-    M.toast({
+    spawnNotification({
       html: 'Discordにログインをしてください',
       classes: 'toast-bouyomi'
     });
@@ -1508,7 +1523,7 @@ function bouyomiExeStart() {
     bouyomiSpeakCheck = false; // 読み上げない状態に変更
     $('#stop').addClass('display-none');
     $('#start').removeClass('display-none');
-    M.toast({
+    spawnNotification({
       html: `棒読みちゃんを起動できませんでした<br>ディレクトリを間違えていないかご確認ください`,
       classes: 'toast-bouyomiExe'
     });
@@ -1530,7 +1545,7 @@ function bouyomiExeStart() {
     bouyomiSpeakCheck = false; // 読み上げない状態に変更
     $('#stop').addClass('display-none');
     $('#start').removeClass('display-none');
-    M.toast({
+    spawnNotification({
       html: `棒読みちゃんを起動できませんでした<br>ディレクトリを間違えていないかご確認ください<br>${bouyomiDir}`,
       classes: 'toast-bouyomiExe'
     });
@@ -1622,6 +1637,28 @@ function bouyomiSpeak(data, set) {
   bouyomiClient.on('end', () => {
     bouyomiRetryNum = 0;
   });
+}
+// 通知
+function spawnNotification(obj) {
+  const body = obj.html.replace(/<br>/g, '\n');
+  const classes = obj.classes;
+  const displayLength = obj.displayLength;
+  const title = '';
+  const classesLength = $(`.${classes}`).length;
+  const isHtml = /<\//.test(body);
+  const notification_d = objectCheck(setting, 'dispeak.notification_d');
+  const notification_w = objectCheck(setting, 'dispeak.notification_w');
+  if (!notification_d && !isHtml) obj.classes = `${classes} display-none`;
+  if (!classesLength) {
+    M.toast(obj);
+    if (notification_w && !isHtml) {
+      let myNotification = new Notification(title, {
+        body: body,
+        icon: `${__dirname}\\images\\icon.png`,
+      });
+      setTimeout(myNotification.close.bind(myNotification), 4000);
+    }
+  }
 }
 // クリップボードへコピー
 function copyTextToClipboard(textVal) {
@@ -1852,7 +1889,7 @@ function errorLog(obj) {
   debugLog(`[errorLog] jsnRep`, jsnRep);
   if ($('.toast-error').length || msgTxt === '') return;
   const toastHTML = `<i class="material-icons yellow-text text-accent-1">info_outline</i><span>${msgTxt}</span>`;
-  M.toast({
+  spawnNotification({
     html: toastHTML,
     classes: 'toast-error'
   });
