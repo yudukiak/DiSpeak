@@ -500,7 +500,7 @@ function mainWindowMenu() {
         label: 'Wikiを開く',
         accelerator: 'F1',
         click: () => {
-          shell.openExternal('https://github.com/micelle/dc_DiSpeak/wiki')
+          shell.openExternal('https://github.com/micelle/DiSpeak/wiki')
         }
       },
       {
