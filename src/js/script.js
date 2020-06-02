@@ -1643,7 +1643,7 @@ function spawnNotification(obj) {
   const body = obj.html.replace(/<br>/g, '\n');
   const classes = obj.classes;
   const displayLength = obj.displayLength;
-  const title = '';
+  const title = 'DiSpeak';
   const classesLength = $(`.${classes}`).length;
   const isHtml = /<\//.test(body);
   const notification_d = objectCheck(setting, 'dispeak.notification_d');
