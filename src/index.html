@@ -71,6 +71,7 @@
               <li class="collection-item waves-effect waves-light">棒読みちゃん</li>
               <li class="collection-item waves-effect waves-light">ブラックリスト</li>
               <li class="collection-item waves-effect waves-light">ホワイトリスト</li>
+              <li class="collection-item waves-effect waves-light">NGワード</li>
             </ul>
           </div>
           <div id="setting_table" class="col s9">
@@ -549,6 +550,22 @@
                       <div class="circle-clipper right"><div class="circle"></div></div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+            <!-- NGワード -->
+            <div id="ngword" class="collection col s12 display-none">
+              <div class="row section">
+                <div class="col s12">
+                  <span class="helper-text">NGワードを追加することで、該当するワードが入力されている通知を読ませない・ログを表示させないことができます。</span>
+                </div>
+                <div class="col s12">
+                  <table id="ngword-list" class="centered">
+                    <tbody></tbody>
+                  </table>
+                </div>
+                <div class="col s12">
+                  <div class="chips chips-placeholder"></div>
                 </div>
               </div>
             </div>

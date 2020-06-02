@@ -220,7 +220,7 @@ main .tabs .indicator {
 }
 
 /* ********************
-  blacklist, whitelist
+  blacklist, whitelist, ngword
 ******************** */
 #blacklist img,
 #whitelist img {
@@ -233,20 +233,27 @@ main .tabs .indicator {
 }
 
 #blacklist .chips .input,
-#whitelist .chips .input {
+#whitelist .chips .input,
+#ngword .chips .input {
   width: 100% !important
 }
 
 #blacklist .chips.focus,
-#whitelist .chips.focus {
+#whitelist .chips.focus,
+#ngword .chips.focus {
   border-bottom: 1px solid #5c6bc0;
   -webkit-box-shadow: 0 1px 0 0 #5c6bc0;
   box-shadow: 0 1px 0 0 #5c6bc0;
 }
 
 #blacklist .chip:focus,
-#whitelist .chip:focus {
+#whitelist .chip:focus,
+#ngword .chip:focus {
   background-color: #5c6bc0;
+}
+
+#ngword tr {
+  border-bottom: 0;
 }
 
 /* ********************

@@ -136,6 +136,37 @@ $(function() {
       }
     }
   });
+  M.Chips.init($('#ngword .chips'), {
+    placeholder: 'NGワードを記入し、エンターで追加できます',
+    secondaryPlaceholder: '+ NGワードを追加する',
+    data: (function() {
+      if (objectCheck(setting, 'ngword') == null) return [];
+      return setting.ngword;
+    })(),
+    onChipAdd: function() {
+      const instance = M.Chips.getInstance($('#ngword .chips'));
+      const ary = instance.chipsData;
+      const aryLen = ary.length - 1;
+      const lastAry = ary[aryLen];
+      const lastTag = lastAry.tag;
+      instance.deleteChip();
+      const input = $(`#ngword-list [name="ngword_${lastTag}"]`);
+      if (input.length) {
+        spawnNotification({
+          html: `「${lastTag}」は既に追加されています`,
+          classes: 'toast-chips'
+        });
+        return;
+      }
+      const html =
+        '<tr>' +
+        `<td class="input-field" data-template="ngword"><input name="ngword_${lastTag}" type="text" value="${lastTag}" readonly></td>` +
+        '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
+        '</tr>';
+      $('#ngword-list tbody').append(html);
+      writeFile();
+    }
+  });
   // デフォルトのテンプレートを反映
   $('#directmessage .template, #group .template, #server .template').each(function() {
     const data = $(this).data('template');
@@ -606,6 +637,15 @@ $(function() {
         const data = $(this).data('template');
         $(this).children('input').val(data);
       });
+      writeFile();
+    }
+  });
+  // NGリスト
+  $(document).on('click', '#ngword-list button', function() {
+    const text = $(this).children('i').text();
+    debugLog('[ngword-list] text', text);
+    if (/close/.test(text)) {
+      $(this).parents('tr').remove();
       writeFile();
     }
   });
@@ -1355,6 +1395,14 @@ function readFile() {
           '</tr>';
         $('#files-list tbody').prepend(html);
       }
+      else if (/^ngword_/.test(name)) {
+        const html =
+          '<tr>' +
+          `<td class="input-field" data-template="ngword"><input name="${name}" type="text" value="${val}" readonly></td>` +
+          '<td><button class="btn-flat waves-effect waves-light" type="button"><i class="material-icons">close</i></button></td>' +
+          '</tr>';
+        $('#ngword-list tbody').append(html);
+      }
       // それ以外
       else {
         $(`#${id} input[name="${name}"]`).val([val]);
@@ -1376,7 +1424,7 @@ function readFile() {
 // ファイルへ書き込み
 function writeFile() {
   let setting_AutoSave = {};
-  $('#dispeak, #discord, #directmessage, #group, #bouyomi, #server .template, #server-list > div, #emojis').each(function() {
+  $('#dispeak, #discord, #directmessage, #group, #bouyomi, #server .template, #server-list > div, #emojis, #ngword').each(function() {
     const divId = $(this).attr('id');
     const id = (function() {
       if (divId == null) return 'server';
@@ -1398,7 +1446,7 @@ function writeFile() {
         return;
       } else if (/^files_read/.test(name)) {
         mimeObj[name] = val;
-      } else {
+      } else if (name != null) {
         inputObj[name] = val;
       }
     });
