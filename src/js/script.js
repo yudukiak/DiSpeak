@@ -1037,7 +1037,7 @@ client.on('message', function(data) {
   // NGワードの処理
   const ngwordlist = objectCheck(setting, 'ngword');
   debugLog('[Discord] ngwordlist', ngwordlist);
-  const ngwordress = (function(){
+  const ngwordres = (function(){
     for (let ngwordkey in ngwordlist) {
       const ngword = ngwordlist[ngwordkey];
       const ngwordReg = new RegExp(ngword);
@@ -1046,8 +1046,8 @@ client.on('message', function(data) {
     }
     return false;
   })();
-  debugLog('[Discord] ngwordress', ngwordress);
-  if (ngwordress) return;
+  debugLog('[Discord] ngwordres', ngwordres);
+  if (ngwordres) return;
   // チャンネルの処理
   const contentMatchChannel = content.match(/<#([0-9]*?)>/g);
   if (contentMatchChannel != null) {
