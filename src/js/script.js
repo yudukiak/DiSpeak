@@ -1034,6 +1034,20 @@ client.on('message', function(data) {
   const avatarURL = data.author.displayAvatarURL.replace(/\?size=\d+/, '');
   // チャットの内容
   let content = data.content;
+  // NGワードの処理
+  const ngwordlist = objectCheck(setting, 'ngword');
+  debugLog('[Discord] ngwordlist', ngwordlist);
+  const ngwordress = (function(){
+    for (let ngwordkey in ngwordlist) {
+      const ngword = ngwordlist[ngwordkey];
+      const ngwordReg = new RegExp(ngword);
+      const test = ngwordReg.test(content);
+      if (test) return true;
+    }
+    return false;
+  })();
+  debugLog('[Discord] ngwordress', ngwordress);
+  if (ngwordress) return;
   // チャンネルの処理
   const contentMatchChannel = content.match(/<#([0-9]*?)>/g);
   if (contentMatchChannel != null) {
