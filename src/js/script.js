@@ -309,7 +309,8 @@ $(function() {
     } else {
       $('.fixed-action-btn').addClass('display-none');
     }
-    $('main').scrollTop(0);
+    const has = $('main').hasClass('tab-fixed');
+    (!has) ? $('main').scrollTop(0) : $('.contents').scrollTop(0);
   });
   // 設定リストの切り替え
   $(document).on('click', '#setting_menu li, #help_menu li', function() {
@@ -319,7 +320,8 @@ $(function() {
     $(`#${id}_table > div`).eq(index).removeClass('display-none');
     $(`#${id}_menu li`).removeClass('active blue');
     $(this).addClass('active blue');
-    $('main').scrollTop(0);
+    const has = $('main').hasClass('tab-fixed');
+    (!has) ? $('main').scrollTop(0) : $('.contents').scrollTop(0);
   });
   // 再生・停止
   $(document).on('click', '.fixed-action-btn a', function() {

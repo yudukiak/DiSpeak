@@ -69,6 +69,9 @@ main>.container>.row {
 /* ********************
   tabs
 ******************** */
+main .tabs {
+  margin-bottom: .5rem;
+}
 main .tabs .tab a {
   color: rgba(33, 150, 243, 0.7);
 }
@@ -94,6 +97,20 @@ main .tabs .tab a:hover {
 
 main .tabs .indicator {
   background-color: #2196f3;
+}
+
+/* ********************
+  tab固定
+******************** */
+main.tab-fixed {
+  overflow-y: hidden;
+}
+main.tab-fixed .tabs {
+  padding-right: 10px;
+}
+main.tab-fixed .contents {
+  overflow-y: scroll;
+  height: calc(100vh - 25px - 48px - .5rem);
 }
 
 /* ********************
@@ -433,6 +450,16 @@ main .modal-overlay {
 /* ********************
   各種微調整
 ******************** */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background: #9e9e9e;
+}
+
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
