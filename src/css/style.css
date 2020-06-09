@@ -119,7 +119,7 @@ main.tab-fixed .tabs {
 }
 main.tab-fixed .contents {
   overflow-y: scroll;
-  height: calc(100vh - 25px - 48px - .5rem);
+  height: calc(100vh - 25px - 48px - .5rem - .5em);
 }
 
 /* ********************
