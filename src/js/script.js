@@ -296,6 +296,16 @@ $(function() {
     const val = $(this).prop('checked');
     serverChannel(index, val);
   });
+  // タブ固定化
+  $(document).on('change', 'input[name=tab_fixed]', function() {
+    const checked = $('input[name=tab_fixed]').prop('checked');
+    const has = $('main').hasClass('tab-fixed');
+    debugLog('[tab_fixed] checked', checked);
+    debugLog('[tab_fixed] has', has);
+    (checked) ? $('main').addClass('tab-fixed') : $('main').removeClass('tab-fixed');
+    const instance = M.Tabs.getInstance($('.tabs'));
+    if (instance) instance.updateTabIndicator();
+  });
   // ヘッダー
   $(document).on('click', 'header > div', function() {
     const id = $(this).attr('id');
@@ -1394,6 +1404,7 @@ function readFile() {
       // チェックボックス
       else if (/object Boolean/.test(type)) {
         $(`#${id} input[name="${name}"]`).prop('checked', val);
+        if(name === 'tab_fixed' && val) $('main').addClass('tab-fixed');
       }
       // $filename$の設定
       else if (/^files_mime/.test(name)) {
