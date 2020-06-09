@@ -55,7 +55,6 @@ header>div:last-child:hover {
 main {
   overflow-y: scroll;
   height: calc(100vh - 25px);
-  padding-top: .5rem;
 }
 
 main>.container {
@@ -66,10 +65,20 @@ main>.container>.row {
   margin: 0;
 }
 
+main>.container>.row>.col.s12.z-depth-1 {
+  position: relative;
+  z-index: 2;
+}
+
+main .row .col.contents {
+  padding-top: .5em;
+}
+
 /* ********************
   tabs
 ******************** */
 main .tabs {
+  margin-top: .5rem;
   margin-bottom: .5rem;
 }
 main .tabs .tab a {

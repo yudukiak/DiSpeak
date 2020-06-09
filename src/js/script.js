@@ -302,7 +302,13 @@ $(function() {
     const has = $('main').hasClass('tab-fixed');
     debugLog('[tab_fixed] checked', checked);
     debugLog('[tab_fixed] has', has);
-    (checked) ? $('main').addClass('tab-fixed') : $('main').removeClass('tab-fixed');
+    if (checked) {
+      $('main').addClass('tab-fixed');
+      $('.tabs').parent().addClass('z-depth-1');
+    } else {
+      $('main').removeClass('tab-fixed');
+      $('.tabs').parent().removeClass('z-depth-1');
+    }
     const instance = M.Tabs.getInstance($('.tabs'));
     if (instance) instance.updateTabIndicator();
   });
@@ -1412,7 +1418,10 @@ function readFile() {
       // チェックボックス
       else if (/object Boolean/.test(type)) {
         $(`#${id} input[name="${name}"]`).prop('checked', val);
-        if(name === 'tab_fixed' && val) $('main').addClass('tab-fixed');
+        if(name === 'tab_fixed' && val) {
+          $('main').addClass('tab-fixed');
+          $('.tabs').parent().addClass('z-depth-1');
+        }
       }
       // $filename$の設定
       else if (/^files_mime/.test(name)) {
