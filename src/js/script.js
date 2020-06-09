@@ -1302,7 +1302,15 @@ client.on('message', function(data) {
     }
     return tmp;
   })();
-  let set = {};
+  let set = (function(){
+    let obj = {};
+    obj.voice = setting[channelType]b_voice;
+    obj.volume = setting[channelType]b_volume;
+    obj.speed = setting[channelType]b_speed;
+    obj.tone = setting[channelType]b_tone;
+    return obj;
+  })();
+  debugLog('[Discord] set', set);
   if (guildId != '') {
     set.voice = setting.server[guildId].b_voice;
     set.volume = setting.server[guildId].b_volume;
