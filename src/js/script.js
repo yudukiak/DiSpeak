@@ -554,12 +554,12 @@ $(function() {
       const num = 10 - debugNum;
       spawnNotification({
         html: `デバッグの許可まであと${num}回`,
-        classes: 'toast-chips'
+        classes: `toast-chips debug-last${num}`
       });
     } else if (debugNum == 10) {
       spawnNotification({
         html: 'デバッグをONにしました',
-        classes: 'toast-chips'
+        classes: 'toast-chips debug-on'
       });
       $('#dispeak > div:last-child').removeClass('display-none');
       $('#dispeak input[name=debug]').prop('checked', true);
