@@ -24,6 +24,7 @@ let debugNum = 0;
 let bouyomiRetryNum = 0;
 // 状態を保持
 let lastStatus = '';
+let lastMessage = '';
 // analytics
 let clientID = (function() {
   if (objectCheck(setting, 'clientID') == null) return '';
@@ -1318,23 +1319,30 @@ client.on('message', function(data) {
     }
     return tmp;
   })();
+  // 棒読みちゃんの各種設定
   let set = (function(){
     let obj = {};
     obj.voice = setting[channelType].b_voice;
     obj.volume = setting[channelType].b_volume;
     obj.speed = setting[channelType].b_speed;
     obj.tone = setting[channelType].b_tone;
+    obj.command = setting[channelType].b_command;
+    if (guildId != '') {
+      const voice = objectCheck(setting, `server.${guildId}.b_voice`);
+      const volume = objectCheck(setting, `server.${guildId}.b_volume`);
+      const speed = objectCheck(setting, `server.${guildId}.b_speed`);
+      const tone = objectCheck(setting, `server.${guildId}.b_tone`);
+      const command = objectCheck(setting, `server.${guildId}.b_command`);
+      if (voice.length) obj.voice = voice;
+      if (volume.length) obj.volume = volume;
+      if (speed.length) obj.speed = speed;
+      if (tone.length) obj.tone = tone;
+      if (command.length) obj.command = command;
+    }
     return obj;
   })();
   debugLog('[Discord] set', set);
-  if (guildId != '') {
-    set.voice = setting.server[guildId].b_voice;
-    set.volume = setting.server[guildId].b_volume;
-    set.speed = setting.server[guildId].b_speed;
-    set.tone = setting.server[guildId].b_tone;
-    const templateCommand = setting.server[guildId].b_command;
-    sendTextToBouyomi = `${templateCommand} ${sendTextToBouyomi}`;
-  }
+  if (set.command != '') sendTextToBouyomi = `${set.command} ${sendTextToBouyomi}`;
   // テキストが存在しないときの処理
   if (content === '' || /^([\s]+)$/.test(content)) {
     if (objectCheck(setting, 'dispeak.files_chat')) bouyomiSpeak(sendTextToBouyomi, set);
@@ -1665,6 +1673,8 @@ function bouyomiExeStart() {
 function bouyomiSpeak(data, set) {
   debugLog(`[bouyomiSpeak] data (retry${bouyomiRetryNum + 1})`, data);
   debugLog(`[bouyomiSpeak] set (retry${bouyomiRetryNum + 1})`, set);
+  debugLog('[bouyomiSpeak] bouyomiSpeakCheck', bouyomiSpeakCheck);
+  debugLog('[bouyomiSpeak] bouyomiExeStartCheck', bouyomiExeStartCheck);
   if (!bouyomiSpeakCheck || !bouyomiExeStartCheck || bouyomiRetryNum>=10) return;
   bouyomiRetryNum++;
   const bouyomiServer = {};
@@ -1687,6 +1697,9 @@ function bouyomiSpeak(data, set) {
     data = data.replace(emojiReg, emojiTxt);
   }
   const message = data.replace(/\s+/g, ' ').trim();
+  if (message != lastMessage) bouyomiRetryNum = 0;
+  lastMessage = message;
+  debugLog('[bouyomiSpeak] message', message);
   const setSpeed = (function() {
     const s = objectCheck(set, 'speed');
     if (s == null || s === '') return 0xFFFF;
@@ -1728,8 +1741,10 @@ function bouyomiSpeak(data, set) {
     messageBuffer.copy(buffer, 15, 0, messageBuffer.length);
     bouyomiClient.write(buffer);
   });
+  debugLog('[bouyomiSpeak] bouyomiClient', bouyomiClient);
   // エラー（接続できなかったときなど）
   bouyomiClient.on('error', (e) => {
+    debugLog('[bouyomiSpeak] error', e);
     if (bouyomiRetryNum >= 10) {
       bouyomiRetryNum = 0;
       erroeObj(e);
@@ -1741,10 +1756,12 @@ function bouyomiSpeak(data, set) {
     }
   });
   bouyomiClient.on('data', (e) => {
+    debugLog('[bouyomiSpeak] data', e);
     bouyomiClient.end();
   });
   // 接続が完了したとき
   bouyomiClient.on('end', () => {
+    debugLog('[bouyomiSpeak] end', '');
     bouyomiRetryNum = 0;
   });
 }
