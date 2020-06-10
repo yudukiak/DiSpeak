@@ -534,6 +534,10 @@ textarea.materialize-textarea:focus:not([readonly])+label {
   display: inline-block;
   overflow: hidden;
 }
+main>.fixed-action-btn:nth-child(3) {
+  left: 23px;
+  display: none;
+}
 
 input[type=text]:not(.browser-default).swal2-input {
   height: 2.625em;

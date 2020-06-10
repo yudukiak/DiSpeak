@@ -321,12 +321,13 @@ $(function() {
   $(document).on('click', '.tabs li', function() {
     const index = $('.tabs li').index(this);
     if (index == 0) {
-      $('.fixed-action-btn').removeClass('display-none');
+      $('.fixed-action-btn:eq(0)').removeClass('display-none');
     } else {
-      $('.fixed-action-btn').addClass('display-none');
+      $('.fixed-action-btn:eq(0)').addClass('display-none');
     }
     const has = $('main').hasClass('tab-fixed');
     (!has) ? $('main').scrollTop(0) : $('.contents').scrollTop(0);
+    $('.fixed-action-btn:eq(1)').fadeOut();
   });
   // 設定リストの切り替え
   $(document).on('click', '#setting_menu li, #help_menu li', function() {
@@ -338,12 +339,21 @@ $(function() {
     $(this).addClass('active blue');
     const has = $('main').hasClass('tab-fixed');
     (!has) ? $('main').scrollTop(0) : $('.contents').scrollTop(0);
+    $('.fixed-action-btn:eq(1)').fadeOut();
   });
   // 再生・停止
-  $(document).on('click', '.fixed-action-btn a', function() {
+  $(document).on('click', '.fixed-action-btn:eq(0) a', function() {
     const thisId = $(this).attr('id');
     const siblingsId = $(this).siblings().attr('id');
     startSpeak(thisId, siblingsId);
+  });
+  // 上に戻るボタン
+  $(document).on('click', '.fixed-action-btn:eq(1) a', function() {
+    const has = $('main').hasClass('tab-fixed');
+    const trg = (!has) ? 'main' : '.contents';
+    $(trg).animate({
+      'scrollTop': 0
+    }, 300);
   });
   // ログイン・ログアウト
   $(document).on('click', '#offline, #online', function() {
@@ -1464,6 +1474,14 @@ function readFile() {
   if (objectCheck(setting, 'dispeak.bouyomi')) {
     startSpeak('start', 'stop');
   }
+  // 上に戻るボタン
+  const mainHasTabFixed = $('main').hasClass('tab-fixed');
+  const scrollTargetClass = (!mainHasTabFixed) ? 'main' : '.contents';
+  $(scrollTargetClass).scroll(function () {
+    const btn = $('.fixed-action-btn:eq(1)');
+    const scroll = $(this).scrollTop();
+    (scroll > 180) ? btn.fadeIn() : btn.fadeOut();
+  });
 }
 // ファイルへ書き込み
 function writeFile() {
