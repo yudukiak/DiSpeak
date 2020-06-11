@@ -1991,6 +1991,8 @@ function errorLog(obj) {
   console.groupEnd();
   // ネットワークエラーなど
   if (/undefined/.test(msg) || /{"isTrusted":true}/.test(msg) || /Failed to fetch/.test(msg)) return;
+  // Discord.js側のエラー
+  if (/channelClass is not a constructor/.test(msg)) return;
   const msgTxt = (function() {
     if (/Incorrect login details were provided/.test(msg)) return 'トークンが正しくありません';
     if (/Something took too long to do/.test(msg)) return 'Discordに接続できません';
