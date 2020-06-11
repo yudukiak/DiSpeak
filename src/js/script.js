@@ -906,6 +906,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   // 切断チャンネル（old:123456789012345678, new:null）
   const channelPrevID = oldMember.voiceChannelID;
   const channelPrevName = (function() {
+    if (channelPrevID == null ) return '';
     const channelPrevData = guildChannel.get(channelPrevID);
     if (channelPrevData == null) return '';
     return channelPrevData.name;
@@ -913,6 +914,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   // 参加チャンネル（old:null, new:123456789012345678）
   const channelNextID = newMember.voiceChannelID;
   const channelNextName = (function() {
+    if (channelNextID == null ) return '';
     const channelNextData = guildChannel.get(channelNextID);
     if (channelNextData == null) return '';
     return channelNextData.name;
