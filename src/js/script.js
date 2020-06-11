@@ -1729,6 +1729,11 @@ function bouyomiSpeak(data, set) {
   debugLog('[bouyomiSpeak] setVolume', setVolume);
   debugLog('[bouyomiSpeak] setVoice', setVoice);
   const bouyomiClient = net.createConnection(options, () => {
+    debugLog('[bouyomiSpeak] start', '');
+    debugLog('[bouyomiSpeak] bouyomiClient', bouyomiClient);
+  });
+  bouyomiClient.on('connect', () => {
+    debugLog('[bouyomiSpeak] connect', '');
     const messageBuffer = Buffer.from(message);
     const buffer = Buffer.alloc(15 + messageBuffer.length);
     buffer.writeUInt16LE(0x0001, 0);
@@ -1740,8 +1745,9 @@ function bouyomiSpeak(data, set) {
     buffer.writeUInt32LE(messageBuffer.length, 11);
     messageBuffer.copy(buffer, 15, 0, messageBuffer.length);
     bouyomiClient.write(buffer);
+    debugLog('[bouyomiSpeak] messageBuffer', messageBuffer);
+    debugLog('[bouyomiSpeak] buffer', buffer);
   });
-  debugLog('[bouyomiSpeak] bouyomiClient', bouyomiClient);
   // エラー（接続できなかったときなど）
   bouyomiClient.on('error', (e) => {
     debugLog('[bouyomiSpeak] error', e);
