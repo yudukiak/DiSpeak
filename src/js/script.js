@@ -2030,7 +2030,7 @@ function errorLog(obj) {
     html: toastHTML,
     classes: 'toast-error'
   });
-  if (pathExe.match(usernameReg) == null) return; // インストール先に存在しない場合のは送らないよ
+  if (pathExe.match(usernameReg) == null || !/AppData\\Local\\DiSpeak\\app-/.test(pathExe)) return; // インストール先に存在しない場合のは送らないよ
   if (objectCheck(setting, 'dispeak.errorlog') && /\[.+]<br>/.test(msgTxt)) $.post(`${postUrl}?t=e`, jsnRep);
 }
 // デバッグ
