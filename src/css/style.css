@@ -556,6 +556,7 @@ textarea.materialize-textarea:focus:not([readonly])+label {
 }
 main>.fixed-action-btn:nth-child(3) {
   left: 23px;
+  right: auto;
   display: none;
 }
 
