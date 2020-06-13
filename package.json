@@ -1,6 +1,6 @@
 {
   "name": "DiSpeak_build",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "For DiSpeak build.",
   "main": "index.js",
   "dependencies": {
@@ -19,8 +19,8 @@
     "ftp-deploy": "^2.3.7"
   },
   "scripts": {
-    "c": "ncu",
-    "cs": "cd src && ncu",
+    "c": "ncu -x discord.js",
+    "cs": "cd src && ncu -x discord.js",
     "u": "ncu -u && npm i",
     "us": "cd src && ncu -u && npm i",
     "build": "node lib/build.js",
