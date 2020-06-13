@@ -749,9 +749,13 @@ client.on('ready', function() {
         if (val.iconURL == null) return 'images/group.svg';
         return val.iconURL.replace(/\?size=\d+/, '');
       })();
-      const name = val.recipients.map(function(v) {
-        return escapeHtml(v.username);
-      }).join(', ');
+      const name = (function() {
+        const usernames = val.recipients.map(function(v) {
+          return escapeHtml(v.username);
+        }).join(', ');
+        if (val.name == null) return usernames;
+        return val.name;
+      })();
       $('#group-list').append(
         '<div class="collection-item avatar valign-wrapper">' +
         `<div class="col s9 valign-wrapper"><img src="${iconURL}" alt="" class="circle"><span class="title">${name}</span></div>` +
@@ -1052,7 +1056,8 @@ client.on('message', function(data) {
     const obj = data.channel.recipients.map(function(v) {
       return v.username;
     }).join(', ');
-    return obj;
+    if (data.channel.name == null) return obj;
+    return data.channel.name;
   })();
   const username = data.author.username; // 対象者の名前
   const nickname = (function() { // 対象者のニックネーム。未設定はnull
