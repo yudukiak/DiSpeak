@@ -12,10 +12,10 @@
     "universal-analytics": "^0.4.20"
   },
   "devDependencies": {
-    "electron": "^9.0.0",
+    "electron": "^9.0.4",
     "electron-packager": "^14.2.1",
     "electron-winstaller": "^4.0.0",
-    "fs-extra": "^9.0.0",
+    "fs-extra": "^9.0.1",
     "ftp-deploy": "^2.3.7"
   },
   "scripts": {
