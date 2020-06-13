@@ -1095,11 +1095,13 @@ client.on('message', function(data) {
     }
   }
   // メンションの処理
-  const contentMatchMention = content.match(/<@!?([0-9]*?)>/g);
+  const mentionReg = /<@[!&]([0-9]*?)>/g;
+  const contentMatchMention = content.match(mentionReg);
   if (contentMatchMention != null) {
     for (let i = 0, n = contentMatchMention.length; i < n; i++) {
       const contentMention = contentMatchMention[i];
-      const contentMentionId = contentMention.replace(/[<@!>]/g, ''); // IDだけ取り出す
+      const isUser= (/!/.test(contentMention)) ? true : false;
+      const contentMentionId = contentMention.replace(/[<@!&>]/g, ''); // IDだけ取り出す
       const contentMentionReg = new RegExp(contentMention, 'g');
       const myMention = (function() {
         const tmp = objectCheck(setting, 'dispeak.my_mention_bym');
@@ -1111,27 +1113,46 @@ client.on('message', function(data) {
         if (tmp == null) return '';
         return tmp;
       })();
-      const mentionUserdata = client.users.get(contentMentionId);
-      const mentionUsername = mentionUserdata.username;
-      const mentionNickname = (function() {
-        if (channelType !== 'server') return mentionUsername;
-        const members = (function() {
-          if (objectCheck(data, 'member') == null) return data.mentions._guild.members;
-          return data.member.guild.members;
-        })();
-        const member = members.get(contentMentionId);
-        const nick = objectCheck(member, 'nickname');
-        debugLog('[Discord] members', members);
-        debugLog('[Discord] member', member);
-        if (nick == null) return mentionUsername;
-        return nick;
+      const roleMention = (function() {
+        const tmp = objectCheck(setting, 'dispeak.role_mention_bym');
+        if (tmp == null) return '';
+        return tmp;
       })();
-      if (!objectCheck(setting, 'dispeak.mention')) {
-        content = content.replace(/<@!?([0-9]*?)>/g, '');
-      } else if (contentMentionId == userId) {
-        content = content.replace(contentMentionReg, myMention).replace(/\$username\$/, mentionUsername).replace(/\$nickname\$/, mentionNickname);
+      if (isUser) {
+        const mentionUserdata = client.users.get(contentMentionId);
+        const mentionUsername = mentionUserdata.username;
+        const mentionNickname = (function() {
+          if (channelType !== 'server') return mentionUsername;
+          const members = (function() {
+            if (objectCheck(data, 'member') == null) return data.mentions._guild.members;
+            return data.member.guild.members;
+          })();
+          const member = members.get(contentMentionId);
+          const nick = objectCheck(member, 'nickname');
+          debugLog('[Discord] members', members);
+          debugLog('[Discord] member', member);
+          if (nick == null) return mentionUsername;
+          return nick;
+        })();
+        if (!objectCheck(setting, 'dispeak.mention')) {
+          content = content.replace(mentionReg, '');
+        } else if (contentMentionId == userId) {
+          content = content.replace(contentMentionReg, myMention).replace(/\$username\$/, mentionUsername).replace(/\$nickname\$/, mentionNickname);
+        } else {
+          content = content.replace(contentMentionReg, otherMention).replace(/\$username\$/, mentionUsername).replace(/\$nickname\$/, mentionNickname);
+        }
       } else {
-        content = content.replace(contentMentionReg, otherMention).replace(/\$username\$/, mentionUsername).replace(/\$nickname\$/, mentionNickname);
+        const roles = data.channel.guild.roles;
+        const role = roles.get(contentMentionId);
+        const roleName = role.name;
+        debugLog('[Discord] roles', roles);
+        debugLog('[Discord] role', role);
+        debugLog('[Discord] roleName', roleName);
+        if (!objectCheck(setting, 'dispeak.mention')) {
+          content = content.replace(mentionReg, '');
+        } else {
+          content = content.replace(contentMentionReg, roleMention).replace(/\$role\$/, roleName);
+        }
       }
     }
   }

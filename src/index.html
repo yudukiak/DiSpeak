@@ -150,6 +150,15 @@
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
                   </div>
                 </div>
+                <div class="col s12 valign-wrapper template" data-template="$role$へ">
+                  <div class="input-field col s8 mb0">
+                    <input id="role_mention_bym" name="role_mention_bym" type="text" value="$role$へ">
+                    <label for="role_mention_bym">ロール宛</label>
+                  </div>
+                  <div class="input-field col s4 center-align mb0">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
+                </div>
               </div>
               <div class="divider"></div>
               <div class="row section valign-wrapper">
@@ -740,6 +749,10 @@
                   <tr>
                     <td><input type="text" value="$nickname$" readonly></td>
                     <td><span>ユーザーのニックネームが挿入されます。もしニックネームが無い場合は$username$が挿入されます。<br>※「サーバー」でのみ使用可能</span></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" value="$role$" readonly></td>
+                    <td><span>ロール名が挿入されます。<br>※「メンション設定」でのみ使用可能</span></span></td>
                   </tr>
                   <tr>
                     <td><input type="text" value="$memo$" readonly></td>
