@@ -21,8 +21,8 @@
   "scripts": {
     "c": "ncu -x discord.js",
     "cs": "cd src && ncu -x discord.js",
-    "u": "ncu -u && npm i",
-    "us": "cd src && ncu -u && npm i",
+    "u": "ncu -u -x discord.js && npm i",
+    "us": "cd src && ncu -u -x discord.js && npm i",
     "build": "node lib/build.js",
     "start": "./node_modules/.bin/electron src"
   },
