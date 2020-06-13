@@ -531,6 +531,7 @@
             <!-- 棒読みちゃん -->
             <div id="bouyomi" class="collection col s12 display-none">
               <div class="row section">
+                <div class="col s12"><strong class="valign-wrapper">基本設定</strong></div>
                 <div class="input-field col s9">
                   <input id="bouyomi_dir" name="dir" type="text" value="" readonly>
                   <label for="bouyomi_dir">ディレクトリ</label>
@@ -539,6 +540,20 @@
                 <div class="input-field col s3 center-align">
                   <button id="bouyomi_dir_btn" class="btn waves-effect waves-light indigo lighten-1" type="button">選択<i class="material-icons left">folder_open</i></button>
                 </div>
+              </div>
+              <div class="divider"></div>
+              <div class="row section">
+                <div class="col s12"><strong class="valign-wrapper">通信設定</strong></div>
+                <div class="col s4">
+                  <label><input name="communication" type="radio" value="socket" checked /><span class="black-text">Socket通信</span></label>
+                </div>
+                <div class="col s4">
+                  <label><input name="communication" type="radio" value="http" /><span class="black-text">HTTP通信</span></label>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="row section">
+                <div class="col s12"><strong class="valign-wrapper">Socket通信</strong></div>
                 <div class="template" data-template="127.0.0.1">
                   <div class="input-field col s8">
                     <input id="bouyomi_ip" name="ip" type="text" value="127.0.0.1">
@@ -552,6 +567,19 @@
                   <div class="input-field col s8">
                     <input id="bouyomi_port" name="port" type="text" value="50001">
                     <label for="bouyomi_port">ポート</label>
+                  </div>
+                  <div class="input-field col s4 center-align">
+                    <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="row section">
+                <div class="col s12"><strong class="valign-wrapper">HTTP通信</strong></div>
+                <div class="template" data-template="50080">
+                  <div class="input-field col s8">
+                    <input id="bouyomi_port_http" name="port_http" type="text" value="50080">
+                    <label for="bouyomi_port_http">ポート</label>
                   </div>
                   <div class="input-field col s4 center-align">
                     <button class="btn waves-effect waves-light indigo lighten-1" type="button">リセット<i class="material-icons left">replay</i></button>

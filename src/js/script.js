@@ -6,6 +6,7 @@ const net = require('net');
 const ua = require('universal-analytics');
 const markdown = require('markdown');
 const mime = require('mime-types');
+let http = require('http');
 const nowVersion = ipcRenderer.sendSync('now-version-check');
 const pathExe = ipcRenderer.sendSync('get-path-exe');
 const client = new Discord.Client({'sync': true});
@@ -1723,6 +1724,34 @@ function bouyomiSpeak(data, set) {
   if (message != lastMessage) bouyomiRetryNum = 0;
   lastMessage = message;
   debugLog('[bouyomiSpeak] message', message);
+  if (objectCheck(setting, 'bouyomi.communication') === 'http') {
+    const encodeURI = encodeURIComponent(message);
+    const port = objectCheck(setting, 'bouyomi.port_http');
+    const url = `http://localhost:${port}/talk?text=${encodeURI}`
+    http.get(url, (res) => {
+      let body = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => {
+          body += chunk;
+      });
+      res.on('end', (res) => {
+          res = JSON.parse(body);
+          debugLog('[bouyomiSpeak] res', res);
+      });
+    }).on('error', (e) => {
+      debugLog('[bouyomiSpeak] error', e);
+      debugLog('[bouyomiSpeak] bouyomiRetryNum', bouyomiRetryNum);
+      if (bouyomiRetryNum >= 10) {
+        bouyomiRetryNum = 0;
+        erroeObj(e);
+      } else {
+        setTimeout(function() {
+          bouyomiSpeak(message, set);
+        }, 100);
+      }
+    });
+    return;
+  }
   const setSpeed = (function() {
     const s = objectCheck(set, 'speed');
     if (s == null || s === '') return 0xFFFF;
