@@ -1108,7 +1108,7 @@ client.on('message', function(data) {
   if (contentMatchMention != null) {
     for (let i = 0, n = contentMatchMention.length; i < n; i++) {
       const contentMention = contentMatchMention[i];
-      const isUser= (/!/.test(contentMention)) ? true : false;
+      const isUser= (/&/.test(contentMention)) ? false : true;
       const contentMentionId = contentMention.replace(/[<@!&>]/g, ''); // IDだけ取り出す
       const contentMentionReg = new RegExp(contentMention, 'g');
       const myMention = (function() {
