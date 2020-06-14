@@ -50,12 +50,14 @@ autoUpdater.on("update-downloaded", () => {
     message: '新しいバージョンをダウンロードしたっす！',
     detail: '再起動してインストールするっす？\nあとでを選んだときは終了時にインストールするっすよ。'
   };
-  dialog.showMessageBox(mesOptions, (res) => {
-    if (res == 0) {
+  dialog.showMessageBox(mainWindow, mesOptions).then(res => {
+    if (res.response == 0) {
       autoUpdater.quitAndInstall();
     } else {
       updateDownloaded = true;
     }
+  }).catch(err => {
+    sendDebugLog('[update-downloaded] showMessageBox err', err);
   });
   updateFirst = false;
   updateInterval = false;
@@ -76,8 +78,10 @@ autoUpdater.on("update-not-available", () => {
       message: '新しいバージョンをダウンロードしたっす！',
       detail: '再起動してインストールするっす？\nあとでを選んだときは終了時にインストールするっすよ。'
     };
-    dialog.showMessageBox(mesOptions, (res) => {
-      if (res == 0) autoUpdater.quitAndInstall();
+    dialog.showMessageBox(mainWindow, mesOptions).then(res => {
+      if (res.response == 0) autoUpdater.quitAndInstall();
+    }).catch(err => {
+    sendDebugLog('[update-not-available] showMessageBox err', err);
     });
   }
   // ダウンロードが無かった場合
@@ -89,7 +93,7 @@ autoUpdater.on("update-not-available", () => {
       message: 'おぉ…！！',
       detail: '最新のバージョンを使ってるっす。ありがとおぉおおぉっ！！'
     };
-    dialog.showMessageBox(mesOptions);
+    dialog.showMessageBox(mainWindow, mesOptions);
   }
   updateInterval = false;
 });
@@ -102,7 +106,7 @@ autoUpdater.on("error", (e) => {
     message: '最新のバージョン取得に失敗しました。',
     detail: '時間を置いてからご確認ください。お願いします。'
   };
-  dialog.showMessageBox(mesOptions);
+  dialog.showMessageBox(mainWindow, mesOptions);
   updateFirst = false;
   updateInterval = false;
   // エラーの送信
