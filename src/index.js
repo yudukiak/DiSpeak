@@ -301,10 +301,12 @@ function setupAutomaticLogin() {
     '--processStart', `"${exeName}"`,
     '--process-start-args', `"--hidden"`
   ];
-  const loginItemSettings = app.getLoginItemSettings({
+  const settingOptions = {
+    openAtLogin: false,
     path: updateExe,
     args: argsSettings
-  });
+  }
+  const loginItemSettings = app.getLoginItemSettings(settingOptions);
   const openAtLogin = loginItemSettings.openAtLogin; // true:登録済、false:未登録
   const mesOptions = (() => {
     if (openAtLogin) {
@@ -326,15 +328,13 @@ function setupAutomaticLogin() {
     }
   })();
   sendDebugLog('[setupAutomaticLogin] loginItemSettings', loginItemSettings);
-  dialog.showMessageBox(mesOptions, (res) => {
+  dialog.showMessageBox(mainWindow, mesOptions).then(res => {
+    settingOptions.openAtLogin = !openAtLogin;
     sendDebugLog('[setupAutomaticLogin] res', res);
-    if (res !== 0) return;
-    app.setLoginItemSettings({
-      openAtLogin: !openAtLogin,
-      openAsHidden: true,
-      path: updateExe,
-      args: argsSettings
-    });
+    if (res.response !== 0) return;
+    app.setLoginItemSettings(settingOptions);
+  }).catch(err => {
+    sendDebugLog('[setupAutomaticLogin] err', err);
   });
 }
 // ------------------------------
