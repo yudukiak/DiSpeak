@@ -313,6 +313,8 @@ $(function() {
     }
     const instance = M.Tabs.getInstance($('.tabs'));
     if (instance) instance.updateTabIndicator();
+    // 上に戻るボタン
+    backToTop();
   });
   // ヘッダー
   $(document).on('click', 'header > div', function() {
@@ -1512,13 +1514,7 @@ function readFile() {
     startSpeak('start', 'stop');
   }
   // 上に戻るボタン
-  const mainHasTabFixed = $('main').hasClass('tab-fixed');
-  const scrollTargetClass = (!mainHasTabFixed) ? 'main' : '.contents';
-  $(scrollTargetClass).scroll(function () {
-    const btn = $('.fixed-action-btn:eq(1)');
-    const scroll = $(this).scrollTop();
-    (scroll > 180) ? btn.fadeIn() : btn.fadeOut();
-  });
+  backToTop();
 }
 // ファイルへ書き込み
 function writeFile() {
@@ -1963,6 +1959,16 @@ function release(data) {
   $('#release a[href^=http]').attr('target', '_blank').attr('draggable', 'false');
   M.Collapsible.init($('.collapsible.expandable'), {
     accordion: false
+  });
+}
+// 上に戻るボタン
+function backToTop() {
+  const mainHasTabFixed = $('main').hasClass('tab-fixed');
+  const scrollTargetClass = (!mainHasTabFixed) ? 'main' : '.contents';
+  $(scrollTargetClass).scroll(function () {
+    const btn = $('.fixed-action-btn:eq(1)');
+    const scroll = $(this).scrollTop();
+    (scroll > 180) ? btn.fadeIn() : btn.fadeOut();
   });
 }
 // 連想配列にアクセス
