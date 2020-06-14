@@ -1101,7 +1101,7 @@ client.on('message', function(data) {
     }
   }
   // メンションの処理
-  const mentionReg = /<@[!&]([0-9]*?)>/g;
+  const mentionReg = /<@[!&]?([0-9]*?)>/g;
   const contentMatchMention = content.match(mentionReg);
   if (contentMatchMention != null) {
     for (let i = 0, n = contentMatchMention.length; i < n; i++) {
