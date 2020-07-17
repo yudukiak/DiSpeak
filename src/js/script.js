@@ -909,6 +909,10 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   debugLog('[Discord] voiceStateUpdate server[guildId]', objectCheck(setting, `server.${guildId}`));
   if (setting.server[guildId] == null) return; // settingがない場合は読まない
   if (setting.server[guildId].voice == false) return; // settingがfalseのとき読まない
+  const authorBot = oldMember.user.bot; // 参加者・退出者がBOTならtrue
+  const settingBotChat = objectCheck(setting, 'dispeak.bot_chat');
+  debugLog('[Discord] voiceStateUpdate authorBot', authorBot);
+  if (authorBot && !settingBotChat) return; // BOTが入退出したとき、読み上げない設定の場合は処理を行わない
   const guildChannel = oldMember.guild.channels; // サーバのチャンネル一覧を取得
   // 切断チャンネル（old:123456789012345678, new:null）
   const channelPrevID = oldMember.voiceChannelID;
