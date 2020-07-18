@@ -204,7 +204,7 @@ $(function() {
       } else {
         const loginTime = whatTimeIsIt();
         const loginHtml = `${loginTime} [info]<br>
-        「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
+        「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/DiSpeak/wiki/06.GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
         logProcess(loginHtml, 'images/discord.png');
       }
     });
@@ -213,7 +213,7 @@ $(function() {
   else if (setting == null) {
     const loginTime = whatTimeIsIt();
     const loginHtml = `${loginTime} [info]<br>
-    「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
+    「設定 > Discord」からログインしてください。トークンの取得方法については<a href="https://github.com/micelle/DiSpeak/wiki/06.GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
     logProcess(loginHtml, 'images/discord.png');
     writeFile();
   }
@@ -221,7 +221,7 @@ $(function() {
   else if (setting.version == null) {
     const loginTime = whatTimeIsIt();
     const loginHtml = `${loginTime} [info]<br>
-    「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
+    「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/DiSpeak/wiki/06.GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
     logProcess(loginHtml, 'images/discord.png');
     spawnNotification({
       html: 'v2.0未満の設定ファイルです<br>設定の読み込みを中止しました',
@@ -232,7 +232,7 @@ $(function() {
   else if (objectCheck(setting, 'discord.token') == null || objectCheck(setting, 'discord.token') == '') {
     const loginTime = whatTimeIsIt();
     const loginHtml = `${loginTime} [info]<br>
-    「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
+    「設定」から各種設定をしてください。トークンの取得方法については<a href="https://github.com/micelle/DiSpeak/wiki/06.GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
     logProcess(loginHtml, 'images/discord.png');
     // 設定ファイルを反映
     readFile();
@@ -1601,7 +1601,7 @@ function loginDiscord(token) {
         const loginHtml = `${loginTime} [info]<br>
         ログインに失敗しました。<br>
         入力されたトークンが間違えている、もしくはトークンの値が変わった可能性があります。
-        トークンの取得方法については<a href="https://github.com/micelle/dc_DiSpeak/wiki/GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
+        トークンの取得方法については<a href="https://github.com/micelle/DiSpeak/wiki/06.GetTokenAndId" target="_blank">こちら</a>をご参考ください。`;
         logProcess(loginHtml, 'images/discord.png');
         spawnNotification({
           html: 'ログインに失敗しました',
