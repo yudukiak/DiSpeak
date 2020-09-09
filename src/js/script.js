@@ -1583,6 +1583,22 @@ function writeFile() {
 }
 // ログイン
 function loginDiscord(token) {
+  // サービス終了の処理
+  const loginHtmlDescribe = `[技術的なお話]<br>
+  DiSpeakで利用している<a href="https://github.com/discordjs/discord.js" target="_blank">discord.js</a>は
+  v12.xよりユーザーのTokenを受付けなくなりましたので、DiSpeakではv11.6.4を使い続けてました。
+  しかしDiscordのAPI接続先変更をサポートしているのがv12.x以降になっているため、
+  v11.xでは対応できずエラーが発生してる状況です。<br>
+  対応としては「BOTのTokenを使う」「Discord.jsのForksを探す」かな、と思います。
+  とはいえ1つめはDiSpeak本来の使い方じゃないし、2つめは軽く探しましたが無さそうなので諦めています。
+  もし情報があれば<a href="https://twitter.com/micelle9" target="_blank">Twitter</a>までご連絡ください。`;
+  logProcess(loginHtmlDescribe, 'images/discord.png');
+  const loginHtmlInfo = `[お知らせ]<br>
+  DiscordのAPI接続先が変わったため、本アプリは利用できなくなりました。<br>
+  R.I.P. DiSpeak`;
+  logProcess(loginHtmlInfo, 'images/discord.png');
+  return;
+  
   if (token == null || token == '') return;
   debugLog('[loginDiscord] token', token);
   M.Modal.getInstance($('#modal_discord')).open();
