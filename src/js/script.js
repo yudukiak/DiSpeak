@@ -720,7 +720,8 @@ client.on('ready', function() {
   // アカウント
   const user = client.user;
   const userId = user.id;
-  const avatarURL = user.displayAvatarURL.replace(/\?size=\d+/, '');
+  //const avatarURL = user.displayAvatarURL.replace(/\?size=\d+/, '');
+  const avatarURL = `https://cdn.discordapp.com/avatars/${userId}/${user.avatar}.png`;
   const username = user.username;
   const discriminator = user.discriminator;
   $('#discord_token').prop('disabled', true);
@@ -731,10 +732,11 @@ client.on('ready', function() {
   const loginHtml = `${loginTime} [info]<br>Discordのログインに成功しました`;
   logProcess(loginHtml, avatarURL, userId);
   // 各チャンネル
-  client.channels.map(function(val, key) {
+  client.channels.cache.map(function(val, key) {
     // ダイレクトメッセージ
     if (val.type == 'dm') {
-      const avatarURL = val.recipient.displayAvatarURL.replace(/\?size=\d+/, '');
+      //const avatarURL = val.recipient.displayAvatarURL.replace(/\?size=\d+/, '');
+      const avatarURL = `https://cdn.discordapp.com/avatars/${val.recipient.id}/${val.recipient.avatar}.png`;
       const name = escapeHtml(val.recipient.username);
       const id = val.recipient.id;
       const discriminator = val.recipient.discriminator;
@@ -772,8 +774,10 @@ client.on('ready', function() {
       const s_id = val.guild.id;
       const s_name = escapeHtml(val.guild.name);
       const s_iconURL = (function() {
-        if (val.guild.iconURL == null) return 'images/group.svg';
-        return val.guild.iconURL.replace(/\?size=\d+/, '');
+        //if (val.guild.iconURL == null) return 'images/group.svg';
+        //return val.guild.iconURL.replace(/\?size=\d+/, '');
+        if (val.guild.icon == null) return 'images/group.svg';
+        return `https://cdn.discordapp.com/icons/${val.guild.id}/${val.guild.icon}`;
       })();
       if (document.getElementById(s_id) == null) {
         $('#server-list').append(
@@ -800,14 +804,16 @@ client.on('ready', function() {
     }
   });
   // 絵文字
-  client.guilds.map(function(v, k) {
+  client.guilds.cache.map(function(v, k) {
     const server_name = escapeHtml(v.name);
     const server_iconURL = (function() {
-      if (v.iconURL == null) return 'images/group.svg';
-      return v.iconURL.replace(/\?size=\d+/, '');
+      //if (v.iconURL == null) return 'images/group.svg';
+      //return v.iconURL.replace(/\?size=\d+/, '');
+      if (v.icon == null) return 'images/group.svg';
+      return `https://cdn.discordapp.com/icons/${v.id}/${v.icon}`;
     })();
     let html = `<li><div class="collapsible-header valign-wrapper"><img src="${server_iconURL}" alt="" class="circle">${server_name}</div><div class="collapsible-body">`;
-    v.emojis.map(function(val, key) {
+    v.emojis.cache.map(function(val, key) {
       const emoji_name = escapeHtml(val.name);
       const emoji_id = key;
       const emoji_url = val.url;
@@ -976,7 +982,8 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     if (oldMember.user.note == null) return '';
     return oldMember.user.note;
   })();
-  const avatarURL = oldMember.user.displayAvatarURL.replace(/\?size=\d+/, '');
+  //const avatarURL = oldMember.user.displayAvatarURL.replace(/\?size=\d+/, '');
+  const avatarURL = `https://cdn.discordapp.com/avatars/${oldMember.user.id}/${oldMember.user.avatar}.png`;
   const template_bymRep = template_bym
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
@@ -1074,7 +1081,8 @@ client.on('message', function(data) {
     if (data.author.note == null) return '';
     return data.author.note;
   })();
-  const avatarURL = data.author.displayAvatarURL.replace(/\?size=\d+/, '');
+  //const avatarURL = data.author.displayAvatarURL.replace(/\?size=\d+/, '');
+  const avatarURL = `https://cdn.discordapp.com/avatars/${author.id}/${author.avatar}.png`;
   // チャットの内容
   let content = data.content;
   // NGワードの処理
@@ -1588,7 +1596,7 @@ function loginDiscord(token) {
   M.Modal.getInstance($('#modal_discord')).open();
   client.login(token)
     .then(function(res) {
-      client.user.setStatus(client.user.settings.status);
+      //client.user.setStatus(client.user.settings.status);
       //client.user.settings.update('status', client.user.settings.status);
       writeFile();
     }).catch(function(err) {
@@ -1620,7 +1628,8 @@ function chipWrite(userData, tag, len, listId) {
   } else {
     const userName = escapeHtml(userData.username);
     const userDiscriminator = userData.discriminator;
-    const useAvatarURL = userData.displayAvatarURL.replace(/\?size=\d+/, '');
+    //const useAvatarURL = userData.displayAvatarURL.replace(/\?size=\d+/, '');
+    const useAvatarURL = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
     $(`#${listId} .chip`).eq(len).html(`<img src="${useAvatarURL}"><div>${userName}#${userDiscriminator} (${tag})</div><i class="material-icons close">close</i>`);
   }
 }
