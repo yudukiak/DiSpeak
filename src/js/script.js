@@ -1,6 +1,6 @@
 'use strict';
 const {ipcRenderer} = require('electron');
-const Discord = require('discord.js');
+const Discord = require('discord.js-conpatto');
 const $ = require('jquery');
 const net = require('net');
 const ua = require('universal-analytics');
