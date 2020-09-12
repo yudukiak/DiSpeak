@@ -867,6 +867,7 @@ client.on('ready', function() {
   debugLog('[Discord] sessionStorage', sStorage);
   if (sStorage == null) {
     readFile(); // 設定ファイルを反映
+    writeFile();
   } else {
     const sStorageObj = JSON.parse(sStorage);
     const lStorageId = localStorage.getItem('DiscordLoginId');
@@ -1598,7 +1599,7 @@ function loginDiscord(token) {
     .then(function(res) {
       //client.user.setStatus(client.user.settings.status);
       //client.user.settings.update('status', client.user.settings.status);
-      writeFile();
+      //writeFile();
     }).catch(function(err) {
       M.Modal.getInstance($('#modal_discord')).close();
       const txt = String(err);
