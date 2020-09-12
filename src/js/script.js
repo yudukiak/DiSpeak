@@ -73,7 +73,7 @@ $(function() {
           classes: 'toast-chips'
         });
       } else if (lastImg == null) {
-        const userData = client.users.get(lastTag);
+        const userData = client.users.cache.get(lastTag);
         if (userData == null) {
           client.fetchUser(lastTag)
             .then(function(val) {
@@ -116,7 +116,7 @@ $(function() {
           classes: 'toast-chips'
         });
       } else if (lastImg == null) {
-        const userData = client.users.get(lastTag);
+        const userData = client.users.cache.get(lastTag);
         if (userData == null) {
           client.fetchUser(lastTag)
             .then(function(val) {
@@ -434,7 +434,7 @@ $(function() {
       if (thisId === 'whitelist') $('#whitelist img').index(this);
     })();
     const id = $(this).next('div').text().match(/\((\d+)\)$/)[1];
-    const userData = client.users.get(id);
+    const userData = client.users.cache.get(id);
     if (userData == null) {
       client.fetchUser(id)
         .then(function(val) {
@@ -833,7 +833,7 @@ client.on('ready', function() {
     $('#whitelist > .row.section').eq(1).addClass('display-none');
     $('#blacklist .chip').each(function(i) {
       const id = $(this).text().replace(/[^0-9]/g, '');
-      const userData = client.users.get(id);
+      const userData = client.users.cache.get(id);
       if (userData == null) {
         client.fetchUser(id)
           .then(function(val) {
@@ -848,7 +848,7 @@ client.on('ready', function() {
     });
     $('#whitelist .chip').each(function(i) {
       const id = $(this).text().replace(/[^0-9]/g, '');
-      const userData = client.users.get(id);
+      const userData = client.users.cache.get(id);
       if (userData == null) {
         client.fetchUser(id)
           .then(function(val) {
@@ -1139,7 +1139,7 @@ client.on('message', function(data) {
         return tmp;
       })();
       if (isUser) {
-        const mentionUserdata = client.users.get(contentMentionId);
+        const mentionUserdata = client.users.cache.get(contentMentionId);
         const mentionUsername = mentionUserdata.username;
         const mentionNickname = (function() {
           if (channelType !== 'server') return mentionUsername;
