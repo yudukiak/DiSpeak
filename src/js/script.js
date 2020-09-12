@@ -1082,7 +1082,7 @@ client.on('message', function(data) {
     return data.author.note;
   })();
   //const avatarURL = data.author.displayAvatarURL.replace(/\?size=\d+/, '');
-  const avatarURL = `https://cdn.discordapp.com/avatars/${author.id}/${author.avatar}.png`;
+  const avatarURL = `https://cdn.discordapp.com/avatars/${data.author.id}/${data.author.avatar}.png`;
   // チャットの内容
   let content = data.content;
   // NGワードの処理
