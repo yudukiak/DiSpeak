@@ -1190,7 +1190,8 @@ client.on('message', function(data) {
     let fileHtmlAry = [];
     let fileListHtmlAry = [];
     data.attachments.map(function(val, key) {
-      const filename = val.filename;
+      //const filename = val.filename;
+      const filename = val.name;
       // ファイル名（スポイラー対応）
       const spoilerText = (function() {
         const spoiler_bym = objectCheck(setting, 'dispeak.spoiler_bym');
@@ -1243,7 +1244,8 @@ client.on('message', function(data) {
       })();
       fileHtmlAry.push(html);
       // ファイルリスト化 ( https://cdn.jsdelivr.net/gh/jshttp/mime-db@master/db.json )
-      const filesize = calculationByteSize(val.filesize);
+      //const filesize = calculationByteSize(val.filesize);
+      const filesize = calculationByteSize(val.size);
       const listIcon = (function() {
         if (!mimeType) return 'description';
         // 一般的
