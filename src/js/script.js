@@ -925,7 +925,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   const channelPrevID = oldMember.voiceChannelID;
   const channelPrevName = (function() {
     if (channelPrevID == null ) return '';
-    const channelPrevData = guildChannel.get(channelPrevID);
+    const channelPrevData = guildChannel.cache.get(channelPrevID);
     if (channelPrevData == null) return '';
     return channelPrevData.name;
   })();
@@ -933,7 +933,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   const channelNextID = newMember.voiceChannelID;
   const channelNextName = (function() {
     if (channelNextID == null ) return '';
-    const channelNextData = guildChannel.get(channelNextID);
+    const channelNextData = guildChannel.cache.get(channelNextID);
     if (channelNextData == null) return '';
     return channelNextData.name;
   })();
@@ -1108,7 +1108,7 @@ client.on('message', function(data) {
       const contentChannelId = contentChannel.replace(/[<#>]/g, ''); // IDだけ取り出す
       const contentChannelReg = new RegExp(contentChannel, 'g');
       const channels = data.channel.guild.channels;
-      const channel = channels.get(contentChannelId);
+      const channel = channels.cache.get(contentChannelId);
       const contentChannelName = channel.name;
       content = content.replace(contentChannelReg, `#${contentChannelName}`);
       debugLog('[Discord] channels', channels);
@@ -1148,7 +1148,7 @@ client.on('message', function(data) {
             if (objectCheck(data, 'member') == null) return data.mentions._guild.members;
             return data.member.guild.members;
           })();
-          const member = members.get(contentMentionId);
+          const member = members.cache.get(contentMentionId);
           const nick = objectCheck(member, 'nickname');
           debugLog('[Discord] members', members);
           debugLog('[Discord] member', member);
@@ -1164,7 +1164,7 @@ client.on('message', function(data) {
         }
       } else {
         const roles = data.channel.guild.roles;
-        const role = roles.get(contentMentionId);
+        const role = roles.cache.get(contentMentionId);
         const roleName = role.name;
         debugLog('[Discord] roles', roles);
         debugLog('[Discord] role', role);
