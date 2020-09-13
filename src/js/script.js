@@ -2082,6 +2082,8 @@ function errorLog(obj) {
   console.groupCollapsed(`%c${time} [Error] ${msg}`, 'color:red');
   console.info('obj:', obj);
   console.groupEnd();
+  // 新しいAPIのエラー
+  if (/onVoiceStateUpdate/.test(msg)) return;
   // ネットワークエラーなど
   if (/undefined/.test(msg) || /{"isTrusted":true}/.test(msg) || /Failed to fetch/.test(msg)) return;
   // Discord.js側のエラー
