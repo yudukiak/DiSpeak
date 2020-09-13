@@ -967,7 +967,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   // テキストの生成
   const time = whatTimeIsIt(); // 現在の時刻
   const guildName = oldMember.guild.name; // 対象サーバーの名前
-  const username = oldMember.user.username; // 対象者の名前
+  const username = oldMember.member.user.username; // 対象者の名前
   const nickname = (function() { // 対象者のニックネーム。未設定はnull
     if (oldMember.nickname == null) return username;
     return oldMember.nickname;
@@ -982,11 +982,11 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   const template_bym = vcSettingAry[1];
   const template_log = vcSettingAry[2];
   const note = (function() {
-    if (oldMember.user.note == null) return '';
-    return oldMember.user.note;
+    if (oldMember.member.user.note == null) return '';
+    return oldMember.member.user.note;
   })();
   //const avatarURL = oldMember.user.displayAvatarURL.replace(/\?size=\d+/, '');
-  const avatarURL = `https://cdn.discordapp.com/avatars/${oldMember.user.id}/${oldMember.user.avatar}.png`;
+  const avatarURL = `https://cdn.discordapp.com/avatars/${oldMember.member.user.id}/${oldMember.member.user.avatar}.png`;
   const template_bymRep = template_bym
     .replace(/\$time\$/, time).replace(/\$server\$/, guildName).replace(/\$channel\$/, channelName)
     .replace(/\$channel-prev\$/, channelPrevName).replace(/\$channel-next\$/, channelNextName)
