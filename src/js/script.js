@@ -2090,6 +2090,7 @@ function errorLog(obj) {
   if (/channelClass is not a constructor/.test(msg)) return;
   const msgTxt = (function() {
     if (/Incorrect login details were provided/.test(msg)) return 'トークンが正しくありません';
+    if (/An invalid token was provided./.test(msg)) return 'トークンが正しくありません';
     if (/Something took too long to do/.test(msg)) return 'Discordに接続できません';
     if (/getaddrinfo ENOTFOUND/.test(msg)) return 'IPが正しくありません';
     if (/"port" option should be/.test(msg)) return 'ポートが正しくありません';
