@@ -511,7 +511,9 @@ function mainWindowMenu() {
         label: 'リロード',
         accelerator: 'CmdOrCtrl+R',
         click: () => {
-          mainWindow.reload()
+          //mainWindow.reload()
+          app.relaunch()
+          app.exit()
         }
       },
       {
