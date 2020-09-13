@@ -957,9 +957,11 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   })();
   debugLog('[Discord] voiceStateUpdate voiceChannelMembers', voiceChannelMembers);
   let inTheCall = false;
-  voiceChannelMembers.forEach(function(val, key) {
-    if (client.user.id === key) inTheCall = true;
-  });
+  if (voiceChannelMembers != null) {
+    voiceChannelMembers.forEach(function(val, key) {
+      if (client.user.id === key) inTheCall = true;
+    });
+  }
   const notInVc = objectCheck(setting, 'dispeak.not_in_vc');
   if (!inTheCall && !notInVc) return;
   // テキストの生成
