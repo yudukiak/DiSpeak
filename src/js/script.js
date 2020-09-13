@@ -259,11 +259,11 @@ $(function() {
   現在、新しいAPIを利用したDiSpeakをベータ版として開発中です。ベータ版のダウンロードは
   <a href="https://github.com/micelle/DiSpeak/releases" target="_blank">こちら</a>
   から行えます。`;
-  logProcess(loginHtmlDescribe, 'images/discord.png');
+  logProcess(loginHtmlDescribe, 'images/discord_red.png');
   const loginHtmlInfo = `[お知らせ]<br>
   DiscordのAPI接続先が変わったため、DiSpeak v2.6.x は順次利用できなくなります。<br>
   R.I.P. DiSpeak`;
-  logProcess(loginHtmlInfo, 'images/discord.png');
+  logProcess(loginHtmlInfo, 'images/discord_red.png');
   // バージョンを記入
   $('#info button span').eq(0).text(nowVersion);
   // 時刻を記入
@@ -2078,7 +2078,7 @@ function errorLog(obj) {
     引き続きDiSpeakを利用したい場合は
     <a href="https://github.com/micelle/DiSpeak/releases" target="_blank">ここから</a>
     ベータ版をダウンロードし、ご利用ください。`;
-    logProcess(loginHtmlInfo, 'images/discord.png');
+    logProcess(loginHtmlInfo, 'images/discord_red.png');
     return;
   }
   // ネットワークエラーなど
