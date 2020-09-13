@@ -250,6 +250,15 @@ $(function() {
     // ログインの処理
     loginDiscord(objectCheck(setting, 'discord.token'));
   }
+  if (/Alpha/.test(nowVersion)) {
+    const loginHtmlInfo = `[お知らせ]<br>
+    本バージョン v${nowVersion} はテスト版です。<br>
+    いくつか問題点がありますので、注意してください。<br>
+    詳細については
+    <a href="https://github.com/micelle/DiSpeak/releases/tag/v${nowVersion}" target="_blank">リリース情報</a>
+    をご確認下さい。`;
+    logProcess(loginHtmlInfo, 'images/discord_red.png');
+  }
   // バージョンを記入
   $('#info button span').eq(0).text(nowVersion);
   // 時刻を記入
