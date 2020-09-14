@@ -2105,6 +2105,7 @@ function errorLog(obj) {
     if (/Can not find Squirrel/.test(msg)) return `アップデートを行えません<br>再起動しても直らない場合は手動でアップデートを行ってください`; // 自動更新周りのエラー？
     if (/AutoUpdater process with arguments/.test(msg)) return `アップデートを行えません<br>再起動しても直らない場合は手動でアップデートを行って下さい`; // 自動更新周りのエラー？
     if (/no such file or directory/.test(msg)) return `設定ファイルが見つかりません<br>再起動しても直らない場合は再インストールを行って下さい`; // ファイルが存在しないっぽい？
+    if (/The user aborted a request./.test(msg)) return `ログインの処理がタイムアウトしました。<br>更新、もしくは再起動してください。`;
     // プログラムミスのエラー
     if (/([0-9a-zA-Z]+) is not defined/.test(msg)) return `[${msg}]<br>エラーが発生しました`;
     if (/Cannot read property .+ of null/.test(msg)) return `[${msg}]<br>エラーが発生しました`;
