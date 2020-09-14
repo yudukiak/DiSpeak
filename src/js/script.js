@@ -75,7 +75,7 @@ $(function() {
       } else if (lastImg == null) {
         const userData = client.users.cache.get(lastTag);
         if (userData == null) {
-          client.fetchUser(lastTag)
+          client.users.fetch(lastTag)
             .then(function(val) {
               chipWrite(val, lastTag, aryLen, 'blacklist');
               writeFile();
@@ -118,7 +118,7 @@ $(function() {
       } else if (lastImg == null) {
         const userData = client.users.cache.get(lastTag);
         if (userData == null) {
-          client.fetchUser(lastTag)
+          client.users.fetch(lastTag)
             .then(function(val) {
               chipWrite(val, lastTag, aryLen, 'whitelist');
               writeFile();
@@ -445,7 +445,7 @@ $(function() {
     const id = $(this).next('div').text().match(/\((\d+)\)$/)[1];
     const userData = client.users.cache.get(id);
     if (userData == null) {
-      client.fetchUser(id)
+      client.users.fetch(id)
         .then(function(val) {
           chipWrite(val, id, index, thisId);
         })
@@ -844,7 +844,7 @@ client.on('ready', function() {
       const id = $(this).text().replace(/[^0-9]/g, '');
       const userData = client.users.cache.get(id);
       if (userData == null) {
-        client.fetchUser(id)
+        client.users.fetch(id)
           .then(function(val) {
             chipWrite(val, id, i, 'blacklist');
           })
@@ -859,7 +859,7 @@ client.on('ready', function() {
       const id = $(this).text().replace(/[^0-9]/g, '');
       const userData = client.users.cache.get(id);
       if (userData == null) {
-        client.fetchUser(id)
+        client.users.fetch(id)
           .then(function(val) {
             chipWrite(val, id, i, 'whitelist');
           })
