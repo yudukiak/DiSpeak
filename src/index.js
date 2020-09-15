@@ -341,6 +341,18 @@ function setupAutomaticLogin() {
     sendDebugLog('[setupAutomaticLogin] err', err);
   });
 }
+// デバッグ用
+function openDevtools() {
+  const devtools = new BrowserWindow({
+    autoHideMenuBar: true,
+    icon: `${__dirname}/images/icon.png`,
+    backgroundColor: '#4a5459'
+  })
+  mainWindow.webContents.setDevToolsWebContents(devtools.webContents)
+  mainWindow.webContents.openDevTools({
+    mode: 'detach'
+  })
+}
 // ------------------------------
 // レンダラープロセスとのやりとり
 // ------------------------------
@@ -548,7 +560,8 @@ function mainWindowMenu() {
         label: 'デバッグ',
         accelerator: 'CmdOrCtrl+Shift+I',
         click: () => {
-          mainWindow.toggleDevTools()
+          //mainWindow.toggleDevTools()
+          openDevtools()
         }
       },
       {
@@ -604,6 +617,13 @@ function taskTrayMenu() {
       label: 'Localを開く',
       click: () => {
         shell.openExternal(process.env.LOCALAPPDATA + '\\DiSpeak')
+      }
+    },
+    {
+      label: 'DevToolsを開く',
+      click: () => {
+        //mainWindow.webContents.openDevTools()
+        openDevtools()
       }
     },
     {
