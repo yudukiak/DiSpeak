@@ -1350,8 +1350,8 @@ client.on('message', function(data) {
     let sendContent = escapeHtml(content);
     // 絵文字の処理をする
     sendContent = sendContent
-      .replace(/&lt;(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
-      .replace(/&lt;a(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
+      .replace(/&lt;(:[a-zA-Z0-9_]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.png" alt="$1" draggable="false">')
+      .replace(/&lt;a(:[a-zA-Z0-9_]+:)([0-9]+)&gt;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$2.gif" alt="$1" draggable="false">');
     // スポイラーの処理
     if (!objectCheck(setting, 'dispeak.spoiler')) {
       const sendContentMatch = sendContent.match(/([^`]+(?=`[^`]+`)|[^`]+$)/g);
@@ -1737,18 +1737,19 @@ function bouyomiSpeak(data, set) {
   bouyomiServer.port = setting.bouyomi.port;
   const options = bouyomiServer;
   // 絵文字の処理
-  const dataMatch = data.match(/<a?(:[a-zA-Z0-9!-/:-@¥[-`{-~]+:)([0-9]+)>/g); // 絵文字を抽出
+  const dataMatch = data.match(/<a?(:[a-zA-Z0-9_]+:)([0-9]+)>/g); // 絵文字を抽出
   const dataLen = (function() {
     if (dataMatch) return dataMatch.length;
     return 0;
   })();
   for (let i = 0; i < dataLen; i++) {
-    const emojiId = dataMatch[i].replace(/<a?:[a-zA-Z0-9!-/:-@¥[-`{-~]+:([0-9]+)>/, '$1'); // 絵文字IDのみを抜き出し
+    const emojiId = dataMatch[i].replace(/<a?(:[a-zA-Z0-9_]+:)([0-9]+)>/, '$2'); // 絵文字IDのみを抜き出し
+    debugLog('[bouyomiSpeak] emojiId', emojiId);
     const emojiTxt = (function() {
       if (objectCheck(setting, `emojis.${emojiId}`) == null) return '（絵文字）'; // 絵文字の文字を調べる
       return setting.emojis[emojiId];
     })();
-    const emojiReg = new RegExp('<a?:[a-zA-Z0-9!-/:-@¥[-`{-~]+:(' + emojiId + ')>'); // 絵文字を文字に置換
+    const emojiReg = new RegExp('<a?:[a-zA-Z0-9_]+:(' + emojiId + ')>'); // 絵文字を文字に置換
     data = data.replace(emojiReg, emojiTxt);
   }
   const message = data.replace(/\s+/g, ' ').trim();
