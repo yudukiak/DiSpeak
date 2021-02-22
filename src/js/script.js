@@ -931,7 +931,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   if (authorBot && !settingBotChat) return; // BOTが入退出したとき、読み上げない設定の場合は処理を行わない
   const guildChannel = oldMember.guild.channels; // サーバのチャンネル一覧を取得
   // 切断チャンネル（old:123456789012345678, new:null）
-  const channelPrevID = oldMember.voiceChannelID;
+  const channelPrevID = oldMember.channelID;
   const channelPrevName = (function() {
     if (channelPrevID == null ) return '';
     const channelPrevData = guildChannel.cache.get(channelPrevID);
@@ -939,7 +939,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     return channelPrevData.name;
   })();
   // 参加チャンネル（old:null, new:123456789012345678）
-  const channelNextID = newMember.voiceChannelID;
+  const channelNextID = newMember.channelID;
   const channelNextName = (function() {
     if (channelNextID == null ) return '';
     const channelNextData = guildChannel.cache.get(channelNextID);
